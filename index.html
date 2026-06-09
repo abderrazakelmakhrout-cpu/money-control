@@ -835,12 +835,6 @@ body {
         grid-template-columns: 1fr;
     }
 }
- }
-let currentYear = new Date().getFullYear();
-let currentMonth = new Date().toLocaleString('fr-FR', { month: 'short' }).toLowerCase() + '-' + new Date().getFullYear();
-let editTransactionId = null;
-let editObjectiveId = null;
-let charts = {};   
 </style>
 </head>
 <body data-theme="dark">
@@ -1653,15 +1647,7 @@ function renderCalendar() {
     const calendarContainer = document.getElementById('calendarView');
     if (calendarContainer) calendarContainer.innerHTML = html;
 }
-    function applyGlobalFilters() {
-    renderDashboard();
-    renderTransactions();
-    renderBudgets();
-    renderObjectifs();
-    renderCalendar();
-    renderReports();
-    renderAdvancedAnalysis();
-}
+
 function updateCategorySelect() {
     const type = document.getElementById('txType').value;
     let cats = [];
