@@ -835,6 +835,12 @@ body {
         grid-template-columns: 1fr;
     }
 }
+ // Ajoutez ces variables après la déclaration de `let editObjectiveId = null;`
+let currentYear = new Date().getFullYear();
+let currentMonth = new Date().toLocaleString('fr-FR', { month: 'short' }).toLowerCase() + '-' + new Date().getFullYear();
+let editTransactionId = null;
+let editObjectiveId = null;
+let charts = {};   
 </style>
 </head>
 <body data-theme="dark">
@@ -1275,26 +1281,96 @@ function showSection(sectionId, el) {
 
 function getFilteredTransactions() {
     let filtered = [...transactions];
-    const year = parseInt(document.getElementById('globalYear')?.value || currentYear);
-    const month = document.getElementById('globalMonth')?.value || currentMonth;
-    const category = document.getElementById('globalCategory')?.value || 'all';
-    const type = document.getElementById('globalType')?.value || 'all';
-    filtered = filtered.filter(t => t.annee === year);
-    if (month !== 'all') filtered = filtered.filter(t => t.mois === month);
-    if (category !== 'all') filtered = filtered.filter(t => t.categorie === category);
-    if (type !== 'all') filtered = filtered.filter(t => t.type === type);
+    
+    // Filtre Année
+    const year = document.getElementById('globalYear')?.value;
+    if (year && year !== 'all') {
+        filtered = filtered.filter(t => t.annee == parseInt(year));
+    }
+    
+    // Filtre Mois
+    const month = document.getElementById('globalMonth')?.value;
+    if (month && month !== 'all') {
+        filtered = filtered.filter(t => t.mois === month);
+    }
+    
+    // Filtre Catégorie
+    const category = document.getElementById('globalCategory')?.value;
+    if (category && category !== 'all') {
+        filtered = filtered.filter(t => t.categorie === category);
+    }
+    
+    // Filtre Type
+    const type = document.getElementById('globalType')?.value;
+    if (type && type !== 'all') {
+        filtered = filtered.filter(t => t.type === type);
+    }
+    
+    // Recherche textuelle
+    const search = document.getElementById('globalSearch')?.value.toLowerCase();
+    if (search) {
+        filtered = filtered.filter(t => 
+            t.description.toLowerCase().includes(search) || 
+            t.categorie.toLowerCase().includes(search)
+        );
+    }
+    
     return filtered;
 }
 
 function applyGlobalFilters() { renderDashboard(); renderTransactions(); renderBudgets(); }
 
 function initFilters() {
-    const years = [...new Set(transactions.map(t => t.annee))].sort();
-    document.getElementById('globalYear').innerHTML = years.map(y => `<option value="${y}">${y}</option>`).join('');
-    const months = ['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
-    document.getElementById('globalMonth').innerHTML = '<option value="all">Tous</option>' + months.map(m => `<option value="${m}-${currentYear}">${m}</option>`).join('');
+    // Récupérer toutes les années disponibles dans les transactions
+    const years = [...new Set(transactions.map(t => t.annee))].sort((a,b) => b - a);
+    if (years.length === 0) years.push(currentYear);
+    
+    const yearSelect = document.getElementById('globalYear');
+    if (yearSelect) {
+        yearSelect.innerHTML = '<option value="all">Toutes années</option>' + 
+            years.map(y => `<option value="${y}" ${y == currentYear ? 'selected' : ''}>${y}</option>`).join('');
+        yearSelect.onchange = () => {
+            currentYear = yearSelect.value === 'all' ? currentYear : parseInt(yearSelect.value);
+            applyGlobalFilters();
+        };
+    }
+    
+    // Mois
+    const monthsList = ['janv', 'févr', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
+    const monthSelect = document.getElementById('globalMonth');
+    if (monthSelect) {
+        monthSelect.innerHTML = '<option value="all">Tous mois</option>' + 
+            monthsList.map(m => `<option value="${m}-${currentYear}" ${currentMonth === `${m}-${currentYear}` ? 'selected' : ''}>${m} ${currentYear}</option>`).join('');
+        monthSelect.onchange = () => {
+            currentMonth = monthSelect.value;
+            applyGlobalFilters();
+        };
+    }
+    
+    // Catégories - Regroupées par type
+    const allCategories = [...new Set(transactions.map(t => t.categorie))];
+    const categorySelect = document.getElementById('globalCategory');
+    if (categorySelect) {
+        categorySelect.innerHTML = '<option value="all">Toutes catégories</option>' + 
+            allCategories.map(c => `<option value="${c}">${c}</option>`).join('');
+        categorySelect.onchange = () => applyGlobalFilters();
+    }
+    
+    // Type
+    const typeSelect = document.getElementById('globalType');
+    if (typeSelect) {
+        typeSelect.onchange = () => applyGlobalFilters();
+    }
 }
-
+function applyGlobalFilters() {
+    renderDashboard();
+    renderTransactions();
+    renderBudgets();
+    renderObjectifs();
+    renderCalendar();
+    renderReports();
+    renderAdvancedAnalysis();
+}
 function renderDashboard() {
     const filtered = getFilteredTransactions();
     const revenus = filtered.filter(t => t.type === 'Revenu').reduce((s,t) => s+t.montant,0);
@@ -1396,27 +1472,87 @@ function editObjective(id) { const o = objectifs.find(x => x.id === id); openObj
 function deleteObjective(id) { if (confirm('Supprimer ?')) { objectifs = objectifs.filter(o => o.id !== id); saveAllData(); renderObjectifs(); showNotification('Objectif supprimé', 'success'); } }
 
 function renderCalendar() {
+    const filtered = getFilteredTransactions();
     const year = currentYear;
     const monthStr = currentMonth.split('-')[0];
-    const monthIndex = ['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'].indexOf(monthStr);
+    const monthNames = ['janv', 'févr', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
+    const monthIndex = monthNames.indexOf(monthStr);
+    if (monthIndex === -1) return;
+    
     const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
-    const filtered = getFilteredTransactions();
+    const firstDay = new Date(year, monthIndex, 1).getDay();
+    
     let html = '<div class="calendar-grid">';
-    ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].forEach(d => html += `<div class="calendar-day-header">${d}</div>`);
+    ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].forEach(d => html += `<div class="calendar-day-header">${d}</div>`);
+    
+    for (let i = 0; i < (firstDay + 6) % 7; i++) html += '<div></div>';
+    
     for (let d = 1; d <= daysInMonth; d++) {
-        const dateStr = `${year}-${String(monthIndex+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const dateStr = `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const dayEvents = filtered.filter(t => t.date === dateStr);
-        html += `<div class="calendar-day"><div class="calendar-day-number">${d}</div>${dayEvents.slice(0,2).map(e => `<div class="calendar-event">${e.type==='Revenu'?'💰':'💸'} ${formatMoney(e.montant)}</div>`).join('')}</div>`;
+        html += `<div class="calendar-day">
+            <div class="calendar-day-number">${d}</div>
+            ${dayEvents.slice(0, 3).map(e => `<div class="calendar-event">${e.type === 'Revenu' ? '💰' : e.type === 'Dépense' ? '💸' : '🏦'} ${formatMoney(e.montant)}</div>`).join('')}
+        </div>`;
     }
     html += '</div>';
     document.getElementById('calendarView').innerHTML = html;
 }
-
+function updateCategorySelect() {
+    const type = document.getElementById('txType').value;
+    let cats = [];
+    if (type === 'Revenu') cats = [...new Set(transactions.filter(t => t.type === 'Revenu').map(t => t.categorie))];
+    else if (type === 'Dépense') cats = [...new Set(transactions.filter(t => t.type === 'Dépense').map(t => t.categorie))];
+    else cats = [...new Set(transactions.filter(t => t.type === 'Épargne').map(t => t.categorie))];
+    
+    if (cats.length === 0) cats = ['Salaire', 'Logement', 'Voyage'];
+    
+    const catSelect = document.getElementById('txCategory');
+    if (catSelect) {
+        catSelect.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+}
 function renderReports() {
     const filtered = getFilteredTransactions();
-    const revenus = filtered.filter(t => t.type === 'Revenu').reduce((s,t) => s+t.montant,0);
-    const depenses = filtered.filter(t => t.type === 'Dépense').reduce((s,t) => s+t.montant,0);
-    document.getElementById('reportContent').innerHTML = `<div class="rapport-stats"><div class="rapport-card"><div class="rapport-value" style="color:var(--success)">+${formatMoney(revenus)}</div><div class="rapport-label">Revenus</div></div><div class="rapport-card"><div class="rapport-value" style="color:var(--danger)">-${formatMoney(depenses)}</div><div class="rapport-label">Dépenses</div></div><div class="rapport-card"><div class="rapport-value">${formatMoney(revenus-depenses)}</div><div class="rapport-label">Balance</div></div></div>`;
+    const revenus = filtered.filter(t => t.type === 'Revenu').reduce((s,t) => s + t.montant, 0);
+    const depenses = filtered.filter(t => t.type === 'Dépense').reduce((s,t) => s + t.montant, 0);
+    const epargne = filtered.filter(t => t.type === 'Épargne').reduce((s,t) => s + t.montant, 0);
+    const balance = revenus - depenses - epargne;
+    
+    // Analyse par catégorie
+    const categoriesReport = {};
+    filtered.forEach(t => {
+        if (!categoriesReport[t.categorie]) categoriesReport[t.categorie] = { revenus: 0, depenses: 0, epargne: 0 };
+        if (t.type === 'Revenu') categoriesReport[t.categorie].revenus += t.montant;
+        if (t.type === 'Dépense') categoriesReport[t.categorie].depenses += t.montant;
+        if (t.type === 'Épargne') categoriesReport[t.categorie].epargne += t.montant;
+    });
+    
+    document.getElementById('reportContent').innerHTML = `
+        <div class="rapport-stats">
+            <div class="rapport-card"><div class="rapport-value" style="color:var(--success)">+${formatMoney(revenus)}</div><div class="rapport-label">Revenus totaux</div></div>
+            <div class="rapport-card"><div class="rapport-value" style="color:var(--danger)">-${formatMoney(depenses)}</div><div class="rapport-label">Dépenses totales</div></div>
+            <div class="rapport-card"><div class="rapport-value" style="color:var(--info)">${formatMoney(epargne)}</div><div class="rapport-label">Épargne totale</div></div>
+            <div class="rapport-card"><div class="rapport-value" style="color:${balance>=0?'var(--success)':'var(--danger)'}">${balance>=0?'+':''}${formatMoney(balance)}</div><div class="rapport-label">Balance nette</div></div>
+        </div>
+        <div class="table-card">
+            <div class="table-header"><div class="table-title">Analyse par catégorie</div></div>
+            <table class="data-table">
+                <thead><th>Catégorie</th><th>Revenus</th><th>Dépenses</th><th>Épargne</th><th>Solde</th></thead>
+                <tbody>
+                    ${Object.entries(categoriesReport).map(([cat, data]) => `
+                        <tr>
+                            <td><strong>${cat}</strong></td>
+                            <td class="amt-rev">+${formatMoney(data.revenus)}</td>
+                            <td class="amt-dep">-${formatMoney(data.depenses)}</td>
+                            <td class="amt-ep">${formatMoney(data.epargne)}</td>
+                            <td style="color:${(data.revenus-data.depenses-data.epargne)>=0?'var(--success)':'var(--danger)'}">${formatMoney(data.revenus-data.depenses-data.epargne)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
 }
 
 function renderAdvancedAnalysis() {
