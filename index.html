@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>Money Control Pro - Gestion Financière Personnelle</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -12,7 +14,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
 
 <style>
 * {
@@ -64,13 +65,11 @@ body {
     transition: all 0.3s ease;
 }
 
-/* Layout */
 .app-container {
     display: flex;
     min-height: 100vh;
 }
 
-/* Sidebar */
 .sidebar {
     width: 280px;
     background: var(--bg-card);
@@ -161,7 +160,6 @@ body {
     font-weight: 600;
 }
 
-/* Main Content */
 .main-content {
     flex: 1;
     margin-left: 280px;
@@ -169,7 +167,6 @@ body {
     transition: all 0.3s ease;
 }
 
-/* Filters Bar */
 .filters-bar {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -221,7 +218,6 @@ body {
     border-color: var(--primary);
 }
 
-/* Page Header */
 .page-header {
     display: flex;
     justify-content: space-between;
@@ -246,7 +242,6 @@ body {
     margin-top: 4px;
 }
 
-/* Buttons */
 .btn {
     padding: 10px 20px;
     border-radius: 12px;
@@ -295,7 +290,6 @@ body {
     font-size: 12px;
 }
 
-/* Cards Grid */
 .cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -362,7 +356,6 @@ body {
     margin-top: 6px;
 }
 
-/* Charts Grid */
 .charts-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
@@ -395,7 +388,6 @@ body {
     height: 280px;
 }
 
-/* Tables */
 .table-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -447,7 +439,6 @@ body {
     background: rgba(99, 102, 241, 0.05);
 }
 
-/* Badges */
 .badge {
     padding: 4px 10px;
     border-radius: 20px;
@@ -471,7 +462,6 @@ body {
     color: var(--info);
 }
 
-/* Progress Bar */
 .progress-bg {
     height: 8px;
     background: var(--border);
@@ -497,33 +487,6 @@ body {
     background: var(--danger);
 }
 
-/* Status */
-.status {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.status-ok {
-    background: rgba(16, 185, 129, 0.15);
-    color: var(--success);
-}
-
-.status-warning {
-    background: rgba(245, 158, 11, 0.15);
-    color: var(--warning);
-}
-
-.status-danger {
-    background: rgba(239, 68, 68, 0.15);
-    color: var(--danger);
-}
-
-/* Objectifs Grid */
 .objectifs-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
@@ -615,7 +578,6 @@ body {
     justify-content: flex-end;
 }
 
-/* Modal */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -689,7 +651,6 @@ body {
     color: white;
 }
 
-/* Form */
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -726,7 +687,6 @@ body {
     border-color: var(--primary);
 }
 
-/* Sections */
 .section {
     display: none;
     animation: fadeIn 0.4s ease;
@@ -747,7 +707,6 @@ body {
     }
 }
 
-/* Alerts */
 .alert-bar {
     background: var(--bg-card);
     border-radius: 12px;
@@ -775,80 +734,6 @@ body {
     color: var(--success);
 }
 
-/* Rapports */
-.rapport-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-    margin-bottom: 24px;
-}
-
-.rapport-card {
-    background: var(--bg-card);
-    border-radius: 16px;
-    padding: 20px;
-    text-align: center;
-    border: 1px solid var(--border);
-}
-
-.rapport-value {
-    font-size: 24px;
-    font-weight: 700;
-}
-
-.rapport-label {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-top: 6px;
-}
-
-/* Calendar */
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 8px;
-    margin-top: 20px;
-}
-
-.calendar-day-header {
-    text-align: center;
-    font-weight: 600;
-    font-size: 12px;
-    padding: 10px;
-    color: var(--text-muted);
-}
-
-.calendar-day {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 10px;
-    min-height: 100px;
-    transition: all 0.2s;
-}
-
-.calendar-day:hover {
-    transform: scale(1.02);
-    border-color: var(--primary);
-}
-
-.calendar-day-number {
-    font-weight: 600;
-    font-size: 14px;
-    margin-bottom: 8px;
-    color: var(--text);
-}
-
-.calendar-event {
-    font-size: 10px;
-    padding: 3px 6px;
-    border-radius: 6px;
-    margin-top: 4px;
-    background: rgba(99, 102, 241, 0.15);
-    color: var(--text-light);
-}
-
-/* Theme Toggle */
 .theme-toggle {
     position: fixed;
     bottom: 24px;
@@ -870,7 +755,6 @@ body {
     transform: scale(1.05);
 }
 
-/* Menu Toggle (Mobile) */
 .menu-toggle {
     display: none;
     position: fixed;
@@ -887,7 +771,6 @@ body {
     font-size: 18px;
 }
 
-/* Notifications */
 .notif-panel {
     position: fixed;
     top: 20px;
@@ -922,69 +805,35 @@ body {
     }
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-    width: 6px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--bg);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--border);
-    border-radius: 3px;
-}
-
-/* Responsive */
-@media (max-width: 1024px) {
-    .sidebar {
-        transform: translateX(-100%);
-    }
-    
-    .sidebar.open {
-        transform: translateX(0);
-    }
-    
-    .main-content {
-        margin-left: 0;
-        padding: 16px;
-    }
-    
-    .charts-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .menu-toggle {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .filters-bar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .filter-group {
-        justify-content: space-between;
-    }
-    
-    .search-box {
-        width: 100%;
-    }
-}
-
-/* Bouton déconnexion */
 .logout-btn {
     position: fixed;
     top: 20px;
     right: 80px;
     z-index: 100;
+}
+
+@media (max-width: 1024px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    .sidebar.open {
+        transform: translateX(0);
+    }
+    .main-content {
+        margin-left: 0;
+        padding: 16px;
+    }
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    .menu-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
 }
 </style>
 </head>
@@ -993,23 +842,23 @@ body {
 <!-- ÉCRAN DE CONNEXION -->
 <div id="loginContainer" style="display: flex; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999;">
     <div style="margin: auto; width: 100%; max-width: 450px; padding: 20px;">
-        <div style="background: var(--card); border-radius: 28px; padding: 40px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+        <div style="background: var(--bg-card); border-radius: 28px; padding: 40px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
             <div style="text-align: center; margin-bottom: 32px;">
                 <div style="width: 75px; height: 75px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 22px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
                     <i class="fas fa-chart-line" style="font-size: 36px; color: white;"></i>
                 </div>
                 <h1 style="font-size: 28px; font-weight: 800; color: var(--text);">Money Control Pro</h1>
-                <p style="color: var(--muted); font-size: 14px; margin-top: 8px;">Gestion financière professionnelle</p>
+                <p style="color: var(--text-muted); font-size: 14px; margin-top: 8px;">Gestion financière professionnelle</p>
             </div>
 
             <div id="loginForm">
                 <div class="form-group" style="margin-bottom: 20px;">
                     <label class="form-label">EMAIL</label>
-                    <input type="email" id="loginEmail" class="form-input" placeholder="exemple@email.com" value="test@example.com">
+                    <input type="email" id="loginEmail" class="form-input" placeholder="exemple@email.com">
                 </div>
                 <div class="form-group" style="margin-bottom: 20px;">
                     <label class="form-label">MOT DE PASSE</label>
-                    <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" value="123456">
+                    <input type="password" id="loginPassword" class="form-input" placeholder="••••••••">
                 </div>
                 <button class="btn btn-primary" style="width: 100%; margin-bottom: 12px;" onclick="loginWithEmail()">
                     <i class="fas fa-sign-in-alt"></i> Se connecter
@@ -1019,8 +868,8 @@ body {
                 </button>
                 <div style="text-align: center; margin-top: 20px;">
                     <a href="#" onclick="showRegisterForm(); return false;" style="color: var(--primary);">Créer un compte</a>
-                    <span style="margin: 0 10px; color: var(--muted);">|</span>
-                    <a href="#" onclick="showResetForm(); return false;" style="color: var(--muted);">Mot de passe oublié ?</a>
+                    <span style="margin: 0 10px; color: var(--text-muted);">|</span>
+                    <a href="#" onclick="showResetForm(); return false;" style="color: var(--text-muted);">Mot de passe oublié ?</a>
                 </div>
             </div>
 
@@ -1045,7 +894,7 @@ body {
                     <i class="fas fa-user-plus"></i> Créer un compte
                 </button>
                 <div style="text-align: center;">
-                    <a href="#" onclick="showLoginForm(); return false;" style="color: var(--muted);">Déjà un compte ? Se connecter</a>
+                    <a href="#" onclick="showLoginForm(); return false;" style="color: var(--text-muted);">Déjà un compte ? Se connecter</a>
                 </div>
             </div>
 
@@ -1058,7 +907,7 @@ body {
                     <i class="fas fa-envelope"></i> Envoyer le lien
                 </button>
                 <div style="text-align: center;">
-                    <a href="#" onclick="showLoginForm(); return false;" style="color: var(--muted);">Retour à la connexion</a>
+                    <a href="#" onclick="showLoginForm(); return false;" style="color: var(--text-muted);">Retour à la connexion</a>
                 </div>
             </div>
         </div>
@@ -1068,23 +917,51 @@ body {
 <!-- APPLICATION PRINCIPALE -->
 <div id="appContainer" style="display: none;">
     <div class="app-container">
-        <button class="logout-btn btn btn-secondary btn-sm" onclick="logout()" style="position: fixed; top: 20px; right: 80px; z-index: 100;">
-            <i class="fas fa-sign-out-alt"></i> Déconnexion
-        </button>
+        <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
         <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+        <button class="logout-btn btn btn-secondary btn-sm" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
         <div class="notif-panel" id="notifPanel"></div>
 
         <aside class="sidebar" id="sidebar">
-            <div class="logo"><div class="logo-icon"><i class="fas fa-chart-line"></i></div><h1>MONEY CONTROL</h1></div>
-            <nav>
-                <div class="nav-item active" onclick="showSection('dashboard',this)"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
-                <div class="nav-item" onclick="showSection('transactions',this)"><i class="fas fa-exchange-alt"></i> Transactions</div>
-                <div class="nav-item" onclick="showSection('budgets',this)"><i class="fas fa-chart-simple"></i> Budgets</div>
-                <div class="nav-item" onclick="showSection('objectifs',this)"><i class="fas fa-bullseye"></i> Objectifs</div>
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="logo-text">
+                        <h1>MONEY CONTROL</h1>
+                        <span>Gestion Financière Pro</span>
+                    </div>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-item active" onclick="showSection('dashboard', this)">
+                    <i class="fas fa-tachometer-alt"></i><span>Tableau de Bord</span>
+                </div>
+                <div class="nav-item" onclick="showSection('transactions', this)">
+                    <i class="fas fa-exchange-alt"></i><span>Transactions</span>
+                    <span class="nav-badge" id="txCount">0</span>
+                </div>
+                <div class="nav-item" onclick="showSection('budgets', this)">
+                    <i class="fas fa-chart-simple"></i><span>Budgets</span>
+                </div>
+                <div class="nav-item" onclick="showSection('objectifs', this)">
+                    <i class="fas fa-bullseye"></i><span>Objectifs</span>
+                    <span class="nav-badge" id="objCount">0</span>
+                </div>
+                <div class="nav-item" onclick="showSection('calendrier', this)">
+                    <i class="fas fa-calendar-alt"></i><span>Calendrier</span>
+                </div>
+                <div class="nav-item" onclick="showSection('rapports', this)">
+                    <i class="fas fa-file-alt"></i><span>Rapports</span>
+                </div>
+                <div class="nav-item" onclick="showSection('analyse', this)">
+                    <i class="fas fa-chart-pie"></i><span>Analyse</span>
+                </div>
+                <div class="nav-item" onclick="showSection('parametres', this)">
+                    <i class="fas fa-cog"></i><span>Paramètres</span>
+                </div>
             </nav>
         </aside>
 
-       <!-- Main Content -->
         <main class="main-content">
             <!-- Filtres Globaux -->
             <div class="filters-bar">
@@ -1104,51 +981,31 @@ body {
                 <input type="text" id="globalSearch" class="search-box" placeholder="🔍 Rechercher une transaction..." oninput="applyGlobalFilters()">
             </div>
 
-            <!-- Dashboard -->
+            <!-- Sections -->
             <section id="dashboard" class="section active">
                 <div class="page-header">
                     <div class="page-title">
                         <h2>Tableau de Bord</h2>
                         <p>Vue d'ensemble de vos finances personnelles</p>
                     </div>
-                    <button class="btn btn-primary" onclick="showSection('transactions', null)">
-                        <i class="fas fa-plus"></i> Nouvelle transaction
-                    </button>
+                    <button class="btn btn-primary" onclick="showSection('transactions', null)"><i class="fas fa-plus"></i> Transaction</button>
                 </div>
                 <div id="alertsContainer"></div>
                 <div class="cards-grid" id="kpiGrid"></div>
                 <div class="charts-grid">
-                    <div class="chart-card">
-                        <div class="chart-header"><div class="chart-title">Répartition des Dépenses</div></div>
-                        <div class="chart-container"><canvas id="expenseChart"></canvas></div>
-                    </div>
-                    <div class="chart-card">
-                        <div class="chart-header"><div class="chart-title">Répartition des Revenus</div></div>
-                        <div class="chart-container"><canvas id="incomeChart"></canvas></div>
-                    </div>
+                    <div class="chart-card"><div class="chart-header"><div class="chart-title">Répartition des Dépenses</div></div><div class="chart-container"><canvas id="expenseChart"></canvas></div></div>
+                    <div class="chart-card"><div class="chart-header"><div class="chart-title">Répartition des Revenus</div></div><div class="chart-container"><canvas id="incomeChart"></canvas></div></div>
                 </div>
                 <div class="charts-grid">
-                    <div class="chart-card">
-                        <div class="chart-header"><div class="chart-title">Évolution Mensuelle</div></div>
-                        <div class="chart-container"><canvas id="evolutionChart"></canvas></div>
-                    </div>
-                    <div class="chart-card">
-                        <div class="chart-header"><div class="chart-title">Budget vs Réalisé</div></div>
-                        <div class="chart-container"><canvas id="budgetVsRealChart"></canvas></div>
-                    </div>
+                    <div class="chart-card"><div class="chart-header"><div class="chart-title">Évolution Mensuelle</div></div><div class="chart-container"><canvas id="evolutionChart"></canvas></div></div>
+                    <div class="chart-card"><div class="chart-header"><div class="chart-title">Budget vs Réalisé</div></div><div class="chart-container"><canvas id="budgetVsRealChart"></canvas></div></div>
                 </div>
             </section>
 
-            <!-- Transactions -->
             <section id="transactions" class="section">
                 <div class="page-header">
-                    <div class="page-title">
-                        <h2>Transactions</h2>
-                        <p>Gérez vos revenus, dépenses et épargne</p>
-                    </div>
-                    <button class="btn btn-primary" onclick="openTransactionModal()">
-                        <i class="fas fa-plus"></i> Ajouter
-                    </button>
+                    <div class="page-title"><h2>Transactions</h2><p>Gérez vos revenus, dépenses et épargne</p></div>
+                    <button class="btn btn-primary" onclick="openTransactionModal()"><i class="fas fa-plus"></i> Ajouter</button>
                 </div>
                 <div class="table-card">
                     <div class="table-header">
@@ -1161,127 +1018,60 @@ body {
                     </div>
                     <div style="overflow-x: auto;">
                         <table class="data-table">
-                            <thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Catégorie</th><th>Sous-catégorie</th><th>Montant</th><th>Actions</th></tr></thead>
+                            <thead><th>Date</th><th>Type</th><th>Description</th><th>Catégorie</th><th>Sous-catégorie</th><th>Montant</th><th>Actions</th></thead>
                             <tbody id="transactionsTable"></tbody>
                         </table>
                     </div>
                 </div>
             </section>
 
-            <!-- Budgets -->
             <section id="budgets" class="section">
-                <div class="page-header">
-                    <div class="page-title">
-                        <h2>Budgets Mensuels</h2>
-                        <p>Contrôlez vos dépenses par catégorie</p>
-                    </div>
-                </div>
+                <div class="page-header"><div class="page-title"><h2>Budgets Mensuels</h2><p>Contrôlez vos dépenses par catégorie</p></div></div>
                 <div class="cards-grid" id="budgetCards"></div>
                 <div class="table-card">
                     <table class="data-table">
-                        <thead><tr><th>Catégorie</th><th>Budget prévu</th><th>Réalisé</th><th>Restant</th><th>Consommation</th><th>Statut</th></tr></thead>
+                        <thead><th>Catégorie</th><th>Budget prévu</th><th>Réalisé</th><th>Restant</th><th>Consommation</th><th>Statut</th></thead>
                         <tbody id="budgetTable"></tbody>
                     </table>
                 </div>
             </section>
 
-            <!-- Objectifs -->
             <section id="objectifs" class="section">
                 <div class="page-header">
-                    <div class="page-title">
-                        <h2>Objectifs d'Épargne</h2>
-                        <p>Suivez la progression de vos projets financiers</p>
-                    </div>
-                    <button class="btn btn-primary" onclick="openObjectiveModal()">
-                        <i class="fas fa-plus"></i> Nouvel objectif
-                    </button>
+                    <div class="page-title"><h2>Objectifs d'Épargne</h2><p>Suivez la progression de vos projets</p></div>
+                    <button class="btn btn-primary" onclick="openObjectiveModal()"><i class="fas fa-plus"></i> Nouvel objectif</button>
                 </div>
                 <div class="objectifs-grid" id="objectifsGrid"></div>
             </section>
 
-            <!-- Calendrier -->
             <section id="calendrier" class="section">
-                <div class="page-header">
-                    <div class="page-title">
-                        <h2>Calendrier Financier</h2>
-                        <p>Visualisation des transactions et échéances</p>
-                    </div>
-                </div>
+                <div class="page-header"><div class="page-title"><h2>Calendrier Financier</h2><p>Visualisation des transactions</p></div></div>
                 <div class="chart-card" id="calendarView"></div>
             </section>
 
-            <!-- Rapports -->
             <section id="rapports" class="section">
                 <div class="page-header">
-                    <div class="page-title">
-                        <h2>Rapports Financiers</h2>
-                        <p>Analyses détaillées de vos finances</p>
-                    </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn btn-secondary" onclick="printReport()"><i class="fas fa-print"></i> Imprimer</button>
-                        <button class="btn btn-secondary" onclick="exportFullReportPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
-                    </div>
+                    <div class="page-title"><h2>Rapports Financiers</h2><p>Analyses détaillées</p></div>
+                    <div><button class="btn btn-secondary" onclick="printReport()"><i class="fas fa-print"></i> Imprimer</button></div>
                 </div>
                 <div id="reportContent"></div>
             </section>
 
-            <!-- Analyse Avancée -->
             <section id="analyse" class="section">
-                <div class="page-header">
-                    <div class="page-title">
-                        <h2>Analyse Financière Avancée</h2>
-                        <p>Indicateurs clés et prévisions</p>
-                    </div>
-                </div>
+                <div class="page-header"><div class="page-title"><h2>Analyse Financière</h2><p>Indicateurs avancés</p></div></div>
                 <div class="cards-grid" id="advancedKPIs"></div>
-                <div class="charts-grid">
-                    <div class="chart-card">
-                        <div class="chart-header"><div class="chart-title">Prévision de Trésorerie</div></div>
-                        <div class="chart-container"><canvas id="forecastChart"></canvas></div>
-                    </div>
-                    <div class="chart-card">
-                        <div class="chart-header"><div class="chart-title">Évolution du Patrimoine</div></div>
-                        <div class="chart-container"><canvas id="wealthChart"></canvas></div>
-                    </div>
-                </div>
             </section>
 
-            <!-- Paramètres -->
             <section id="parametres" class="section">
-                <div class="page-header">
-                    <div class="page-title">
-                        <h2>Paramètres</h2>
-                        <p>Personnalisation de l'application</p>
-                    </div>
-                </div>
+                <div class="page-header"><div class="page-title"><h2>Paramètres</h2><p>Personnalisation</p></div></div>
                 <div class="table-card">
-                    <div class="table-header"><div class="table-title">Configuration Générale</div></div>
+                    <div class="table-header"><div class="table-title">Configuration</div></div>
                     <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label">Devise</label>
-                            <select id="settingsCurrency" class="form-select" onchange="saveSettings()">
-                                <option>MAD</option><option>EUR</option><option>USD</option><option>GBP</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Alerte Budget (%)</label>
-                            <input type="number" id="settingsBudgetAlert" class="form-input" value="80" onchange="saveSettings()">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Alerte Objectif (%)</label>
-                            <input type="number" id="settingsObjAlert" class="form-input" value="90" onchange="saveSettings()">
-                        </div>
+                        <div class="form-group"><label class="form-label">Devise</label><select id="settingsCurrency" class="form-select"><option>MAD</option><option>EUR</option><option>USD</option></select></div>
+                        <div class="form-group"><label class="form-label">Alerte Budget (%)</label><input type="number" id="settingsBudgetAlert" class="form-input" value="80"></div>
+                        <div class="form-group"><label class="form-label">Alerte Objectif (%)</label><input type="number" id="settingsObjAlert" class="form-input" value="90"></div>
                     </div>
-                    <button class="btn btn-danger" onclick="resetData()" style="margin-top: 16px;">
-                        <i class="fas fa-undo"></i> Réinitialiser toutes les données
-                    </button>
-                </div>
-                <div class="table-card">
-                    <div class="table-header"><div class="table-title">Gestion des Catégories</div></div>
-                    <div id="categoriesManager"></div>
-                    <button class="btn btn-secondary btn-sm" onclick="addCustomCategory()" style="margin-top: 16px;">
-                        <i class="fas fa-plus"></i> Ajouter une catégorie
-                    </button>
+                    <button class="btn btn-danger" onclick="resetData()"><i class="fas fa-undo"></i> Réinitialiser</button>
                 </div>
             </section>
         </main>
@@ -1290,28 +1080,22 @@ body {
     <!-- Modals -->
     <div class="modal-overlay" id="transactionModal">
         <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title" id="transactionModalTitle">Nouvelle transaction</div>
-                <button class="modal-close" onclick="closeTransactionModal()"><i class="fas fa-times"></i></button>
-            </div>
+            <div class="modal-header"><div class="modal-title">Nouvelle transaction</div><button class="modal-close" onclick="closeTransactionModal()"><i class="fas fa-times"></i></button></div>
             <div class="form-grid">
                 <div class="form-group"><label class="form-label">Date</label><input type="date" id="txDate" class="form-input"></div>
                 <div class="form-group"><label class="form-label">Type</label><select id="txType" class="form-select" onchange="updateCategorySelect()"><option value="Revenu">Revenu</option><option value="Dépense">Dépense</option><option value="Épargne">Épargne</option></select></div>
-                <div class="form-group"><label class="form-label">Description</label><input type="text" id="txDesc" class="form-input" placeholder="Description..."></div>
+                <div class="form-group"><label class="form-label">Description</label><input type="text" id="txDesc" class="form-input" placeholder="Description"></div>
                 <div class="form-group"><label class="form-label">Catégorie</label><select id="txCategory" class="form-select"></select></div>
                 <div class="form-group"><label class="form-label">Sous-catégorie</label><input type="text" id="txSubCategory" class="form-input" placeholder="Sous-catégorie"></div>
                 <div class="form-group"><label class="form-label">Montant</label><input type="number" id="txAmount" class="form-input" placeholder="0.00"></div>
             </div>
-            <button class="btn btn-primary" style="width: 100%;" onclick="saveTransaction()"><i class="fas fa-save"></i> Enregistrer</button>
+            <button class="btn btn-primary" style="width:100%" onclick="saveTransaction()"><i class="fas fa-save"></i> Enregistrer</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="objectiveModal">
         <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title" id="objectiveModalTitle">Nouvel objectif</div>
-                <button class="modal-close" onclick="closeObjectiveModal()"><i class="fas fa-times"></i></button>
-            </div>
+            <div class="modal-header"><div class="modal-title">Nouvel objectif</div><button class="modal-close" onclick="closeObjectiveModal()"><i class="fas fa-times"></i></button></div>
             <div class="form-grid">
                 <div class="form-group"><label class="form-label">Nom</label><input type="text" id="objName" class="form-input"></div>
                 <div class="form-group"><label class="form-label">Description</label><input type="text" id="objDesc" class="form-input"></div>
@@ -1320,12 +1104,11 @@ body {
                 <div class="form-group"><label class="form-label">Date cible</label><input type="date" id="objDate" class="form-input"></div>
                 <div class="form-group"><label class="form-label">Priorité</label><select id="objPriority" class="form-select"><option value="Haute">Haute</option><option value="Moyenne">Moyenne</option><option value="Basse">Basse</option></select></div>
             </div>
-            <button class="btn btn-primary" style="width: 100%;" onclick="saveObjective()"><i class="fas fa-save"></i> Enregistrer</button>
+            <button class="btn btn-primary" style="width:100%" onclick="saveObjective()"><i class="fas fa-save"></i> Enregistrer</button>
         </div>
     </div>
 </div>
 
-<!-- Configuration Firebase -->
 <script>
 // Configuration Firebase
 const firebaseConfig = {
@@ -1337,73 +1120,69 @@ const firebaseConfig = {
     appId: "1:631933178769:web:b35ea0547739cfc8a20030"
 };
 
-// Initialiser Firebase
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 const googleProvider = new firebase.auth.GoogleAuthProvider();
 
-console.log("✅ Firebase initialisé");
-</script>
-
-<script>
 // ==================== DONNÉES ====================
 let transactions = JSON.parse(localStorage.getItem('transactions')) || [
-    {id:1,date:"2026-05-01",mois:"mai-2026",annee:2026,type:"Revenu",description:"Salaire mai 2026",categorie:"Salaire",sous_categorie:"Mensuel",montant:8500},
-    {id:2,date:"2026-05-05",mois:"mai-2026",annee:2026,type:"Dépense",description:"Loyer mai",categorie:"Logement",sous_categorie:"Loyer",montant:3500},
+    {id:1,date:"2026-05-01",mois:"mai-2026",annee:2026,type:"Revenu",description:"Salaire",categorie:"Salaire",sous_categorie:"Mensuel",montant:8500},
+    {id:2,date:"2026-05-05",mois:"mai-2026",annee:2026,type:"Dépense",description:"Loyer",categorie:"Logement",sous_categorie:"Loyer",montant:3500},
     {id:3,date:"2026-05-10",mois:"mai-2026",annee:2026,type:"Revenu",description:"Freelance",categorie:"Freelance",sous_categorie:"Consulting",montant:2500},
-    {id:4,date:"2026-05-15",mois:"mai-2026",annee:2026,type:"Dépense",description:"Courses supermarché",categorie:"Alimentation",sous_categorie:"Supermarché",montant:1200},
-    {id:5,date:"2026-05-20",mois:"mai-2026",annee:2026,type:"Épargne",description:"Épargne voyage",categorie:"Épargne",sous_categorie:"Voyage",montant:1000},
-    {id:6,date:"2026-04-10",mois:"avr-2026",annee:2026,type:"Revenu",description:"Salaire avril",categorie:"Salaire",sous_categorie:"Mensuel",montant:8200},
-    {id:7,date:"2026-04-15",mois:"avr-2026",annee:2026,type:"Dépense",description:"Loyer avril",categorie:"Logement",sous_categorie:"Loyer",montant:3500}
+    {id:4,date:"2026-05-15",mois:"mai-2026",annee:2026,type:"Dépense",description:"Courses",categorie:"Alimentation",sous_categorie:"Supermarché",montant:1200}
 ];
 
 let objectifs = JSON.parse(localStorage.getItem('objectifs')) || [
-    {id:1,nom:"Voyage Japon",cible:15000,actuel:6500,date_cible:"2026-12-31",description:"Voyage de rêve",priorite:"Haute",categorie:"Épargne",sous_categorie:"Voyage"},
-    {id:2,nom:"Achat Voiture",cible:80000,actuel:12500,date_cible:"2027-06-30",description:"Voiture familiale",priorite:"Moyenne",categorie:"Épargne",sous_categorie:"Voiture"},
-    {id:3,nom:"Fonds Urgence",cible:20000,actuel:15000,date_cible:"2026-12-31",description:"Sécurité financière",priorite:"Haute",categorie:"Épargne",sous_categorie:"Urgence"}
+    {id:1,nom:"Voyage Japon",cible:15000,actuel:6500,date_cible:"2026-12-31",description:"Voyage de rêve",priorite:"Haute"},
+    {id:2,nom:"Achat Voiture",cible:80000,actuel:12500,date_cible:"2027-06-30",description:"Voiture familiale",priorite:"Moyenne"}
 ];
 
 let budgets = JSON.parse(localStorage.getItem('budgets')) || [
     {categorie:"Alimentation",budget:2000},{categorie:"Logement",budget:4000},{categorie:"Transport",budget:1000},
-    {categorie:"Loisirs",budget:800},{categorie:"Shopping",budget:700},{categorie:"Santé",budget:500}
+    {categorie:"Loisirs",budget:800},{categorie:"Shopping",budget:700}
 ];
 
-let categories = JSON.parse(localStorage.getItem('categories')) || {
-    revenus:["Salaire","Freelance","Investissement","Autre Revenu"],
-    depenses:["Alimentation","Logement","Transport","Loisirs","Shopping","Santé","Éducation","Factures"],
-    epargne:["Voyage","Voiture","Urgence","Investissement","Projet"]
+let categories = {
+    revenus:["Salaire","Freelance","Investissement"],
+    depenses:["Alimentation","Logement","Transport","Loisirs","Shopping"],
+    epargne:["Voyage","Voiture","Urgence"]
 };
 
-
-let editId = null;
+let currentYear = 2026;
+let currentMonth = "mai-2026";
+let editTransactionId = null;
+let editObjectiveId = null;
 let charts = {};
 
 const formatMoney = (n) => n.toLocaleString('fr-FR') + ' MAD';
 const formatDate = (d) => new Date(d).toLocaleDateString('fr-FR');
-const saveAll = () => localStorage.setItem('transactions', JSON.stringify(transactions));
+
+function saveAllData() {
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+    localStorage.setItem('objectifs', JSON.stringify(objectifs));
+    localStorage.setItem('budgets', JSON.stringify(budgets));
+    if (auth.currentUser) syncToCloud();
+}
 
 // ==================== AUTHENTIFICATION ====================
-let loginContainer, appContainer;
-
 document.addEventListener('DOMContentLoaded', () => {
-    loginContainer = document.getElementById('loginContainer');
-    appContainer = document.getElementById('appContainer');
-    
     auth.onAuthStateChanged((user) => {
         if (user) {
-            console.log('✅ Connecté:', user.email);
-            loginContainer.style.display = 'none';
-            appContainer.style.display = 'block';
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
             loadUserData(user.uid);
+            initFilters();
             renderDashboard();
             renderTransactions();
             renderBudgets();
             renderObjectifs();
+            renderCalendar();
+            renderReports();
+            renderAdvancedAnalysis();
         } else {
-            console.log('❌ Déconnecté');
-            loginContainer.style.display = 'flex';
-            appContainer.style.display = 'none';
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('appContainer').style.display = 'none';
         }
     });
 });
@@ -1424,72 +1203,43 @@ async function registerWithEmail() {
     const email = document.getElementById('registerEmail').value;
     const password = document.getElementById('registerPassword').value;
     const confirm = document.getElementById('registerConfirmPassword').value;
-    
-    if (password !== confirm) {
-        showNotification('Les mots de passe ne correspondent pas', 'danger');
-        return;
-    }
+    if (password !== confirm) { showNotification('Mots de passe différents', 'danger'); return; }
     try {
         const result = await auth.createUserWithEmailAndPassword(email, password);
         await result.user.updateProfile({ displayName: name });
-        await db.collection('users').doc(result.user.uid).set({
-            name, email, createdAt: new Date().toISOString(),
-            transactions: [], objectifs: []
-        });
-        showNotification('Compte créé avec succès !', 'success');
-    } catch (error) {
-        showNotification(error.message, 'danger');
-    }
+        await db.collection('users').doc(result.user.uid).set({ name, email, createdAt: new Date().toISOString() });
+        showNotification('Compte créé !', 'success');
+    } catch (error) { showNotification(error.message, 'danger'); }
 }
 
 async function loginWithGoogle() {
-    try {
-        await auth.signInWithPopup(googleProvider);
-        showNotification('Connexion Google réussie !', 'success');
-    } catch (error) {
-        showNotification('Erreur Google', 'danger');
-    }
+    try { await auth.signInWithPopup(googleProvider); showNotification('Connexion Google !', 'success'); } 
+    catch (error) { showNotification('Erreur Google', 'danger'); }
 }
 
 async function resetPassword() {
     const email = document.getElementById('resetEmail').value;
-    try {
-        await auth.sendPasswordResetEmail(email);
-        showNotification('Email de réinitialisation envoyé !', 'success');
-        showLoginForm();
-    } catch (error) {
-        showNotification('Email non trouvé', 'danger');
-    }
+    try { await auth.sendPasswordResetEmail(email); showNotification('Email envoyé !', 'success'); showLoginForm(); } 
+    catch (error) { showNotification('Email non trouvé', 'danger'); }
 }
 
-async function logout() {
-    await auth.signOut();
-    showNotification('Déconnecté', 'success');
-    localStorage.clear();
-    setTimeout(() => location.reload(), 500);
-}
+async function logout() { await auth.signOut(); localStorage.clear(); location.reload(); }
 
 async function loadUserData(uid) {
     const doc = await db.collection('users').doc(uid).get();
     if (doc.exists) {
         const data = doc.data();
-        if (data.transactions?.length) {
-            transactions = data.transactions;
-            saveAll();
-        }
+        if (data.transactions?.length) transactions = data.transactions;
         if (data.objectifs?.length) objectifs = data.objectifs;
+        saveAllData();
     }
 }
 
 async function syncToCloud() {
-    const user = auth.currentUser;
-    if (!user) return;
-    await db.collection('users').doc(user.uid).set({
-        transactions, objectifs, lastSync: new Date().toISOString()
-    }, { merge: true });
+    if (!auth.currentUser) return;
+    await db.collection('users').doc(auth.currentUser.uid).set({ transactions, objectifs, lastSync: new Date().toISOString() }, { merge: true });
 }
 
-// Sauvegarde automatique toutes les 30 secondes
 setInterval(() => { if (auth.currentUser) syncToCloud(); }, 30000);
 
 function showNotification(msg, type) {
@@ -1501,52 +1251,19 @@ function showNotification(msg, type) {
     setTimeout(() => el.remove(), 4000);
 }
 
-function showLoginForm() {
-    document.getElementById('loginForm').style.display = 'block';
-    document.getElementById('registerForm').style.display = 'none';
-    document.getElementById('resetForm').style.display = 'none';
-}
-function showRegisterForm() {
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('registerForm').style.display = 'block';
-    document.getElementById('resetForm').style.display = 'none';
-}
-function showResetForm() {
-    document.getElementById('loginForm').style.display = 'none';
-    document.getElementById('registerForm').style.display = 'none';
-    document.getElementById('resetForm').style.display = 'block';
-}
+function showLoginForm() { document.getElementById('loginForm').style.display = 'block'; document.getElementById('registerForm').style.display = 'none'; document.getElementById('resetForm').style.display = 'none'; }
+function showRegisterForm() { document.getElementById('loginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'block'; document.getElementById('resetForm').style.display = 'none'; }
+function showResetForm() { document.getElementById('loginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'none'; document.getElementById('resetForm').style.display = 'block'; }
 
-// ==================== APPLICATION ====================
-/ ==================== UTILITAIRES ====================
-const formatMoney = (n) => n.toLocaleString('fr-FR') + ' MAD';
-const formatDate = (d) => new Date(d).toLocaleDateString('fr-FR');
-const saveAllData = () => { 
-    localStorage.setItem('transactions', JSON.stringify(transactions)); 
-    localStorage.setItem('objectifs', JSON.stringify(objectifs)); 
-    localStorage.setItem('budgets', JSON.stringify(budgets)); 
-    localStorage.setItem('categories', JSON.stringify(categories));
-    // Synchronisation cloud si disponible
-    if (typeof syncToCloud === 'function') syncToCloud();
-};
-
-// ==================== NAVIGATION ====================
+// ==================== FONCTIONS PRINCIPALES ====================
 function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
-function toggleTheme() {
-    const root = document.body;
-    const current = root.getAttribute('data-theme');
-    root.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
-    const icon = document.querySelector('.theme-toggle i');
-    if (icon) icon.className = current === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-}
+function toggleTheme() { const body = document.body; const current = body.getAttribute('data-theme'); body.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark'); }
 
 function showSection(sectionId, el) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.getElementById(sectionId).classList.add('active');
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     if (el) el.classList.add('active');
-    if (window.innerWidth <= 1024) document.getElementById('sidebar').classList.remove('open');
-    
     if (sectionId === 'dashboard') renderDashboard();
     if (sectionId === 'transactions') renderTransactions();
     if (sectionId === 'budgets') renderBudgets();
@@ -1556,97 +1273,71 @@ function showSection(sectionId, el) {
     if (sectionId === 'analyse') renderAdvancedAnalysis();
 }
 
-// ==================== FILTRES ====================
-function initFilters() {
-    const years = [...new Set(transactions.map(t => t.annee))].sort();
-    if (years.length === 0) years.push(2025, 2026);
-    const yearSelect = document.getElementById('globalYear');
-    yearSelect.innerHTML = years.map(y => `<option value="${y}" ${y == currentYear ? 'selected' : ''}>${y}</option>`).join('');
-    yearSelect.onchange = () => { currentYear = parseInt(yearSelect.value); applyGlobalFilters(); };
-    
-    const months = ['janv', 'févr', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
-    const monthSelect = document.getElementById('globalMonth');
-    monthSelect.innerHTML = '<option value="all">Tous mois</option>' + months.map((m, i) => `<option value="${m}-${currentYear}" ${`${m}-${currentYear}` === currentMonth ? 'selected' : ''}>${m} ${currentYear}</option>`).join('');
-    monthSelect.onchange = () => { currentMonth = monthSelect.value; applyGlobalFilters(); };
-    
-    const allCategories = [...categories.revenus, ...categories.depenses, ...categories.epargne];
-    document.getElementById('globalCategory').innerHTML = '<option value="all">Toutes catégories</option>' + allCategories.map(c => `<option value="${c}">${c}</option>`).join('');
-}
-
 function getFilteredTransactions() {
     let filtered = [...transactions];
     const year = parseInt(document.getElementById('globalYear')?.value || currentYear);
     const month = document.getElementById('globalMonth')?.value || currentMonth;
     const category = document.getElementById('globalCategory')?.value || 'all';
     const type = document.getElementById('globalType')?.value || 'all';
-    const search = document.getElementById('globalSearch')?.value.toLowerCase() || '';
-    
     filtered = filtered.filter(t => t.annee === year);
     if (month !== 'all') filtered = filtered.filter(t => t.mois === month);
     if (category !== 'all') filtered = filtered.filter(t => t.categorie === category);
     if (type !== 'all') filtered = filtered.filter(t => t.type === type);
-    if (search) filtered = filtered.filter(t => t.description.toLowerCase().includes(search) || t.categorie.toLowerCase().includes(search));
     return filtered;
 }
 
-function applyGlobalFilters() { renderDashboard(); renderTransactions(); renderBudgets(); renderCalendar(); renderReports(); renderAdvancedAnalysis(); }
+function applyGlobalFilters() { renderDashboard(); renderTransactions(); renderBudgets(); }
 
-// ==================== DASHBOARD ====================
-function renderDashboard() {
-    const filtered = getFilteredTransactions();
-    const revenus = filtered.filter(t => t.type === 'Revenu').reduce((s, t) => s + t.montant, 0);
-    const depenses = filtered.filter(t => t.type === 'Dépense').reduce((s, t) => s + t.montant, 0);
-    const epargne = filtered.filter(t => t.type === 'Épargne').reduce((s, t) => s + t.montant, 0);
-    const solde = revenus - depenses - epargne;
-    const totalBudget = budgets.reduce((s, b) => s + b.budget, 0);
-    const budgetConsomme = filtered.filter(t => t.type === 'Dépense').reduce((s, t) => s + t.montant, 0);
-    const pctBudget = totalBudget > 0 ? (budgetConsomme / totalBudget * 100).toFixed(1) : 0;
-    const objectifsActifs = objectifs.filter(o => o.actuel < o.cible).length;
-    const objectifsAtteints = objectifs.filter(o => o.actuel >= o.cible).length;
-    const tauxObjectifs = objectifs.length ? (objectifs.reduce((s, o) => s + (o.actuel / o.cible), 0) / objectifs.length * 100).toFixed(1) : 0;
-    
-    document.getElementById('kpiGrid').innerHTML = `
-        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-line"></i></div><div class="kpi-label">Revenus</div><div class="kpi-value">${formatMoney(revenus)}</div><div class="kpi-sub">Période sélectionnée</div></div>
-        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-shopping-cart"></i></div><div class="kpi-label">Dépenses</div><div class="kpi-value">${formatMoney(depenses)}</div><div class="kpi-sub">${revenus > 0 ? ((depenses / revenus) * 100).toFixed(1) : 0}% des revenus</div></div>
-        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-piggy-bank"></i></div><div class="kpi-label">Épargne</div><div class="kpi-value">${formatMoney(epargne)}</div><div class="kpi-sub">Taux: ${revenus > 0 ? ((epargne / revenus) * 100).toFixed(1) : 0}%</div></div>
-        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-wallet"></i></div><div class="kpi-label">Solde</div><div class="kpi-value" style="color: ${solde >= 0 ? 'var(--success)' : 'var(--danger)'}">${solde >= 0 ? '+' : ''}${formatMoney(solde)}</div></div>
-        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-simple"></i></div><div class="kpi-label">Budget consommé</div><div class="kpi-value">${pctBudget}%</div><div class="kpi-sub">${formatMoney(budgetConsomme)} / ${formatMoney(totalBudget)}</div></div>
-        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-bullseye"></i></div><div class="kpi-label">Objectifs</div><div class="kpi-value">${objectifsActifs}</div><div class="kpi-sub">${objectifsAtteints} atteints · ${tauxObjectifs}% global</div></div>`;
-    
-    // Graphiques
-    const depParCat = {}; filtered.filter(t => t.type === 'Dépense').forEach(t => depParCat[t.categorie] = (depParCat[t.categorie] || 0) + t.montant);
-    if (charts.expense) charts.expense.destroy();
-    charts.expense = new Chart(document.getElementById('expenseChart'), { type: 'doughnut', data: { labels: Object.keys(depParCat), datasets: [{ data: Object.values(depParCat), backgroundColor: ['#6366f1', '#ec4899', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'] }] }, options: { responsive: true, maintainAspectRatio: false } });
-    
-    const revParCat = {}; filtered.filter(t => t.type === 'Revenu').forEach(t => revParCat[t.categorie] = (revParCat[t.categorie] || 0) + t.montant);
-    if (charts.income) charts.income.destroy();
-    charts.income = new Chart(document.getElementById('incomeChart'), { type: 'doughnut', data: { labels: Object.keys(revParCat), datasets: [{ data: Object.values(revParCat), backgroundColor: ['#10b981', '#06b6d4', '#f59e0b', '#ec4899'] }] }, options: { responsive: true, maintainAspectRatio: false } });
-    
-    const mois = [...new Set(transactions.map(t => t.mois))].sort();
-    const revMois = mois.map(m => transactions.filter(t => t.mois === m && t.type === 'Revenu').reduce((s, t) => s + t.montant, 0));
-    const depMois = mois.map(m => transactions.filter(t => t.mois === m && t.type === 'Dépense').reduce((s, t) => s + t.montant, 0));
-    if (charts.evolution) charts.evolution.destroy();
-    charts.evolution = new Chart(document.getElementById('evolutionChart'), { type: 'line', data: { labels: mois, datasets: [{ label: 'Revenus', data: revMois, borderColor: '#10b981', tension: 0.4, fill: false }, { label: 'Dépenses', data: depMois, borderColor: '#ef4444', tension: 0.4, fill: false }] }, options: { responsive: true, maintainAspectRatio: false } });
-    
-    const budgetVsReal = budgets.map(b => ({ categorie: b.categorie, budget: b.budget, realise: filtered.filter(t => t.type === 'Dépense' && t.categorie === b.categorie).reduce((s, t) => s + t.montant, 0) }));
-    if (charts.budgetVsReal) charts.budgetVsReal.destroy();
-    charts.budgetVsReal = new Chart(document.getElementById('budgetVsRealChart'), { type: 'bar', data: { labels: budgetVsReal.map(b => b.categorie), datasets: [{ label: 'Budget', data: budgetVsReal.map(b => b.budget), backgroundColor: '#06b6d4' }, { label: 'Réalisé', data: budgetVsReal.map(b => b.realise), backgroundColor: '#ec4899' }] }, options: { responsive: true, maintainAspectRatio: false } });
-    
-    // Alertes
-    const alerts = [];
-    if (pctBudget > 100) alerts.push({ type: 'danger', msg: `⚠️ Dépassement budget global : ${pctBudget}% consommé` });
-    else if (pctBudget > 80) alerts.push({ type: 'warning', msg: `⚠️ Budget à ${pctBudget}% - Attention au dépassement` });
-    objectifs.forEach(o => { const pct = (o.actuel / o.cible) * 100; if (pct > 85 && pct < 100) alerts.push({ type: 'success', msg: `🎯 Objectif "${o.nom}" à ${pct.toFixed(1)}% - Bientôt atteint !` }); });
-    document.getElementById('alertsContainer').innerHTML = alerts.map(a => `<div class="alert-bar alert-${a.type}"><i class="fas fa-bell"></i>${a.msg}</div>`).join('');
+function initFilters() {
+    const years = [...new Set(transactions.map(t => t.annee))].sort();
+    document.getElementById('globalYear').innerHTML = years.map(y => `<option value="${y}">${y}</option>`).join('');
+    const months = ['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
+    document.getElementById('globalMonth').innerHTML = '<option value="all">Tous</option>' + months.map(m => `<option value="${m}-${currentYear}">${m}</option>`).join('');
 }
 
-// ==================== TRANSACTIONS ====================
+function renderDashboard() {
+    const filtered = getFilteredTransactions();
+    const revenus = filtered.filter(t => t.type === 'Revenu').reduce((s,t) => s+t.montant,0);
+    const depenses = filtered.filter(t => t.type === 'Dépense').reduce((s,t) => s+t.montant,0);
+    const epargne = filtered.filter(t => t.type === 'Épargne').reduce((s,t) => s+t.montant,0);
+    const solde = revenus - depenses - epargne;
+    const totalBudget = budgets.reduce((s,b) => s+b.budget,0);
+    const budgetConsomme = filtered.filter(t => t.type === 'Dépense').reduce((s,t) => s+t.montant,0);
+    const pctBudget = totalBudget > 0 ? (budgetConsomme/totalBudget*100).toFixed(1) : 0;
+    
+    document.getElementById('kpiGrid').innerHTML = `
+        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-line"></i></div><div class="kpi-label">Revenus</div><div class="kpi-value">${formatMoney(revenus)}</div></div>
+        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-shopping-cart"></i></div><div class="kpi-label">Dépenses</div><div class="kpi-value">${formatMoney(depenses)}</div></div>
+        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-piggy-bank"></i></div><div class="kpi-label">Épargne</div><div class="kpi-value">${formatMoney(epargne)}</div></div>
+        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-wallet"></i></div><div class="kpi-label">Solde</div><div class="kpi-value" style="color:${solde>=0?'var(--success)':'var(--danger)'}">${solde>=0?'+':''}${formatMoney(solde)}</div></div>
+        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-simple"></i></div><div class="kpi-label">Budget</div><div class="kpi-value">${pctBudget}%</div><div class="kpi-sub">${formatMoney(budgetConsomme)}/${formatMoney(totalBudget)}</div></div>
+        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-bullseye"></i></div><div class="kpi-label">Objectifs</div><div class="kpi-value">${objectifs.length}</div></div>`;
+    
+    const depParCat = {}; filtered.filter(t=>t.type==='Dépense').forEach(t=>depParCat[t.categorie]=(depParCat[t.categorie]||0)+t.montant);
+    if (charts.expense) charts.expense.destroy();
+    charts.expense = new Chart(document.getElementById('expenseChart'), {type:'doughnut',data:{labels:Object.keys(depParCat),datasets:[{data:Object.values(depParCat),backgroundColor:['#6366f1','#ec4899','#06b6d4','#10b981','#f59e0b']}]},options:{responsive:true}});
+    
+    const revParCat = {}; filtered.filter(t=>t.type==='Revenu').forEach(t=>revParCat[t.categorie]=(revParCat[t.categorie]||0)+t.montant);
+    if (charts.income) charts.income.destroy();
+    charts.income = new Chart(document.getElementById('incomeChart'), {type:'doughnut',data:{labels:Object.keys(revParCat),datasets:[{data:Object.values(revParCat),backgroundColor:['#10b981','#06b6d4','#f59e0b']}]},options:{responsive:true}});
+    
+    const mois = [...new Set(transactions.map(t=>t.mois))].sort();
+    const revMois = mois.map(m=>transactions.filter(t=>t.mois===m&&t.type==='Revenu').reduce((s,t)=>s+t.montant,0));
+    const depMois = mois.map(m=>transactions.filter(t=>t.mois===m&&t.type==='Dépense').reduce((s,t)=>s+t.montant,0));
+    if (charts.evolution) charts.evolution.destroy();
+    charts.evolution = new Chart(document.getElementById('evolutionChart'), {type:'line',data:{labels:mois,datasets:[{label:'Revenus',data:revMois,borderColor:'#10b981'},{label:'Dépenses',data:depMois,borderColor:'#ef4444'}]},options:{responsive:true}});
+    
+    const budgetVsReal = budgets.map(b => ({categorie:b.categorie, budget:b.budget, realise: filtered.filter(t=>t.type==='Dépense'&&t.categorie===b.categorie).reduce((s,t)=>s+t.montant,0)}));
+    if (charts.budgetVsReal) charts.budgetVsReal.destroy();
+    charts.budgetVsReal = new Chart(document.getElementById('budgetVsRealChart'), {type:'bar',data:{labels:budgetVsReal.map(b=>b.categorie),datasets:[{label:'Budget',data:budgetVsReal.map(b=>b.budget),backgroundColor:'#06b6d4'},{label:'Réalisé',data:budgetVsReal.map(b=>b.realise),backgroundColor:'#ec4899'}]},options:{responsive:true}});
+}
+
 function renderTransactions() {
     const filtered = getFilteredTransactions();
     document.getElementById('transactionsTable').innerHTML = filtered.map(t => `
-        <tr><td>${formatDate(t.date)}</td><td><span class="badge badge-${t.type === 'Revenu' ? 'rev' : t.type === 'Dépense' ? 'dep' : 'ep'}">${t.type}</span></td>
-        <td>${t.description}</td><td>${t.categorie}</td><td>${t.sous_categorie || '-'}</td>
-        <td class="amt-${t.type === 'Revenu' ? 'rev' : t.type === 'Dépense' ? 'dep' : 'ep'}">${t.type === 'Dépense' ? '-' : '+'}${formatMoney(t.montant)}</td>
+        <tr><td>${formatDate(t.date)}</td><td><span class="badge badge-${t.type==='Revenu'?'rev':'dep'}">${t.type}</span></td>
+        <td>${t.description}</td><td>${t.categorie}</td><td>${t.sous_categorie||'-'}</td>
+        <td class="amt-${t.type==='Revenu'?'rev':'dep'}">${t.type==='Dépense'?'-':'+'}${formatMoney(t.montant)}</td>
         <td><button class="btn btn-secondary btn-sm" onclick="editTransaction(${t.id})"><i class="fas fa-edit"></i></button>
         <button class="btn btn-danger btn-sm" onclick="deleteTransaction(${t.id})"><i class="fas fa-trash"></i></button></td></tr>
     `).join('');
@@ -1659,137 +1350,93 @@ function updateCategorySelect() { const type = document.getElementById('txType')
 
 function saveTransaction() {
     const t = { id: editTransactionId || Date.now(), date: document.getElementById('txDate').value, mois: currentMonth, annee: currentYear, type: document.getElementById('txType').value, description: document.getElementById('txDesc').value, categorie: document.getElementById('txCategory').value, sous_categorie: document.getElementById('txSubCategory').value, montant: parseFloat(document.getElementById('txAmount').value) };
-    if (!t.montant) { alert('Veuillez entrer un montant'); return; }
-    if (t.type === 'Épargne') { const obj = objectifs.find(o => o.nom === t.sous_categorie || o.categorie === t.categorie); if (obj) obj.actuel += t.montant; }
+    if (!t.montant) { showNotification('Montant requis', 'danger'); return; }
     if (editTransactionId) { const idx = transactions.findIndex(x => x.id === editTransactionId); transactions[idx] = t; } else transactions.unshift(t);
-    saveAllData(); closeTransactionModal(); applyGlobalFilters(); 
-    if (typeof showNotification === 'function') showNotification('Transaction enregistrée', 'success');
-    else alert('Transaction enregistrée');
+    saveAllData(); closeTransactionModal(); applyGlobalFilters(); showNotification('Transaction enregistrée', 'success');
 }
 
 function editTransaction(id) { const t = transactions.find(x => x.id === id); openTransactionModal(); editTransactionId = id; document.getElementById('txDate').value = t.date; document.getElementById('txType').value = t.type; document.getElementById('txDesc').value = t.description; updateCategorySelect(); document.getElementById('txCategory').value = t.categorie; document.getElementById('txSubCategory').value = t.sous_categorie; document.getElementById('txAmount').value = t.montant; }
-function deleteTransaction(id) { if (confirm('Supprimer cette transaction ?')) { transactions = transactions.filter(x => x.id !== id); saveAllData(); applyGlobalFilters(); if (typeof showNotification === 'function') showNotification('Transaction supprimée', 'success'); } }
+function deleteTransaction(id) { if (confirm('Supprimer ?')) { transactions = transactions.filter(x => x.id !== id); saveAllData(); applyGlobalFilters(); showNotification('Supprimé', 'success'); } }
 
-// ==================== BUDGETS ====================
 function renderBudgets() {
     const filtered = getFilteredTransactions().filter(t => t.type === 'Dépense');
     document.getElementById('budgetCards').innerHTML = budgets.map(b => {
-        const realise = filtered.filter(t => t.categorie === b.categorie).reduce((s, t) => s + t.montant, 0);
-        const pct = (realise / b.budget * 100).toFixed(1);
-        return `<div class="kpi-card"><div class="kpi-label">${b.categorie}</div><div class="kpi-value" style="font-size: 18px;">${formatMoney(realise)} / ${formatMoney(b.budget)}</div><div class="progress-bg"><div class="progress-fill ${pct > 100 ? 'progress-danger' : pct > 80 ? 'progress-warning' : 'progress-success'}" style="width: ${Math.min(pct, 100)}%"></div></div><div>${pct}%</div></div>`;
+        const realise = filtered.filter(t => t.categorie === b.categorie).reduce((s,t) => s+t.montant,0);
+        const pct = (realise/b.budget*100).toFixed(1);
+        return `<div class="kpi-card"><div class="kpi-label">${b.categorie}</div><div class="kpi-value" style="font-size:18px">${formatMoney(realise)}/${formatMoney(b.budget)}</div><div class="progress-bg"><div class="progress-fill ${pct>100?'progress-danger':pct>80?'progress-warning':'progress-success'}" style="width:${Math.min(pct,100)}%"></div></div><div>${pct}%</div></div>`;
     }).join('');
     document.getElementById('budgetTable').innerHTML = budgets.map(b => {
-        const realise = filtered.filter(t => t.categorie === b.categorie).reduce((s, t) => s + t.montant, 0);
-        const pct = (realise / b.budget * 100).toFixed(1);
+        const realise = filtered.filter(t => t.categorie === b.categorie).reduce((s,t) => s+t.montant,0);
+        const pct = (realise/b.budget*100).toFixed(1);
         let status = '<span class="status status-ok">✅ OK</span>';
         if (pct > 100) status = '<span class="status status-danger">🔴 Dépassement</span>';
         else if (pct > 80) status = '<span class="status status-warning">🟠 Attention</span>';
-        return `<tr><td><strong>${b.categorie}</strong></td><td>${formatMoney(b.budget)}</td><td>${formatMoney(realise)}</td><td>${formatMoney(b.budget - realise)}</td><td>${pct}%</td><td>${status}</td></tr>`;
+        return `<tr><td><strong>${b.categorie}</strong></td><td>${formatMoney(b.budget)}</td><td>${formatMoney(realise)}</td><td>${formatMoney(b.budget-realise)}</td><td>${pct}%</td><td>${status}</td></tr>`;
     }).join('');
 }
 
-// ==================== OBJECTIFS ====================
 function renderObjectifs() {
     document.getElementById('objectifsGrid').innerHTML = objectifs.map(o => {
-        const pct = (o.actuel / o.cible * 100).toFixed(1);
-        const joursRestants = Math.ceil((new Date(o.date_cible) - new Date()) / (1000 * 60 * 60 * 24));
-        return `<div class="obj-card ${o.priorite === 'Haute' ? 'high' : o.priorite === 'Moyenne' ? 'medium' : 'low'}">
-            <div class="obj-header"><div><div class="obj-name">${o.nom}</div><div class="obj-desc">${o.description}</div><div class="obj-desc">📅 ${o.date_cible} · ${joursRestants > 0 ? joursRestants + ' jours restants' : 'Terminé'}</div></div>
-            <div class="obj-amt"><div class="obj-current">${formatMoney(o.actuel)}</div><div class="obj-target">/ ${formatMoney(o.cible)}</div></div></div>
-            <div class="obj-pct">${pct}%</div><div class="progress-bg"><div class="progress-fill progress-success" style="width: ${Math.min(pct, 100)}%"></div></div>
-            <div class="obj-actions"><button class="btn btn-secondary btn-sm" onclick="editObjective(${o.id})"><i class="fas fa-edit"></i> Modifier</button>
-            <button class="btn btn-primary btn-sm" onclick="quickSaveToObjective(${o.id})"><i class="fas fa-plus"></i> Ajouter</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteObjective(${o.id})"><i class="fas fa-trash"></i></button></div></div>`;
+        const pct = (o.actuel/o.cible*100).toFixed(1);
+        const joursRestants = Math.ceil((new Date(o.date_cible)-new Date())/(1000*60*60*24));
+        return `<div class="obj-card ${o.priorite === 'Haute' ? 'high' : 'medium'}"><div class="obj-header"><div><div class="obj-name">${o.nom}</div><div class="obj-desc">${o.description}</div><div class="obj-desc">📅 ${o.date_cible} · ${joursRestants>0?joursRestants+' jours':'Terminé'}</div></div><div class="obj-amt"><div class="obj-current">${formatMoney(o.actuel)}</div><div class="obj-target">/${formatMoney(o.cible)}</div></div></div><div class="obj-pct">${pct}%</div><div class="progress-bg"><div class="progress-fill progress-success" style="width:${Math.min(pct,100)}%"></div></div><div class="obj-actions"><button class="btn btn-secondary btn-sm" onclick="editObjective(${o.id})"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-sm" onclick="deleteObjective(${o.id})"><i class="fas fa-trash"></i></button></div></div>`;
     }).join('');
     document.getElementById('objCount').textContent = objectifs.length;
 }
 
-function openObjectiveModal() { document.getElementById('objectiveModal').classList.add('active'); editObjectiveId = null; document.getElementById('objName').value = ''; document.getElementById('objDesc').value = ''; document.getElementById('objTarget').value = ''; document.getElementById('objCurrent').value = '0'; document.getElementById('objDate').value = ''; }
+function openObjectiveModal() { document.getElementById('objectiveModal').classList.add('active'); editObjectiveId = null; }
 function closeObjectiveModal() { document.getElementById('objectiveModal').classList.remove('active'); }
 function saveObjective() {
-    const obj = { id: editObjectiveId || Date.now(), nom: document.getElementById('objName').value, cible: parseFloat(document.getElementById('objTarget').value), actuel: parseFloat(document.getElementById('objCurrent').value), date_cible: document.getElementById('objDate').value, description: document.getElementById('objDesc').value, priorite: document.getElementById('objPriority').value, categorie: 'Épargne', sous_categorie: document.getElementById('objName').value };
-    if (!obj.nom || !obj.cible) { alert('Nom et cible requis'); return; }
+    const obj = { id: editObjectiveId || Date.now(), nom: document.getElementById('objName').value, cible: parseFloat(document.getElementById('objTarget').value), actuel: parseFloat(document.getElementById('objCurrent').value), date_cible: document.getElementById('objDate').value, description: document.getElementById('objDesc').value, priorite: document.getElementById('objPriority').value };
+    if (!obj.nom || !obj.cible) { showNotification('Nom et cible requis', 'danger'); return; }
     if (editObjectiveId) { const idx = objectifs.findIndex(o => o.id === editObjectiveId); objectifs[idx] = obj; } else objectifs.push(obj);
-    saveAllData(); closeObjectiveModal(); renderObjectifs(); if (typeof showNotification === 'function') showNotification('Objectif enregistré', 'success'); else alert('Objectif enregistré');
+    saveAllData(); closeObjectiveModal(); renderObjectifs(); showNotification('Objectif enregistré', 'success');
 }
 function editObjective(id) { const o = objectifs.find(x => x.id === id); openObjectiveModal(); editObjectiveId = id; document.getElementById('objName').value = o.nom; document.getElementById('objDesc').value = o.description; document.getElementById('objTarget').value = o.cible; document.getElementById('objCurrent').value = o.actuel; document.getElementById('objDate').value = o.date_cible; document.getElementById('objPriority').value = o.priorite; }
-function deleteObjective(id) { if (confirm('Supprimer cet objectif ?')) { objectifs = objectifs.filter(o => o.id !== id); saveAllData(); renderObjectifs(); if (typeof showNotification === 'function') showNotification('Objectif supprimé', 'success'); } }
-function quickSaveToObjective(id) { openTransactionModal(); document.getElementById('txType').value = 'Épargne'; updateCategorySelect(); const obj = objectifs.find(o => o.id === id); document.getElementById('txSubCategory').value = obj.nom; document.getElementById('txDesc').value = `Épargne pour ${obj.nom}`; if (typeof showNotification === 'function') showNotification(`Ajoutez un montant pour "${obj.nom}"`, 'info'); }
+function deleteObjective(id) { if (confirm('Supprimer ?')) { objectifs = objectifs.filter(o => o.id !== id); saveAllData(); renderObjectifs(); showNotification('Objectif supprimé', 'success'); } }
 
-// ==================== CALENDRIER ====================
 function renderCalendar() {
     const year = currentYear;
     const monthStr = currentMonth.split('-')[0];
-    const monthIndex = ['janv', 'févr', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'].indexOf(monthStr);
-    const firstDay = new Date(year, monthIndex, 1).getDay();
+    const monthIndex = ['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'].indexOf(monthStr);
     const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
     const filtered = getFilteredTransactions();
     let html = '<div class="calendar-grid">';
-    ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].forEach(d => html += `<div class="calendar-day-header">${d}</div>`);
-    for (let i = 0; i < (firstDay + 6) % 7; i++) html += '<div></div>';
+    ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].forEach(d => html += `<div class="calendar-day-header">${d}</div>`);
     for (let d = 1; d <= daysInMonth; d++) {
-        const dateStr = `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const dateStr = `${year}-${String(monthIndex+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
         const dayEvents = filtered.filter(t => t.date === dateStr);
-        html += `<div class="calendar-day"><div class="calendar-day-number">${d}</div>${dayEvents.slice(0, 3).map(e => `<div class="calendar-event">${e.type === 'Revenu' ? '💰' : e.type === 'Dépense' ? '💸' : '🏦'} ${formatMoney(e.montant)}</div>`).join('')}</div>`;
+        html += `<div class="calendar-day"><div class="calendar-day-number">${d}</div>${dayEvents.slice(0,2).map(e => `<div class="calendar-event">${e.type==='Revenu'?'💰':'💸'} ${formatMoney(e.montant)}</div>`).join('')}</div>`;
     }
     html += '</div>';
     document.getElementById('calendarView').innerHTML = html;
 }
 
-// ==================== RAPPORTS ====================
 function renderReports() {
     const filtered = getFilteredTransactions();
-    const revenus = filtered.filter(t => t.type === 'Revenu').reduce((s, t) => s + t.montant, 0);
-    const depenses = filtered.filter(t => t.type === 'Dépense').reduce((s, t) => s + t.montant, 0);
-    const epargne = filtered.filter(t => t.type === 'Épargne').reduce((s, t) => s + t.montant, 0);
-    document.getElementById('reportContent').innerHTML = `
-        <div class="rapport-stats"><div class="rapport-card"><div class="rapport-value" style="color: var(--success)">+${formatMoney(revenus)}</div><div class="rapport-label">Revenus totaux</div></div>
-        <div class="rapport-card"><div class="rapport-value" style="color: var(--danger)">-${formatMoney(depenses)}</div><div class="rapport-label">Dépenses totales</div></div>
-        <div class="rapport-card"><div class="rapport-value" style="color: var(--info)">${formatMoney(epargne)}</div><div class="rapport-label">Épargne totale</div></div>
-        <div class="rapport-card"><div class="rapport-value">${formatMoney(revenus - depenses - epargne)}</div><div class="rapport-label">Balance nette</div></div></div>
-        <div class="table-card"><table class="data-table"><thead><th>Catégorie</th><th>Revenus</th><th>Dépenses</th><th>Solde</th></thead><tbody>
-        ${[...new Set([...categories.revenus, ...categories.depenses])].map(cat => {
-            const rev = filtered.filter(t => t.type === 'Revenu' && t.categorie === cat).reduce((s, t) => s + t.montant, 0);
-            const dep = filtered.filter(t => t.type === 'Dépense' && t.categorie === cat).reduce((s, t) => s + t.montant, 0);
-            if (rev === 0 && dep === 0) return '';
-            return `<tr><td><strong>${cat}</strong></td><td class="amt-rev">+${formatMoney(rev)}</td><td class="amt-dep">-${formatMoney(dep)}</td><td>${formatMoney(rev - dep)}</td>`);
-        }).join('')}</tbody>}></table></div>`;
+    const revenus = filtered.filter(t => t.type === 'Revenu').reduce((s,t) => s+t.montant,0);
+    const depenses = filtered.filter(t => t.type === 'Dépense').reduce((s,t) => s+t.montant,0);
+    document.getElementById('reportContent').innerHTML = `<div class="rapport-stats"><div class="rapport-card"><div class="rapport-value" style="color:var(--success)">+${formatMoney(revenus)}</div><div class="rapport-label">Revenus</div></div><div class="rapport-card"><div class="rapport-value" style="color:var(--danger)">-${formatMoney(depenses)}</div><div class="rapport-label">Dépenses</div></div><div class="rapport-card"><div class="rapport-value">${formatMoney(revenus-depenses)}</div><div class="rapport-label">Balance</div></div></div>`;
 }
 
-// ==================== ANALYSE AVANCÉE ====================
 function renderAdvancedAnalysis() {
     const filtered = getFilteredTransactions();
-    const revenus = filtered.filter(t => t.type === 'Revenu').reduce((s, t) => s + t.montant, 0);
-    const depenses = filtered.filter(t => t.type === 'Dépense').reduce((s, t) => s + t.montant, 0);
-    const epargne = filtered.filter(t => t.type === 'Épargne').reduce((s, t) => s + t.montant, 0);
-    const tauxEpargne = revenus > 0 ? (epargne / revenus * 100).toFixed(1) : 0;
-    const ratioDepRevenus = revenus > 0 ? (depenses / revenus * 100).toFixed(1) : 0;
+    const revenus = filtered.filter(t => t.type === 'Revenu').reduce((s,t) => s+t.montant,0);
+    const depenses = filtered.filter(t => t.type === 'Dépense').reduce((s,t) => s+t.montant,0);
+    const epargne = filtered.filter(t => t.type === 'Épargne').reduce((s,t) => s+t.montant,0);
+    const tauxEpargne = revenus > 0 ? (epargne/revenus*100).toFixed(1) : 0;
     document.getElementById('advancedKPIs').innerHTML = `
-        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-percentage"></i></div><div class="kpi-label">Taux d'épargne</div><div class="kpi-value">${tauxEpargne}%</div><div class="kpi-sub">Objectif: >20%</div></div>
-        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-balance-scale"></i></div><div class="kpi-label">Ratio Dépenses/Revenus</div><div class="kpi-value">${ratioDepRevenus}%</div><div class="kpi-sub">Idéal: <50%</div></div>
-        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-line"></i></div><div class="kpi-label">Évolution patrimoine</div><div class="kpi-value">${((revenus - depenses - epargne) / Math.max(1, revenus) * 100).toFixed(1)}%</div><div class="kpi-sub">vs période précédente</div></div>
-        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-calendar-check"></i></div><div class="kpi-label">Prévision annuelle</div><div class="kpi-value">${formatMoney((revenus - depenses) * 12)}</div><div class="kpi-sub">Épargne annuelle projetée</div></div>`;
+        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-percentage"></i></div><div class="kpi-label">Taux épargne</div><div class="kpi-value">${tauxEpargne}%</div></div>
+        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-balance-scale"></i></div><div class="kpi-label">Ratio D/R</div><div class="kpi-value">${revenus>0?((depenses/revenus)*100).toFixed(1):0}%</div></div>
+        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-line"></i></div><div class="kpi-label">Prévision</div><div class="kpi-value">${formatMoney((revenus-depenses)*12)}</div></div>`;
 }
-// ==================== EXPORTS ====================
-function exportToCSV() { let csv = "Date,Type,Description,Categorie,Montant\n"; getFilteredTransactions().forEach(t => csv += `${t.date},${t.type},${t.description},${t.categorie},${t.montant}\n`); const blob = new Blob([csv], { type: 'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `transactions_${currentMonth}_${currentYear}.csv`; a.click(); if (typeof showNotification === 'function') showNotification('Export CSV réussi', 'success'); else alert('Export CSV réussi'); }
-function exportToPDF() { const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.text('Rapport financier - Money Control', 20, 20); doc.text(`Période: ${currentMonth} ${currentYear}`, 20, 30); let y = 50; getFilteredTransactions().slice(0, 20).forEach(t => { doc.text(`${t.date} - ${t.description}: ${t.montant} MAD`, 20, y); y += 8; }); doc.save(`Rapport_${currentMonth}_${currentYear}.pdf`); if (typeof showNotification === 'function') showNotification('Export PDF réussi', 'success'); else alert('Export PDF réussi'); }
-function exportToExcel() { const ws = XLSX.utils.json_to_sheet(getFilteredTransactions()); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Transactions'); XLSX.writeFile(wb, `rapport_${currentMonth}_${currentYear}.xlsx`); if (typeof showNotification === 'function') showNotification('Export Excel réussi', 'success'); else alert('Export Excel réussi'); }
-function exportFullReportPDF() { exportToPDF(); }
-function printReport() { window.print(); }
-function resetData() { if (confirm('⚠️ Réinitialiser toutes les données ? Cette action est irréversible.')) { localStorage.clear(); location.reload(); } }
-function saveSettings() { if (typeof showNotification === 'function') showNotification('Paramètres sauvegardés', 'success'); else alert('Paramètres sauvegardés'); }
-function addCustomCategory() { const cat = prompt('Nouvelle catégorie de dépense:'); if (cat) { categories.depenses.push(cat); saveAllData(); if (typeof showNotification === 'function') showNotification('Catégorie ajoutée', 'success'); else alert('Catégorie ajoutée'); } }
 
-// ==================== INITIALISATION ====================
-initFilters();
-renderDashboard();
-renderTransactions();
-renderBudgets();
-renderObjectifs();
-renderCalendar();
-renderReports();
-renderAdvancedAnalysis();
-// Exporter les fonctions
+function exportToCSV() { let csv = "Date,Type,Description,Montant\n"; getFilteredTransactions().forEach(t => csv += `${t.date},${t.type},${t.description},${t.montant}\n`); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = `export_${currentMonth}.csv`; a.click(); showNotification('Export CSV', 'success'); }
+function exportToPDF() { const {jsPDF}=window.jspdf; const doc=new jsPDF(); doc.text('Rapport financier',20,20); getFilteredTransactions().slice(0,15).forEach((t,i)=>doc.text(`${t.date} - ${t.description}: ${t.montant} MAD`,20,40+i*8)); doc.save('rapport.pdf'); showNotification('Export PDF', 'success'); }
+function exportToExcel() { const ws=XLSX.utils.json_to_sheet(getFilteredTransactions()); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Transactions'); XLSX.writeFile(wb,`rapport_${currentMonth}.xlsx`); showNotification('Export Excel', 'success'); }
+function printReport() { window.print(); }
+function resetData() { if(confirm('Réinitialiser ?')) { localStorage.clear(); location.reload(); } }
+
 window.showSection = showSection;
 window.openTransactionModal = openTransactionModal;
 window.closeTransactionModal = closeTransactionModal;
@@ -1805,6 +1452,19 @@ window.showLoginForm = showLoginForm;
 window.showRegisterForm = showRegisterForm;
 window.showResetForm = showResetForm;
 window.toggleTheme = toggleTheme;
+window.toggleSidebar = toggleSidebar;
+window.editObjective = editObjective;
+window.deleteObjective = deleteObjective;
+window.saveObjective = saveObjective;
+window.openObjectiveModal = openObjectiveModal;
+window.closeObjectiveModal = closeObjectiveModal;
+window.updateCategorySelect = updateCategorySelect;
+window.applyGlobalFilters = applyGlobalFilters;
+window.exportToCSV = exportToCSV;
+window.exportToPDF = exportToPDF;
+window.exportToExcel = exportToExcel;
+window.printReport = printReport;
+window.resetData = resetData;
 </script>
 </body>
 </html>
