@@ -1,47 +1,27 @@
-// ============================================
-// FICHIER: auth.js
-// RÔLE: Gestion complète de l'authentification
-// ============================================
-
-// Éléments du DOM
+// ==================== AUTHENTIFICATION ====================
 let loginContainer, appContainer;
 
-// Attendre que la page soit chargée
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 Auth.js chargé');
-    
-    // Récupérer les conteneurs
     loginContainer = document.getElementById('loginContainer');
     appContainer = document.getElementById('appContainer');
     
-    // Vérifier l'état de connexion
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
-            console.log('✅ Utilisateur connecté:', user.email);
+            console.log('✅ Connecté:', user.email);
             showApp();
             loadUserData(user.uid);
         } else {
-            console.log('❌ Utilisateur déconnecté');
+            console.log('❌ Déconnecté');
             showLogin();
         }
     });
 });
 
-// ============================================
-// FONCTIONS D'AFFICHAGE
-// ============================================
-
 function showApp() {
     if (loginContainer) loginContainer.style.display = 'none';
     if (appContainer) appContainer.style.display = 'block';
-    
-    // Rafraîchir tous les affichages
-    setTimeout(() => {
-        if (typeof renderDashboard === 'function') renderDashboard();
-        if (typeof renderTransactions === 'function') renderTransactions();
-        if (typeof renderObjectifs === 'function') renderObjectifs();
-        if (typeof renderBudgets === 'function') renderBudgets();
-    }, 100);
+    if (typeof renderDashboard === 'function') renderDashboard();
+    if (typeof renderTransactions === 'function') renderTransactions();
 }
 
 function showLogin() {
@@ -49,39 +29,15 @@ function showLogin() {
     if (appContainer) appContainer.style.display = 'none';
 }
 
-// ============================================
-// AUTHENTIFICATION
-// ============================================
-
-// Connexion Email/Mot de passe
+// Connexion Email
 async function loginWithEmail() {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
-    
-    if (!email || !password) {
-        showNotification('Veuillez remplir tous les champs', 'danger');
-        return;
-    }
-    
     try {
-        const result = await firebase.auth().signInWithEmailAndPassword(email, password);
-        console.log('Connexion réussie:', result.user.email);
+        await firebase.auth().signInWithEmailAndPassword(email, password);
         showNotification('Connexion réussie !', 'success');
     } catch (error) {
-        console.error('Erreur connexion:', error);
-        let message = 'Erreur de connexion';
-        switch(error.code) {
-            case 'auth/user-not-found':
-                message = 'Aucun compte associé à cet email';
-                break;
-            case 'auth/wrong-password':
-                message = 'Mot de passe incorrect';
-                break;
-            case 'auth/invalid-email':
-                message = 'Email invalide';
-                break;
-        }
-        showNotification(message, 'danger');
+        showNotification(error.message, 'danger');
     }
 }
 
@@ -92,285 +48,121 @@ async function registerWithEmail() {
     const password = document.getElementById('registerPassword').value;
     const confirm = document.getElementById('registerConfirmPassword').value;
     
-    if (!name || !email || !password) {
-        showNotification('Veuillez remplir tous les champs', 'danger');
-        return;
-    }
-    
     if (password !== confirm) {
         showNotification('Les mots de passe ne correspondent pas', 'danger');
         return;
     }
     
-    if (password.length < 6) {
-        showNotification('Le mot de passe doit faire au moins 6 caractères', 'danger');
-        return;
-    }
-    
     try {
         const result = await firebase.auth().createUserWithEmailAndPassword(email, password);
-        
-        // Mettre à jour le profil avec le nom
         await result.user.updateProfile({ displayName: name });
-        
-        // Créer le document utilisateur dans Firestore
-        await createUserDocument(result.user.uid, { 
-            name: name, 
-            email: email,
-            createdAt: new Date().toISOString()
-        });
-        
-        console.log('Inscription réussie:', result.user.email);
-        showNotification('Compte créé avec succès ! Bienvenue !', 'success');
+        await createUserDocument(result.user.uid, { name, email });
+        showNotification('Compte créé !', 'success');
     } catch (error) {
-        console.error('Erreur inscription:', error);
-        let message = 'Erreur d\'inscription';
-        if (error.code === 'auth/email-already-in-use') {
-            message = 'Cet email est déjà utilisé';
-        }
-        showNotification(message, 'danger');
+        showNotification(error.message, 'danger');
     }
 }
 
 // Connexion Google
 async function loginWithGoogle() {
     try {
-        const result = await firebase.auth().signInWithPopup(googleProvider);
-        
-        // Vérifier si c'est un nouvel utilisateur
-        const userRef = db.collection('users').doc(result.user.uid);
-        const doc = await userRef.get();
-        
-        if (!doc.exists) {
-            await userRef.set({
-                name: result.user.displayName,
-                email: result.user.email,
-                photoURL: result.user.photoURL,
-                createdAt: new Date().toISOString(),
-                plan: 'free',
-                transactions: [],
-                objectifs: []
-            });
-        }
-        
+        await firebase.auth().signInWithPopup(googleProvider);
         showNotification('Connexion Google réussie !', 'success');
     } catch (error) {
-        console.error('Erreur Google:', error);
-        showNotification('Erreur connexion Google', 'danger');
+        showNotification('Erreur Google', 'danger');
     }
 }
 
 // Réinitialisation mot de passe
 async function resetPassword() {
     const email = document.getElementById('resetEmail').value;
-    
-    if (!email) {
-        showNotification('Veuillez entrer votre email', 'danger');
-        return;
-    }
-    
     try {
         await firebase.auth().sendPasswordResetEmail(email);
-        showNotification('Email de réinitialisation envoyé ! Vérifiez votre boîte mail', 'success');
+        showNotification('Email envoyé !', 'success');
         showLoginForm();
     } catch (error) {
-        console.error('Erreur reset:', error);
         showNotification('Email non trouvé', 'danger');
     }
 }
 
 // Déconnexion
 async function logout() {
-    try {
-        await firebase.auth().signOut();
-        showNotification('Déconnecté avec succès', 'success');
-        
-        // Nettoyer localStorage
-        localStorage.removeItem('transactions');
-        localStorage.removeItem('objectifs');
-        localStorage.removeItem('budgets');
-        
-        // Recharger la page pour réinitialiser
-        setTimeout(() => {
-            location.reload();
-        }, 500);
-    } catch (error) {
-        console.error('Erreur déconnexion:', error);
-        showNotification('Erreur lors de la déconnexion', 'danger');
-    }
+    await firebase.auth().signOut();
+    showNotification('Déconnecté', 'success');
+    localStorage.clear();
+    setTimeout(() => location.reload(), 500);
 }
 
-// ============================================
-// GESTION DES DONNÉES UTILISATEUR
-// ============================================
-
+// Créer document utilisateur
 async function createUserDocument(uid, userData) {
     const userRef = db.collection('users').doc(uid);
     const doc = await userRef.get();
-    
     if (!doc.exists) {
-        // Données par défaut pour un nouvel utilisateur
-        const defaultData = {
+        await userRef.set({
             ...userData,
-            plan: 'free',
-            settings: {
-                currency: 'MAD',
-                theme: 'dark',
-                alertBudget: 80,
-                alertObjectif: 90
-            },
-            transactions: [],
-            objectifs: [],
-            budgets: [
-                { categorie: "Alimentation", budget: 2000 },
-                { categorie: "Logement", budget: 4000 },
-                { categorie: "Transport", budget: 1000 },
-                { categorie: "Loisirs", budget: 800 },
-                { categorie: "Shopping", budget: 700 }
-            ],
             createdAt: new Date().toISOString(),
-            lastSync: new Date().toISOString()
-        };
-        
-        await userRef.set(defaultData);
-        console.log('📁 Document utilisateur créé');
+            transactions: [],
+            objectifs: []
+        });
     }
 }
 
+// Charger données utilisateur
 async function loadUserData(uid) {
-    try {
-        const userRef = db.collection('users').doc(uid);
-        const doc = await userRef.get();
-        
-        if (doc.exists) {
-            const data = doc.data();
-            
-            // Charger les transactions
-            if (data.transactions && data.transactions.length > 0) {
-                localStorage.setItem('transactions', JSON.stringify(data.transactions));
-            } else if (!localStorage.getItem('transactions')) {
-                // Données de démonstration
-                const demoTransactions = getDemoTransactions();
-                localStorage.setItem('transactions', JSON.stringify(demoTransactions));
-                await userRef.update({ transactions: demoTransactions });
-            }
-            
-            // Charger les objectifs
-            if (data.objectifs && data.objectifs.length > 0) {
-                localStorage.setItem('objectifs', JSON.stringify(data.objectifs));
-            } else if (!localStorage.getItem('objectifs')) {
-                const demoObjectifs = getDemoObjectifs();
-                localStorage.setItem('objectifs', JSON.stringify(demoObjectifs));
-                await userRef.update({ objectifs: demoObjectifs });
-            }
-            
-            // Charger les budgets
-            if (data.budgets && data.budgets.length > 0) {
-                localStorage.setItem('budgets', JSON.stringify(data.budgets));
-            }
-            
-            console.log('✅ Données utilisateur chargées');
-            
-            // Rafraîchir l'affichage
-            if (typeof renderDashboard === 'function') renderDashboard();
-            if (typeof renderTransactions === 'function') renderTransactions();
-            if (typeof renderObjectifs === 'function') renderObjectifs();
-        }
-    } catch (error) {
-        console.error('Erreur chargement:', error);
+    const userRef = db.collection('users').doc(uid);
+    const doc = await userRef.get();
+    if (doc.exists) {
+        const data = doc.data();
+        if (data.transactions?.length) localStorage.setItem('transactions', JSON.stringify(data.transactions));
+        if (data.objectifs?.length) localStorage.setItem('objectifs', JSON.stringify(data.objectifs));
     }
+    if (typeof renderDashboard === 'function') renderDashboard();
+    if (typeof renderTransactions === 'function') renderTransactions();
 }
 
-// Données de démonstration
-function getDemoTransactions() {
-    return [
-        {id: 1, date: new Date().toISOString().split('T')[0], mois: "mai-2026", annee: 2026, type: "Revenu", description: "Salaire", categorie: "Salaire", sous_categorie: "Mensuel", montant: 8500},
-        {id: 2, date: new Date().toISOString().split('T')[0], mois: "mai-2026", annee: 2026, type: "Dépense", description: "Loyer", categorie: "Logement", sous_categorie: "Loyer", montant: 3500},
-        {id: 3, date: new Date().toISOString().split('T')[0], mois: "mai-2026", annee: 2026, type: "Dépense", description: "Courses", categorie: "Alimentation", sous_categorie: "Supermarché", montant: 1200}
-    ];
-}
-
-function getDemoObjectifs() {
-    return [
-        {id: 1, nom: "Voyage", cible: 15000, actuel: 6500, date_cible: "2026-12-31", description: "Voyage de rêve", priorite: "Haute"},
-        {id: 2, nom: "Voiture", cible: 80000, actuel: 12500, date_cible: "2027-06-30", description: "Achat véhicule", priorite: "Moyenne"}
-    ];
-}
-
-// ============================================
-// SYNCHRONISATION CLOUD
-// ============================================
-
+// Synchroniser dans le cloud
 async function syncToCloud() {
     const user = firebase.auth().currentUser;
-    if (!user) return false;
-    
-    try {
-        const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
-        const objectifs = JSON.parse(localStorage.getItem('objectifs') || '[]');
-        const budgets = JSON.parse(localStorage.getItem('budgets') || '[]');
-        
-        await db.collection('users').doc(user.uid).set({
-            transactions: transactions,
-            objectifs: objectifs,
-            budgets: budgets,
-            lastSync: new Date().toISOString()
-        }, { merge: true });
-        
-        console.log('☁️ Synchronisation cloud réussie');
-        return true;
-    } catch (error) {
-        console.error('Erreur synchro:', error);
-        return false;
-    }
+    if (!user) return;
+    const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+    const objectifs = JSON.parse(localStorage.getItem('objectifs') || '[]');
+    await db.collection('users').doc(user.uid).set({
+        transactions, objectifs, lastSync: new Date().toISOString()
+    }, { merge: true });
 }
 
-// Synchronisation automatique toutes les 30 secondes
-setInterval(() => {
-    const user = firebase.auth().currentUser;
-    if (user) {
-        syncToCloud();
-    }
-}, 30000);
+// Sauvegarde automatique
+setInterval(() => { if (firebase.auth().currentUser) syncToCloud(); }, 30000);
 
-// ============================================
-// INTERFACE UTILISATEUR
-// ============================================
+// Notifications
+function showNotification(msg, type) {
+    const panel = document.getElementById('notifPanel');
+    if (!panel) { alert(msg); return; }
+    const el = document.createElement('div');
+    el.className = 'notif';
+    el.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>${msg}`;
+    panel.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+}
 
+// UI Functions
 function showLoginForm() {
     document.getElementById('loginForm').style.display = 'block';
     document.getElementById('registerForm').style.display = 'none';
     document.getElementById('resetForm').style.display = 'none';
 }
-
 function showRegisterForm() {
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('registerForm').style.display = 'block';
     document.getElementById('resetForm').style.display = 'none';
 }
-
 function showResetForm() {
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('registerForm').style.display = 'none';
     document.getElementById('resetForm').style.display = 'block';
 }
 
-function showNotification(message, type) {
-    const panel = document.getElementById('notifPanel');
-    if (!panel) {
-        console.log('Notification:', message);
-        return;
-    }
-    
-    const el = document.createElement('div');
-    el.className = 'notif';
-    const icon = type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : 'info-circle';
-    el.innerHTML = `<i class="fas fa-${icon}"></i>${message}`;
-    panel.appendChild(el);
-    setTimeout(() => el.remove(), 4000);
-}
-
-// Exporter les fonctions pour utilisation globale
+// Exporter
 window.loginWithEmail = loginWithEmail;
 window.registerWithEmail = registerWithEmail;
 window.loginWithGoogle = loginWithGoogle;
@@ -380,5 +172,3 @@ window.showLoginForm = showLoginForm;
 window.showRegisterForm = showRegisterForm;
 window.showResetForm = showResetForm;
 window.syncToCloud = syncToCloud;
-
-console.log('✅ Auth.js chargé avec succès');
