@@ -835,7 +835,7 @@ body {
         grid-template-columns: 1fr;
     }
 }
- // Ajoutez ces variables après la déclaration de `let editObjectiveId = null;`
+ }
 let currentYear = new Date().getFullYear();
 let currentMonth = new Date().toLocaleString('fr-FR', { month: 'short' }).toLowerCase() + '-' + new Date().getFullYear();
 let editTransactionId = null;
@@ -1192,14 +1192,13 @@ function saveAllData() {
 
 // ==================== AUTHENTIFICATION ====================
 document.addEventListener('DOMContentLoaded', () => {
-    auth.onAuthStateChanged((user) => {
+    auth.onAuthStateChanged(async (user) => {
         if (user) {
             document.getElementById('loginContainer').style.display = 'none';
             document.getElementById('appContainer').style.display = 'block';
-            loadUserData(user.uid);
-            displayWelcomeMessage();
+            await loadUserData(user.uid);
+            await displayWelcomeMessage();
             initFilters();
-            applyGlobalFilters();
             renderDashboard();
             renderTransactions();
             renderBudgets();
@@ -1207,7 +1206,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderCalendar();
             renderReports();
             renderAdvancedAnalysis();
-           
+            applyGlobalFilters();
         } else {
             document.getElementById('loginContainer').style.display = 'flex';
             document.getElementById('appContainer').style.display = 'none';
@@ -1363,7 +1362,7 @@ async function loadUserData(uid) {
         saveAllData();
     }
 }
-await displayWelcomeMessage();
+
 async function syncToCloud() {
     if (!auth.currentUser) return;
     await db.collection('users').doc(auth.currentUser.uid).set({ transactions, objectifs, lastSync: new Date().toISOString() }, { merge: true });
@@ -1441,7 +1440,7 @@ function getFilteredTransactions() {
     return filtered;
 }
 
-function applyGlobalFilters() { renderDashboard(); renderTransactions(); renderBudgets(); }
+
 
 function initFilters() {
     // Récupérer toutes les années disponibles dans les transactions
@@ -1485,7 +1484,7 @@ function initFilters() {
         typeSelect.onchange = () => applyGlobalFilters();
     }
 }
-function applyGlobalFilters() {
+  function applyGlobalFilters() {
     renderDashboard();
     renderTransactions();
     renderBudgets();
@@ -1545,7 +1544,6 @@ function renderTransactions() {
 
 function openTransactionModal() { document.getElementById('transactionModal').classList.add('active'); document.getElementById('txDate').value = new Date().toISOString().split('T')[0]; editTransactionId = null; updateCategorySelect(); }
 function closeTransactionModal() { document.getElementById('transactionModal').classList.remove('active'); }
-function updateCategorySelect() { const type = document.getElementById('txType').value; const cats = type === 'Revenu' ? categories.revenus : type === 'Dépense' ? categories.depenses : categories.epargne; document.getElementById('txCategory').innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join(''); }
 
 function saveTransaction() {
     const t = { id: editTransactionId || Date.now(), date: document.getElementById('txDate').value, mois: currentMonth, annee: currentYear, type: document.getElementById('txType').value, description: document.getElementById('txDesc').value, categorie: document.getElementById('txCategory').value, sous_categorie: document.getElementById('txSubCategory').value, montant: parseFloat(document.getElementById('txAmount').value) };
