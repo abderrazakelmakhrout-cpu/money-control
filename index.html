@@ -19,12 +19,12 @@
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script type="text/javascript">
    window.addEventListener('load', function() {
-    emailjs.init({
-        publicKey: EMAILJS_CONFIG.publicKey  // Utilise la variable plutôt qu'en dur
-    });
-    console.log('✅ EmailJS initialisé avec la clé:', EMAILJS_CONFIG.publicKey);
-});
-</script>  
+      emailjs.init({
+        publicKey: "aBWWakhI_E4qhUp8J"
+      });
+      console.log('✅ EmailJS initialisé');
+   });
+</script> 
 <style>
 * {
     margin: 0;
@@ -945,6 +945,12 @@ body {
 </head>
 <body data-theme="dark">
 
+ // Configuration EmailJS (à remplacer par vos identifiants)
+const EMAILJS_CONFIG = {
+    serviceId: "service_jw6x8wt",      // Ex: "service_abc123"
+    templateId: "template_3khrhny",    // Ex: "template_xyz789"
+    publicKey: "aBWWakhI_E4qhUp8J"       // Ex: "abc123def456"
+};
 <!-- ÉCRAN DE CONNEXION -->
 <div id="loginContainer" style="display: flex; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999;">
     <div style="margin: auto; width: 100%; max-width: 450px; padding: 20px;">
@@ -1073,6 +1079,10 @@ body {
                 <div class="nav-item" onclick="showSection('parametres', this)">
                     <i class="fas fa-cog"></i><span>Paramètres</span>
                 </div>
+             <div class="nav-item" onclick="showSection('admin', this)" id="adminMenuItem" style="display: none;">
+    <i class="fas fa-shield-alt"></i><span>Administration</span>
+    <span class="nav-badge" id="pendingCount">0</span>
+</div>
             </nav>
         </aside>
 
@@ -1200,6 +1210,51 @@ body {
                     <button class="btn btn-danger" onclick="resetData()"><i class="fas fa-undo"></i> Réinitialiser</button>
                 </div>
             </section>
+         <!-- Section Admin -->
+<section id="admin" class="section">
+    <div class="page-header">
+        <div class="page-title">
+            <h2><i class="fas fa-shield-alt"></i> Administration</h2>
+            <p>Gestion des utilisateurs et activations des comptes</p>
+        </div>
+    </div>
+    
+    <div class="table-card">
+        <div class="table-header">
+            <div class="table-title">📋 Demandes d'activation en attente</div>
+            <button class="btn btn-secondary" onclick="refreshActivationRequests()">
+                <i class="fas fa-sync-alt"></i> Rafraîchir
+            </button>
+        </div>
+        <div id="pendingRequestsList" style="padding: 10px 0;">
+            <p style="text-align: center; color: var(--text-muted);">Chargement des demandes...</p>
+        </div>
+    </div>
+    
+    <div class="table-card">
+        <div class="table-header">
+            <div class="table-title">✅ Utilisateurs activés</div>
+        </div>
+        <div id="activatedUsersList" style="padding: 10px 0;">
+            <p style="text-align: center; color: var(--text-muted);">Chargement...</p>
+        </div>
+    </div>
+    
+    <div class="table-card">
+        <div class="table-header">
+            <div class="table-title">🔧 Activation manuelle</div>
+        </div>
+        <div class="form-group" style="margin-bottom: 15px;">
+            <label class="form-label">Email de l'utilisateur</label>
+            <div style="display: flex; gap: 10px;">
+                <input type="email" id="adminUserEmail" class="form-input" placeholder="utilisateur@email.com" style="flex: 1;">
+                <button class="btn btn-primary" onclick="manualActivateUserFirebase()">
+                    <i class="fas fa-check-circle"></i> Activer
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
         </main>
     </div>
 
@@ -1895,17 +1950,7 @@ async function isAccountActivated() {
 }
 
 // Pour vérifier avant d'ajouter des transactions
-async function checkPermissionAndOpenTransactionModal() {
-    const isActivated = await isAccountActivated();
-    if (!isActivated) {
-        showNotification('⚠️ Veuillez activer votre compte pour ajouter des transactions. Cliquez sur "Demander l\'activation" !', 'warning');
-        openWelcomeGuide();
-        if (typeof showGuideTab === 'function') showGuideTab('activation');
-        return false;
-    }
-    openTransactionModal();
-    return true;
-}
+
 // Au chargement, initialiser l'admin si l'utilisateur connecté est admin
 async function initAdminSection() {
     if (!auth.currentUser) return;
@@ -2121,7 +2166,8 @@ document.addEventListener('DOMContentLoaded', () => {
             await loadUserData(user.uid);
             await displayWelcomeMessage();
             initFilters();
-            
+              // ⚠️ AJOUTE CETTE LIGNE ⚠️
+            await initAdminSection();
             // Afficher le guide si nécessaire
             showGuideIfNeeded();
             
@@ -2532,7 +2578,11 @@ function initFilters() {
         categorySelect.onchange = () => applyGlobalFilters();
     }
 }
-
+function refreshActivationRequests() {
+    loadPendingRequestsFirebase();
+    loadActivatedUsersFirebase();
+    showNotification('Listes rafraîchies', 'success');
+}
 function applyGlobalFilters() {
     renderDashboard();
     renderTransactions();
@@ -3259,12 +3309,7 @@ window.resetData = resetData;
    <script>
 // ==================== CONFIGURATION DES ALERTES EMAIL ====================
 
-// Configuration EmailJS (à remplacer par vos identifiants)
-const EMAILJS_CONFIG = {
-    serviceId: "service_jw6x8wt",      // Ex: "service_abc123"
-    templateId: "template_3khrhny",    // Ex: "template_xyz789"
-    publicKey: "aBWWakhI_E4qhUp8J"       // Ex: "abc123def456"
-};
+
 
 // Configuration des alertes utilisateur
 let alertConfig = {
