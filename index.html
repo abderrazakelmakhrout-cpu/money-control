@@ -578,6 +578,43 @@ body {
     justify-content: flex-end;
 }
 
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.calendar-day {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    min-height: 100px;
+    transition: all 0.2s;
+}
+
+.calendar-day:hover {
+    transform: scale(1.02);
+    border-color: var(--primary);
+}
+
+.calendar-day-header {
+    font-weight: 700;
+    font-size: 12px;
+    margin-bottom: 8px;
+    color: var(--primary);
+}
+
+.calendar-event {
+    font-size: 10px;
+    padding: 3px 6px;
+    border-radius: 6px;
+    margin-top: 4px;
+    background: rgba(99, 102, 241, 0.2);
+    color: var(--text);
+}
+
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -863,9 +900,6 @@ body {
                 <button class="btn btn-primary" style="width: 100%; margin-bottom: 12px;" onclick="loginWithEmail()">
                     <i class="fas fa-sign-in-alt"></i> Se connecter
                 </button>
-                <button class="btn btn-secondary" style="width: 100%; margin-bottom: 12px;" onclick="loginWithGoogle()">
-                    <i class="fab fa-google"></i> Continuer avec Google
-                </button>
                 <div style="text-align: center; margin-top: 20px;">
                     <a href="#" onclick="showRegisterForm(); return false;" style="color: var(--primary);">Créer un compte</a>
                     <span style="margin: 0 10px; color: var(--text-muted);">|</span>
@@ -874,33 +908,33 @@ body {
             </div>
 
             <div id="registerForm" style="display: none;">
-    <div class="form-group" style="margin-bottom: 20px;">
-        <label class="form-label">PRÉNOM</label>
-        <input type="text" id="registerFirstName" class="form-input" placeholder="Jean">
-    </div>
-    <div class="form-group" style="margin-bottom: 20px;">
-        <label class="form-label">NOM</label>
-        <input type="text" id="registerLastName" class="form-input" placeholder="Dupont">
-    </div>
-    <div class="form-group" style="margin-bottom: 20px;">
-        <label class="form-label">EMAIL</label>
-        <input type="email" id="registerEmail" class="form-input" placeholder="exemple@email.com">
-    </div>
-    <div class="form-group" style="margin-bottom: 20px;">
-        <label class="form-label">MOT DE PASSE</label>
-        <input type="password" id="registerPassword" class="form-input" placeholder="••••••••">
-    </div>
-    <div class="form-group" style="margin-bottom: 20px;">
-        <label class="form-label">CONFIRMER</label>
-        <input type="password" id="registerConfirmPassword" class="form-input" placeholder="••••••••">
-    </div>
-    <button class="btn btn-primary" style="width: 100%; margin-bottom: 12px;" onclick="registerWithEmail()">
-        <i class="fas fa-user-plus"></i> Créer un compte
-    </button>
-    <div style="text-align: center;">
-        <a href="#" onclick="showLoginForm(); return false;" style="color: var(--text-muted);">Déjà un compte ? Se connecter</a>
-    </div>
-</div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label class="form-label">PRÉNOM</label>
+                    <input type="text" id="registerFirstName" class="form-input" placeholder="Jean">
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label class="form-label">NOM</label>
+                    <input type="text" id="registerLastName" class="form-input" placeholder="Dupont">
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label class="form-label">EMAIL</label>
+                    <input type="email" id="registerEmail" class="form-input" placeholder="exemple@email.com">
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label class="form-label">MOT DE PASSE</label>
+                    <input type="password" id="registerPassword" class="form-input" placeholder="••••••••">
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label class="form-label">CONFIRMER</label>
+                    <input type="password" id="registerConfirmPassword" class="form-input" placeholder="••••••••">
+                </div>
+                <button class="btn btn-primary" style="width: 100%; margin-bottom: 12px;" onclick="registerWithEmail()">
+                    <i class="fas fa-user-plus"></i> Créer un compte
+                </button>
+                <div style="text-align: center;">
+                    <a href="#" onclick="showLoginForm(); return false;" style="color: var(--text-muted);">Déjà un compte ? Se connecter</a>
+                </div>
+            </div>
 
             <div id="resetForm" style="display: none;">
                 <div class="form-group" style="margin-bottom: 20px;">
@@ -967,18 +1001,18 @@ body {
         </aside>
 
         <main class="main-content">
-            <!-- Message de bienvenue -->
-<div id="welcomeMessage" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 16px; padding: 20px; margin-bottom: 24px; color: white;">
-    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
-        <div style="width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px;">
-            <i class="fas fa-user-circle"></i>
-        </div>
-        <div>
-            <h3 style="font-size: 20px; margin-bottom: 5px;" id="welcomeUserText">Bonjour,</h3>
-            <p style="opacity: 0.9; font-size: 14px;">Bienvenue sur votre espace de gestion financière</p>
-        </div>
-    </div>
-</div>
+            <div id="welcomeMessage" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 16px; padding: 20px; margin-bottom: 24px; color: white;">
+                <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                    <div style="width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px;">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 20px; margin-bottom: 5px;" id="welcomeUserText">Bonjour,</h3>
+                        <p style="opacity: 0.9; font-size: 14px;">Bienvenue sur votre espace de gestion financière</p>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Filtres Globaux -->
             <div class="filters-bar">
                 <div class="filter-group">
@@ -1139,49 +1173,118 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
-const googleProvider = new firebase.auth.GoogleAuthProvider();
-// Configuration supplémentaire pour Google
-googleProvider.setCustomParameters({
-    prompt: 'select_account'
-});
-// ==================== DONNÉES ====================
-let transactions = JSON.parse(localStorage.getItem('transactions')) || [
-    {id:1,date:"2026-05-01",mois:"mai-2026",annee:2026,type:"Revenu",description:"Salaire",categorie:"Salaire",sous_categorie:"Mensuel",montant:8500},
-    {id:2,date:"2026-05-05",mois:"mai-2026",annee:2026,type:"Dépense",description:"Loyer",categorie:"Logement",sous_categorie:"Loyer",montant:3500},
-    {id:3,date:"2026-05-10",mois:"mai-2026",annee:2026,type:"Revenu",description:"Freelance",categorie:"Freelance",sous_categorie:"Consulting",montant:2500},
-    {id:4,date:"2026-05-15",mois:"mai-2026",annee:2026,type:"Dépense",description:"Courses",categorie:"Alimentation",sous_categorie:"Supermarché",montant:1200}
+
+// ==================== DONNÉES INITIALES PAR DÉFAUT ====================
+// Chaque nouvel utilisateur recevra ces données de départ
+
+const DEFAULT_TRANSACTIONS = [
+    {id:1, date:"2026-05-01", mois:"mai-2026", annee:2026, type:"Revenu", description:"Salaire mai", categorie:"Salaire", sous_categorie:"Mensuel", montant:8500},
+    {id:2, date:"2026-05-05", mois:"mai-2026", annee:2026, type:"Dépense", description:"Loyer", categorie:"Logement", sous_categorie:"Loyer", montant:3500},
+    {id:3, date:"2026-05-10", mois:"mai-2026", annee:2026, type:"Revenu", description:"Freelance", categorie:"Freelance", sous_categorie:"Consulting", montant:2500},
+    {id:4, date:"2026-05-15", mois:"mai-2026", annee:2026, type:"Dépense", description:"Courses", categorie:"Alimentation", sous_categorie:"Supermarché", montant:1200},
+    {id:5, date:"2026-05-20", mois:"mai-2026", annee:2026, type:"Épargne", description:"Épargne voyage", categorie:"Épargne", sous_categorie:"Voyage", montant:1000},
+    {id:6, date:"2026-04-10", mois:"avr-2026", annee:2026, type:"Revenu", description:"Salaire avril", categorie:"Salaire", sous_categorie:"Mensuel", montant:8200},
+    {id:7, date:"2026-04-15", mois:"avr-2026", annee:2026, type:"Dépense", description:"Loyer avril", categorie:"Logement", sous_categorie:"Loyer", montant:3500},
+    {id:8, date:"2026-04-20", mois:"avr-2026", annee:2026, type:"Dépense", description:"Courses avril", categorie:"Alimentation", sous_categorie:"Supermarché", montant:1100},
+    {id:9, date:"2026-03-10", mois:"mars-2026", annee:2026, type:"Revenu", description:"Salaire mars", categorie:"Salaire", sous_categorie:"Mensuel", montant:8200},
+    {id:10, date:"2026-03-15", mois:"mars-2026", annee:2026, type:"Dépense", description:"Loyer mars", categorie:"Logement", sous_categorie:"Loyer", montant:3500}
 ];
 
-let objectifs = JSON.parse(localStorage.getItem('objectifs')) || [
-    {id:1,nom:"Voyage Japon",cible:15000,actuel:6500,date_cible:"2026-12-31",description:"Voyage de rêve",priorite:"Haute"},
-    {id:2,nom:"Achat Voiture",cible:80000,actuel:12500,date_cible:"2027-06-30",description:"Voiture familiale",priorite:"Moyenne"}
+const DEFAULT_OBJECTIFS = [
+    {id:1, nom:"Voyage Japon", cible:15000, actuel:6500, date_cible:"2026-12-31", description:"Voyage de rêve", priorite:"Haute", categorie:"Épargne", sous_categorie:"Voyage"},
+    {id:2, nom:"Achat Voiture", cible:80000, actuel:12500, date_cible:"2027-06-30", description:"Voiture familiale", priorite:"Moyenne", categorie:"Épargne", sous_categorie:"Voiture"},
+    {id:3, nom:"Fonds Urgence", cible:20000, actuel:15000, date_cible:"2026-12-31", description:"Sécurité financière", priorite:"Haute", categorie:"Épargne", sous_categorie:"Urgence"}
 ];
 
-let budgets = JSON.parse(localStorage.getItem('budgets')) || [
-    {categorie:"Alimentation",budget:2000},{categorie:"Logement",budget:4000},{categorie:"Transport",budget:1000},
-    {categorie:"Loisirs",budget:800},{categorie:"Shopping",budget:700}
+const DEFAULT_BUDGETS = [
+    {categorie:"Alimentation", budget:2000},
+    {categorie:"Logement", budget:4000},
+    {categorie:"Transport", budget:1000},
+    {categorie:"Loisirs", budget:800},
+    {categorie:"Shopping", budget:700},
+    {categorie:"Santé", budget:500}
 ];
 
-let categories = {
-    revenus:["Salaire","Freelance","Investissement"],
-    depenses:["Alimentation","Logement","Transport","Loisirs","Shopping"],
-    epargne:["Voyage","Voiture","Urgence"]
+const DEFAULT_CATEGORIES = {
+    revenus: ["Salaire", "Freelance", "Investissement", "Autre Revenu"],
+    depenses: ["Alimentation", "Logement", "Transport", "Loisirs", "Shopping", "Santé", "Éducation", "Factures"],
+    epargne: ["Voyage", "Voiture", "Urgence", "Investissement", "Projet"]
 };
 
+// ==================== VARIABLES GLOBALES ====================
+let transactions = [];
+let objectifs = [];
+let budgets = [];
+let categories = {};
 let currentYear = 2026;
 let currentMonth = "mai-2026";
 let editTransactionId = null;
 let editObjectiveId = null;
 let charts = {};
 
+// ==================== UTILITAIRES ====================
 const formatMoney = (n) => n.toLocaleString('fr-FR') + ' MAD';
 const formatDate = (d) => new Date(d).toLocaleDateString('fr-FR');
 
+function showNotification(msg, type) {
+    const panel = document.getElementById('notifPanel');
+    const el = document.createElement('div');
+    el.className = 'notif';
+    const icon = type === 'success' ? 'fa-check-circle' : type === 'danger' ? 'fa-exclamation-circle' : 'fa-info-circle';
+    el.innerHTML = `<i class="fas ${icon}"></i>${msg}`;
+    panel.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+}
+
 function saveAllData() {
-    localStorage.setItem('transactions', JSON.stringify(transactions));
-    localStorage.setItem('objectifs', JSON.stringify(objectifs));
-    localStorage.setItem('budgets', JSON.stringify(budgets));
-    if (auth.currentUser) syncToCloud();
+    if (!auth.currentUser) return;
+    
+    localStorage.setItem(`transactions_${auth.currentUser.uid}`, JSON.stringify(transactions));
+    localStorage.setItem(`objectifs_${auth.currentUser.uid}`, JSON.stringify(objectifs));
+    localStorage.setItem(`budgets_${auth.currentUser.uid}`, JSON.stringify(budgets));
+    localStorage.setItem(`categories_${auth.currentUser.uid}`, JSON.stringify(categories));
+    
+    // Sync to cloud
+    db.collection('users').doc(auth.currentUser.uid).set({
+        transactions: transactions,
+        objectifs: objectifs,
+        budgets: budgets,
+        categories: categories,
+        lastSync: new Date().toISOString()
+    }, { merge: true });
+}
+
+async function loadUserData(uid) {
+    // D'abord essayer de charger depuis localStorage spécifique à l'utilisateur
+    const localTransactions = localStorage.getItem(`transactions_${uid}`);
+    const localObjectifs = localStorage.getItem(`objectifs_${uid}`);
+    const localBudgets = localStorage.getItem(`budgets_${uid}`);
+    const localCategories = localStorage.getItem(`categories_${uid}`);
+    
+    if (localTransactions && localObjectifs && localBudgets && localCategories) {
+        // Charger depuis localStorage
+        transactions = JSON.parse(localTransactions);
+        objectifs = JSON.parse(localObjectifs);
+        budgets = JSON.parse(localBudgets);
+        categories = JSON.parse(localCategories);
+    } else {
+        // Essayer de charger depuis Firestore
+        const doc = await db.collection('users').doc(uid).get();
+        if (doc.exists && doc.data().transactions) {
+            transactions = doc.data().transactions;
+            objectifs = doc.data().objectifs || DEFAULT_OBJECTIFS;
+            budgets = doc.data().budgets || DEFAULT_BUDGETS;
+            categories = doc.data().categories || DEFAULT_CATEGORIES;
+            saveAllData();
+        } else {
+            // Initialiser avec les données par défaut
+            transactions = [...DEFAULT_TRANSACTIONS];
+            objectifs = [...DEFAULT_OBJECTIFS];
+            budgets = [...DEFAULT_BUDGETS];
+            categories = {...DEFAULT_CATEGORIES};
+            saveAllData();
+        }
+    }
 }
 
 // ==================== AUTHENTIFICATION ====================
@@ -1207,6 +1310,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
 async function displayWelcomeMessage() {
     const user = auth.currentUser;
     if (!user) return;
@@ -1217,7 +1321,6 @@ async function displayWelcomeMessage() {
             const data = doc.data();
             const firstName = data.firstName || '';
             const lastName = data.lastName || '';
-            const fullName = data.fullName || user.displayName || user.email;
             
             let welcomeText = '';
             if (firstName && lastName) {
@@ -1225,17 +1328,17 @@ async function displayWelcomeMessage() {
             } else if (firstName) {
                 welcomeText = `Bonjour ${firstName} !`;
             } else {
-                welcomeText = `Bonjour ${fullName.split('@')[0]} !`;
+                welcomeText = `Bonjour ${user.email.split('@')[0]} !`;
             }
-            
             document.getElementById('welcomeUserText').innerHTML = `${welcomeText} <span style="font-size: 14px;">👋</span>`;
         } else {
-            document.getElementById('welcomeUserText').innerHTML = `Bonjour ${user.email?.split('@')[0] || 'utilisateur'} ! 👋`;
+            document.getElementById('welcomeUserText').innerHTML = `Bonjour ${user.email.split('@')[0]} ! 👋`;
         }
     } catch (error) {
-        document.getElementById('welcomeUserText').innerHTML = `Bonjour ${user.email?.split('@')[0] || 'utilisateur'} ! 👋`;
+        document.getElementById('welcomeUserText').innerHTML = `Bonjour ${user.email.split('@')[0]} ! 👋`;
     }
 }
+
 async function loginWithEmail() {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
@@ -1273,10 +1376,8 @@ async function registerWithEmail() {
         const result = await auth.createUserWithEmailAndPassword(email, password);
         const fullName = `${firstName} ${lastName}`;
         
-        // Mettre à jour le profil
         await result.user.updateProfile({ displayName: fullName });
         
-        // Créer le document utilisateur
         await db.collection('users').doc(result.user.uid).set({
             uid: result.user.uid,
             email: email,
@@ -1284,8 +1385,10 @@ async function registerWithEmail() {
             lastName: lastName,
             fullName: fullName,
             createdAt: new Date().toISOString(),
-            transactions: [],
-            objectifs: []
+            transactions: DEFAULT_TRANSACTIONS,
+            objectifs: DEFAULT_OBJECTIFS,
+            budgets: DEFAULT_BUDGETS,
+            categories: DEFAULT_CATEGORIES
         });
         
         showNotification(`Bienvenue ${firstName} !`, 'success');
@@ -1298,94 +1401,63 @@ async function registerWithEmail() {
     }
 }
 
-async function loginWithGoogle() {
-    try {
-        const result = await auth.signInWithPopup(googleProvider);
-        const user = result.user;
-        
-        // Vérifier si le document utilisateur existe
-        const userRef = db.collection('users').doc(user.uid);
-        const doc = await userRef.get();
-        
-        if (!doc.exists) {
-            // Créer le document utilisateur avec nom et prénom
-            let displayName = user.displayName || '';
-            let firstName = '';
-            let lastName = '';
-            
-            if (displayName) {
-                const nameParts = displayName.split(' ');
-                firstName = nameParts[0] || '';
-                lastName = nameParts.slice(1).join(' ') || '';
-            }
-            
-            await userRef.set({
-                uid: user.uid,
-                email: user.email,
-                firstName: firstName,
-                lastName: lastName,
-                fullName: displayName,
-                photoURL: user.photoURL || '',
-                createdAt: new Date().toISOString(),
-                transactions: [],
-                objectifs: []
-            });
-        }
-        
-        showNotification(`Bienvenue ${user.displayName || 'chez Money Control'} !`, 'success');
-    } catch (error) {
-        console.error('Erreur Google:', error);
-        showNotification('Erreur connexion Google: ' + error.message, 'danger');
-    }
-}
-
 async function resetPassword() {
     const email = document.getElementById('resetEmail').value;
-    try { await auth.sendPasswordResetEmail(email); showNotification('Email envoyé !', 'success'); showLoginForm(); } 
-    catch (error) { showNotification('Email non trouvé', 'danger'); }
-}
-
-async function logout() { await auth.signOut(); localStorage.clear(); location.reload(); }
-
-async function loadUserData(uid) {
-    const doc = await db.collection('users').doc(uid).get();
-    if (doc.exists) {
-        const data = doc.data();
-        if (data.transactions?.length) transactions = data.transactions;
-        if (data.objectifs?.length) objectifs = data.objectifs;
-        saveAllData();
+    try {
+        await auth.sendPasswordResetEmail(email);
+        showNotification('Email envoyé !', 'success');
+        showLoginForm();
+    } catch (error) {
+        showNotification('Email non trouvé', 'danger');
     }
 }
 
-async function syncToCloud() {
-    if (!auth.currentUser) return;
-    await db.collection('users').doc(auth.currentUser.uid).set({ transactions, objectifs, lastSync: new Date().toISOString() }, { merge: true });
+async function logout() {
+    await auth.signOut();
+    transactions = [];
+    objectifs = [];
+    budgets = [];
+    categories = {};
+    location.reload();
 }
 
-setInterval(() => { if (auth.currentUser) syncToCloud(); }, 30000);
-
-function showNotification(msg, type) {
-    const panel = document.getElementById('notifPanel');
-    const el = document.createElement('div');
-    el.className = 'notif';
-    el.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>${msg}`;
-    panel.appendChild(el);
-    setTimeout(() => el.remove(), 4000);
+function showLoginForm() {
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('resetForm').style.display = 'none';
 }
 
-function showLoginForm() { document.getElementById('loginForm').style.display = 'block'; document.getElementById('registerForm').style.display = 'none'; document.getElementById('resetForm').style.display = 'none'; }
-function showRegisterForm() { document.getElementById('loginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'block'; document.getElementById('resetForm').style.display = 'none'; }
-function showResetForm() { document.getElementById('loginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'none'; document.getElementById('resetForm').style.display = 'block'; }
+function showRegisterForm() {
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('registerForm').style.display = 'block';
+    document.getElementById('resetForm').style.display = 'none';
+}
+
+function showResetForm() {
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('resetForm').style.display = 'block';
+}
 
 // ==================== FONCTIONS PRINCIPALES ====================
-function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
-function toggleTheme() { const body = document.body; const current = body.getAttribute('data-theme'); body.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark'); }
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+}
+
+function toggleTheme() {
+    const body = document.body;
+    const current = body.getAttribute('data-theme');
+    body.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+    showNotification(`Mode ${current === 'dark' ? 'clair' : 'sombre'} activé`, 'success');
+}
 
 function showSection(sectionId, el) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.getElementById(sectionId).classList.add('active');
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     if (el) el.classList.add('active');
+    if (window.innerWidth <= 1024) document.getElementById('sidebar').classList.remove('open');
+    
     if (sectionId === 'dashboard') renderDashboard();
     if (sectionId === 'transactions') renderTransactions();
     if (sectionId === 'budgets') renderBudgets();
@@ -1398,31 +1470,26 @@ function showSection(sectionId, el) {
 function getFilteredTransactions() {
     let filtered = [...transactions];
     
-    // Filtre Année
     const year = document.getElementById('globalYear')?.value;
     if (year && year !== 'all') {
         filtered = filtered.filter(t => t.annee == parseInt(year));
     }
     
-    // Filtre Mois
     const month = document.getElementById('globalMonth')?.value;
     if (month && month !== 'all') {
         filtered = filtered.filter(t => t.mois === month);
     }
     
-    // Filtre Catégorie
     const category = document.getElementById('globalCategory')?.value;
     if (category && category !== 'all') {
         filtered = filtered.filter(t => t.categorie === category);
     }
     
-    // Filtre Type
     const type = document.getElementById('globalType')?.value;
     if (type && type !== 'all') {
         filtered = filtered.filter(t => t.type === type);
     }
     
-    // Recherche textuelle
     const search = document.getElementById('globalSearch')?.value.toLowerCase();
     if (search) {
         filtered = filtered.filter(t => 
@@ -1434,51 +1501,40 @@ function getFilteredTransactions() {
     return filtered;
 }
 
-
-
 function initFilters() {
-    // Récupérer toutes les années disponibles dans les transactions
     const years = [...new Set(transactions.map(t => t.annee))].sort((a,b) => b - a);
     if (years.length === 0) years.push(currentYear);
     
     const yearSelect = document.getElementById('globalYear');
     if (yearSelect) {
-        yearSelect.innerHTML = '<option value="all">Toutes années</option>' + 
-            years.map(y => `<option value="${y}" ${y == currentYear ? 'selected' : ''}>${y}</option>`).join('');
+        yearSelect.innerHTML = years.map(y => `<option value="${y}" ${y == currentYear ? 'selected' : ''}>${y}</option>`).join('');
         yearSelect.onchange = () => {
-            currentYear = yearSelect.value === 'all' ? currentYear : parseInt(yearSelect.value);
+            currentYear = parseInt(yearSelect.value);
             applyGlobalFilters();
         };
     }
     
-    // Mois
     const monthsList = ['janv', 'févr', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
     const monthSelect = document.getElementById('globalMonth');
     if (monthSelect) {
         monthSelect.innerHTML = '<option value="all">Tous mois</option>' + 
-            monthsList.map(m => `<option value="${m}-${currentYear}" ${currentMonth === `${m}-${currentYear}` ? 'selected' : ''}>${m} ${currentYear}</option>`).join('');
+            monthsList.map(m => `<option value="${m}-${currentYear}">${m} ${currentYear}</option>`).join('');
         monthSelect.onchange = () => {
             currentMonth = monthSelect.value;
             applyGlobalFilters();
         };
     }
     
-    // Catégories - Regroupées par type
-    const allCategories = [...new Set(transactions.map(t => t.categorie))];
+    const allCategories = [...categories.revenus, ...categories.depenses, ...categories.epargne];
     const categorySelect = document.getElementById('globalCategory');
     if (categorySelect) {
         categorySelect.innerHTML = '<option value="all">Toutes catégories</option>' + 
             allCategories.map(c => `<option value="${c}">${c}</option>`).join('');
         categorySelect.onchange = () => applyGlobalFilters();
     }
-    
-    // Type
-    const typeSelect = document.getElementById('globalType');
-    if (typeSelect) {
-        typeSelect.onchange = () => applyGlobalFilters();
-    }
 }
-  function applyGlobalFilters() {
+
+function applyGlobalFilters() {
     renderDashboard();
     renderTransactions();
     renderBudgets();
@@ -1487,159 +1543,328 @@ function initFilters() {
     renderReports();
     renderAdvancedAnalysis();
 }
+
+// ==================== DASHBOARD ====================
 function renderDashboard() {
     const filtered = getFilteredTransactions();
-    const revenus = filtered.filter(t => t.type === 'Revenu').reduce((s,t) => s+t.montant,0);
-    const depenses = filtered.filter(t => t.type === 'Dépense').reduce((s,t) => s+t.montant,0);
-    const epargne = filtered.filter(t => t.type === 'Épargne').reduce((s,t) => s+t.montant,0);
+    const revenus = filtered.filter(t => t.type === 'Revenu').reduce((s,t) => s + t.montant, 0);
+    const depenses = filtered.filter(t => t.type === 'Dépense').reduce((s,t) => s + t.montant, 0);
+    const epargne = filtered.filter(t => t.type === 'Épargne').reduce((s,t) => s + t.montant, 0);
     const solde = revenus - depenses - epargne;
-    const totalBudget = budgets.reduce((s,b) => s+b.budget,0);
-    const budgetConsomme = filtered.filter(t => t.type === 'Dépense').reduce((s,t) => s+t.montant,0);
-    const pctBudget = totalBudget > 0 ? (budgetConsomme/totalBudget*100).toFixed(1) : 0;
+    const totalBudget = budgets.reduce((s,b) => s + b.budget, 0);
+    const budgetConsomme = filtered.filter(t => t.type === 'Dépense').reduce((s,t) => s + t.montant, 0);
+    const pctBudget = totalBudget > 0 ? (budgetConsomme / totalBudget * 100).toFixed(1) : 0;
+    const objectifsActifs = objectifs.filter(o => o.actuel < o.cible).length;
+    const objectifsAtteints = objectifs.filter(o => o.actuel >= o.cible).length;
+    const tauxObjectifs = objectifs.reduce((s,o) => s + (o.actuel / o.cible), 0) / objectifs.length * 100;
     
     document.getElementById('kpiGrid').innerHTML = `
         <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-line"></i></div><div class="kpi-label">Revenus</div><div class="kpi-value">${formatMoney(revenus)}</div></div>
         <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-shopping-cart"></i></div><div class="kpi-label">Dépenses</div><div class="kpi-value">${formatMoney(depenses)}</div></div>
         <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-piggy-bank"></i></div><div class="kpi-label">Épargne</div><div class="kpi-value">${formatMoney(epargne)}</div></div>
-        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-wallet"></i></div><div class="kpi-label">Solde</div><div class="kpi-value" style="color:${solde>=0?'var(--success)':'var(--danger)'}">${solde>=0?'+':''}${formatMoney(solde)}</div></div>
-        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-simple"></i></div><div class="kpi-label">Budget</div><div class="kpi-value">${pctBudget}%</div><div class="kpi-sub">${formatMoney(budgetConsomme)}/${formatMoney(totalBudget)}</div></div>
-        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-bullseye"></i></div><div class="kpi-label">Objectifs</div><div class="kpi-value">${objectifs.length}</div></div>`;
+        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-wallet"></i></div><div class="kpi-label">Solde</div><div class="kpi-value" style="color:${solde >= 0 ? 'var(--success)' : 'var(--danger)'}">${solde >= 0 ? '+' : ''}${formatMoney(solde)}</div></div>
+        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-simple"></i></div><div class="kpi-label">Budget consommé</div><div class="kpi-value">${pctBudget}%</div><div class="kpi-sub">${formatMoney(budgetConsomme)}/${formatMoney(totalBudget)}</div></div>
+        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-bullseye"></i></div><div class="kpi-label">Objectifs</div><div class="kpi-value">${objectifsActifs}</div><div class="kpi-sub">${objectifsAtteints} atteints · ${tauxObjectifs.toFixed(1)}% global</div></div>`;
     
-    const depParCat = {}; filtered.filter(t=>t.type==='Dépense').forEach(t=>depParCat[t.categorie]=(depParCat[t.categorie]||0)+t.montant);
+    const depParCat = {};
+    filtered.filter(t => t.type === 'Dépense').forEach(t => depParCat[t.categorie] = (depParCat[t.categorie] || 0) + t.montant);
     if (charts.expense) charts.expense.destroy();
-    charts.expense = new Chart(document.getElementById('expenseChart'), {type:'doughnut',data:{labels:Object.keys(depParCat),datasets:[{data:Object.values(depParCat),backgroundColor:['#6366f1','#ec4899','#06b6d4','#10b981','#f59e0b']}]},options:{responsive:true}});
+    charts.expense = new Chart(document.getElementById('expenseChart'), {
+        type: 'doughnut',
+        data: { labels: Object.keys(depParCat), datasets: [{ data: Object.values(depParCat), backgroundColor: ['#6366f1', '#ec4899', '#06b6d4', '#10b981', '#f59e0b'] }] },
+        options: { responsive: true }
+    });
     
-    const revParCat = {}; filtered.filter(t=>t.type==='Revenu').forEach(t=>revParCat[t.categorie]=(revParCat[t.categorie]||0)+t.montant);
+    const revParCat = {};
+    filtered.filter(t => t.type === 'Revenu').forEach(t => revParCat[t.categorie] = (revParCat[t.categorie] || 0) + t.montant);
     if (charts.income) charts.income.destroy();
-    charts.income = new Chart(document.getElementById('incomeChart'), {type:'doughnut',data:{labels:Object.keys(revParCat),datasets:[{data:Object.values(revParCat),backgroundColor:['#10b981','#06b6d4','#f59e0b']}]},options:{responsive:true}});
+    charts.income = new Chart(document.getElementById('incomeChart'), {
+        type: 'doughnut',
+        data: { labels: Object.keys(revParCat), datasets: [{ data: Object.values(revParCat), backgroundColor: ['#10b981', '#06b6d4', '#f59e0b'] }] },
+        options: { responsive: true }
+    });
     
-    const mois = [...new Set(transactions.map(t=>t.mois))].sort();
-    const revMois = mois.map(m=>transactions.filter(t=>t.mois===m&&t.type==='Revenu').reduce((s,t)=>s+t.montant,0));
-    const depMois = mois.map(m=>transactions.filter(t=>t.mois===m&&t.type==='Dépense').reduce((s,t)=>s+t.montant,0));
+    const mois = [...new Set(transactions.map(t => t.mois))].sort();
+    const revMois = mois.map(m => transactions.filter(t => t.mois === m && t.type === 'Revenu').reduce((s,t) => s + t.montant, 0));
+    const depMois = mois.map(m => transactions.filter(t => t.mois === m && t.type === 'Dépense').reduce((s,t) => s + t.montant, 0));
     if (charts.evolution) charts.evolution.destroy();
-    charts.evolution = new Chart(document.getElementById('evolutionChart'), {type:'line',data:{labels:mois,datasets:[{label:'Revenus',data:revMois,borderColor:'#10b981'},{label:'Dépenses',data:depMois,borderColor:'#ef4444'}]},options:{responsive:true}});
+    charts.evolution = new Chart(document.getElementById('evolutionChart'), {
+        type: 'line',
+        data: { labels: mois, datasets: [{ label: 'Revenus', data: revMois, borderColor: '#10b981' }, { label: 'Dépenses', data: depMois, borderColor: '#ef4444' }] },
+        options: { responsive: true }
+    });
     
-    const budgetVsReal = budgets.map(b => ({categorie:b.categorie, budget:b.budget, realise: filtered.filter(t=>t.type==='Dépense'&&t.categorie===b.categorie).reduce((s,t)=>s+t.montant,0)}));
+    const budgetVsReal = budgets.map(b => ({
+        categorie: b.categorie,
+        budget: b.budget,
+        realise: filtered.filter(t => t.type === 'Dépense' && t.categorie === b.categorie).reduce((s,t) => s + t.montant, 0)
+    }));
     if (charts.budgetVsReal) charts.budgetVsReal.destroy();
-    charts.budgetVsReal = new Chart(document.getElementById('budgetVsRealChart'), {type:'bar',data:{labels:budgetVsReal.map(b=>b.categorie),datasets:[{label:'Budget',data:budgetVsReal.map(b=>b.budget),backgroundColor:'#06b6d4'},{label:'Réalisé',data:budgetVsReal.map(b=>b.realise),backgroundColor:'#ec4899'}]},options:{responsive:true}});
+    charts.budgetVsReal = new Chart(document.getElementById('budgetVsRealChart'), {
+        type: 'bar',
+        data: { labels: budgetVsReal.map(b => b.categorie), datasets: [{ label: 'Budget', data: budgetVsReal.map(b => b.budget), backgroundColor: '#06b6d4' }, { label: 'Réalisé', data: budgetVsReal.map(b => b.realise), backgroundColor: '#ec4899' }] },
+        options: { responsive: true }
+    });
+    
+    // Alertes
+    const alerts = [];
+    if (pctBudget > 100) alerts.push({ type: 'danger', msg: `⚠️ Dépassement budget global : ${pctBudget}% consommé` });
+    else if (pctBudget > 80) alerts.push({ type: 'warning', msg: `⚠️ Budget à ${pctBudget}% - Attention au dépassement` });
+    objectifs.forEach(o => {
+        const pct = (o.actuel / o.cible) * 100;
+        if (pct > 85 && pct < 100) alerts.push({ type: 'warning', msg: `🎯 Objectif "${o.nom}" à ${pct.toFixed(1)}% - Bientôt atteint !` });
+    });
+    document.getElementById('alertsContainer').innerHTML = alerts.map(a => `<div class="alert-bar alert-${a.type}"><i class="fas fa-bell"></i>${a.msg}</div>`).join('');
 }
 
+// ==================== TRANSACTIONS ====================
 function renderTransactions() {
     const filtered = getFilteredTransactions();
     document.getElementById('transactionsTable').innerHTML = filtered.map(t => `
-        <tr><td>${formatDate(t.date)}</td><td><span class="badge badge-${t.type==='Revenu'?'rev':'dep'}">${t.type}</span></td>
-        <td>${t.description}</td><td>${t.categorie}</td><td>${t.sous_categorie||'-'}</td>
-        <td class="amt-${t.type==='Revenu'?'rev':'dep'}">${t.type==='Dépense'?'-':'+'}${formatMoney(t.montant)}</td>
-        <td><button class="btn btn-secondary btn-sm" onclick="editTransaction(${t.id})"><i class="fas fa-edit"></i></button>
-        <button class="btn btn-danger btn-sm" onclick="deleteTransaction(${t.id})"><i class="fas fa-trash"></i></button></td></tr>
+        <tr>
+            <td>${formatDate(t.date)}</td>
+            <td><span class="badge badge-${t.type === 'Revenu' ? 'rev' : t.type === 'Dépense' ? 'dep' : 'ep'}">${t.type}</span></td>
+            <td>${t.description}</td>
+            <td>${t.categorie}</td>
+            <td>${t.sous_categorie || '-'}</td>
+            <td class="amt-${t.type === 'Revenu' ? 'rev' : 'dep'}">${t.type === 'Dépense' ? '-' : '+'}${formatMoney(t.montant)}</td>
+            <td>
+                <button class="btn btn-secondary btn-sm" onclick="editTransaction(${t.id})"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-danger btn-sm" onclick="deleteTransaction(${t.id})"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>
     `).join('');
     document.getElementById('txCount').textContent = transactions.length;
 }
 
-function openTransactionModal() { document.getElementById('transactionModal').classList.add('active'); document.getElementById('txDate').value = new Date().toISOString().split('T')[0]; editTransactionId = null; updateCategorySelect(); }
-function closeTransactionModal() { document.getElementById('transactionModal').classList.remove('active'); }
-
-function saveTransaction() {
-    const t = { id: editTransactionId || Date.now(), date: document.getElementById('txDate').value, mois: currentMonth, annee: currentYear, type: document.getElementById('txType').value, description: document.getElementById('txDesc').value, categorie: document.getElementById('txCategory').value, sous_categorie: document.getElementById('txSubCategory').value, montant: parseFloat(document.getElementById('txAmount').value) };
-    if (!t.montant) { showNotification('Montant requis', 'danger'); return; }
-    if (editTransactionId) { const idx = transactions.findIndex(x => x.id === editTransactionId); transactions[idx] = t; } else transactions.unshift(t);
-    saveAllData(); closeTransactionModal(); applyGlobalFilters(); showNotification('Transaction enregistrée', 'success');
+function openTransactionModal() {
+    document.getElementById('transactionModal').classList.add('active');
+    document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
+    editTransactionId = null;
+    updateCategorySelect();
 }
 
-function editTransaction(id) { const t = transactions.find(x => x.id === id); openTransactionModal(); editTransactionId = id; document.getElementById('txDate').value = t.date; document.getElementById('txType').value = t.type; document.getElementById('txDesc').value = t.description; updateCategorySelect(); document.getElementById('txCategory').value = t.categorie; document.getElementById('txSubCategory').value = t.sous_categorie; document.getElementById('txAmount').value = t.montant; }
-function deleteTransaction(id) { if (confirm('Supprimer ?')) { transactions = transactions.filter(x => x.id !== id); saveAllData(); applyGlobalFilters(); showNotification('Supprimé', 'success'); } }
+function closeTransactionModal() {
+    document.getElementById('transactionModal').classList.remove('active');
+}
 
+function updateCategorySelect() {
+    const type = document.getElementById('txType').value;
+    let cats = [];
+    if (type === 'Revenu') cats = categories.revenus;
+    else if (type === 'Dépense') cats = categories.depenses;
+    else cats = categories.epargne;
+    
+    const catSelect = document.getElementById('txCategory');
+    if (catSelect) {
+        catSelect.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+}
+
+function saveTransaction() {
+    const t = {
+        id: editTransactionId || Date.now(),
+        date: document.getElementById('txDate').value,
+        mois: currentMonth,
+        annee: currentYear,
+        type: document.getElementById('txType').value,
+        description: document.getElementById('txDesc').value,
+        categorie: document.getElementById('txCategory').value,
+        sous_categorie: document.getElementById('txSubCategory').value,
+        montant: parseFloat(document.getElementById('txAmount').value)
+    };
+    
+    if (!t.montant || !t.description) {
+        showNotification('Veuillez remplir tous les champs', 'danger');
+        return;
+    }
+    
+    if (editTransactionId) {
+        const idx = transactions.findIndex(x => x.id === editTransactionId);
+        transactions[idx] = t;
+    } else {
+        transactions.unshift(t);
+    }
+    
+    saveAllData();
+    closeTransactionModal();
+    applyGlobalFilters();
+    showNotification('Transaction enregistrée', 'success');
+}
+
+function editTransaction(id) {
+    const t = transactions.find(x => x.id === id);
+    openTransactionModal();
+    editTransactionId = id;
+    document.getElementById('txDate').value = t.date;
+    document.getElementById('txType').value = t.type;
+    document.getElementById('txDesc').value = t.description;
+    updateCategorySelect();
+    document.getElementById('txCategory').value = t.categorie;
+    document.getElementById('txSubCategory').value = t.sous_categorie;
+    document.getElementById('txAmount').value = t.montant;
+}
+
+function deleteTransaction(id) {
+    if (confirm('Supprimer cette transaction ?')) {
+        transactions = transactions.filter(x => x.id !== id);
+        saveAllData();
+        applyGlobalFilters();
+        showNotification('Transaction supprimée', 'success');
+    }
+}
+
+// ==================== BUDGETS ====================
 function renderBudgets() {
     const filtered = getFilteredTransactions().filter(t => t.type === 'Dépense');
     document.getElementById('budgetCards').innerHTML = budgets.map(b => {
-        const realise = filtered.filter(t => t.categorie === b.categorie).reduce((s,t) => s+t.montant,0);
-        const pct = (realise/b.budget*100).toFixed(1);
-        return `<div class="kpi-card"><div class="kpi-label">${b.categorie}</div><div class="kpi-value" style="font-size:18px">${formatMoney(realise)}/${formatMoney(b.budget)}</div><div class="progress-bg"><div class="progress-fill ${pct>100?'progress-danger':pct>80?'progress-warning':'progress-success'}" style="width:${Math.min(pct,100)}%"></div></div><div>${pct}%</div></div>`;
+        const realise = filtered.filter(t => t.categorie === b.categorie).reduce((s, t) => s + t.montant, 0);
+        const pct = (realise / b.budget * 100).toFixed(1);
+        return `
+            <div class="kpi-card">
+                <div class="kpi-label">${b.categorie}</div>
+                <div class="kpi-value" style="font-size: 18px">${formatMoney(realise)} / ${formatMoney(b.budget)}</div>
+                <div class="progress-bg"><div class="progress-fill ${pct > 100 ? 'progress-danger' : pct > 80 ? 'progress-warning' : 'progress-success'}" style="width: ${Math.min(pct, 100)}%"></div></div>
+                <div>${pct}%</div>
+            </div>
+        `;
     }).join('');
+    
     document.getElementById('budgetTable').innerHTML = budgets.map(b => {
-        const realise = filtered.filter(t => t.categorie === b.categorie).reduce((s,t) => s+t.montant,0);
-        const pct = (realise/b.budget*100).toFixed(1);
-        let status = '<span class="status status-ok">✅ OK</span>';
-        if (pct > 100) status = '<span class="status status-danger">🔴 Dépassement</span>';
-        else if (pct > 80) status = '<span class="status status-warning">🟠 Attention</span>';
-        return `<tr><td><strong>${b.categorie}</strong></td><td>${formatMoney(b.budget)}</td><td>${formatMoney(realise)}</td><td>${formatMoney(b.budget-realise)}</td><td>${pct}%</td><td>${status}</td></tr>`;
+        const realise = filtered.filter(t => t.categorie === b.categorie).reduce((s, t) => s + t.montant, 0);
+        const pct = (realise / b.budget * 100).toFixed(1);
+        let status = '<span class="status s-ok">✅ OK</span>';
+        if (pct > 100) status = '<span class="status s-danger">🔴 Dépassement</span>';
+        else if (pct > 80) status = '<span class="status s-warn">🟠 Attention</span>';
+        return `
+            <tr>
+                <td><strong>${b.categorie}</strong></td>
+                <td>${formatMoney(b.budget)}</td>
+                <td>${formatMoney(realise)}</td>
+                <td>${formatMoney(b.budget - realise)}</td>
+                <td>${pct}%</td>
+                <td>${status}</td>
+            </tr>
+        `;
     }).join('');
 }
 
+// ==================== OBJECTIFS ====================
 function renderObjectifs() {
     document.getElementById('objectifsGrid').innerHTML = objectifs.map(o => {
-        const pct = (o.actuel/o.cible*100).toFixed(1);
-        const joursRestants = Math.ceil((new Date(o.date_cible)-new Date())/(1000*60*60*24));
-        return `<div class="obj-card ${o.priorite === 'Haute' ? 'high' : 'medium'}"><div class="obj-header"><div><div class="obj-name">${o.nom}</div><div class="obj-desc">${o.description}</div><div class="obj-desc">📅 ${o.date_cible} · ${joursRestants>0?joursRestants+' jours':'Terminé'}</div></div><div class="obj-amt"><div class="obj-current">${formatMoney(o.actuel)}</div><div class="obj-target">/${formatMoney(o.cible)}</div></div></div><div class="obj-pct">${pct}%</div><div class="progress-bg"><div class="progress-fill progress-success" style="width:${Math.min(pct,100)}%"></div></div><div class="obj-actions"><button class="btn btn-secondary btn-sm" onclick="editObjective(${o.id})"><i class="fas fa-edit"></i></button><button class="btn btn-danger btn-sm" onclick="deleteObjective(${o.id})"><i class="fas fa-trash"></i></button></div></div>`;
+        const pct = (o.actuel / o.cible * 100).toFixed(1);
+        const joursRestants = Math.ceil((new Date(o.date_cible) - new Date()) / (1000 * 60 * 60 * 24));
+        return `
+            <div class="obj-card ${o.priorite === 'Haute' ? 'high' : o.priorite === 'Moyenne' ? 'medium' : 'low'}">
+                <div class="obj-header">
+                    <div>
+                        <div class="obj-name">${o.nom}</div>
+                        <div class="obj-desc">${o.description}</div>
+                        <div class="obj-desc">📅 ${o.date_cible} · ${joursRestants > 0 ? joursRestants + ' jours restants' : 'Terminé'}</div>
+                    </div>
+                    <div class="obj-amt">
+                        <div class="obj-current">${formatMoney(o.actuel)}</div>
+                        <div class="obj-target">/${formatMoney(o.cible)}</div>
+                    </div>
+                </div>
+                <div class="obj-pct">${pct}%</div>
+                <div class="progress-bg"><div class="progress-fill progress-success" style="width: ${Math.min(pct, 100)}%"></div></div>
+                <div class="obj-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="editObjective(${o.id})"><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteObjective(${o.id})"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        `;
     }).join('');
     document.getElementById('objCount').textContent = objectifs.length;
 }
 
-function openObjectiveModal() { document.getElementById('objectiveModal').classList.add('active'); editObjectiveId = null; }
-function closeObjectiveModal() { document.getElementById('objectiveModal').classList.remove('active'); }
-function saveObjective() {
-    const obj = { id: editObjectiveId || Date.now(), nom: document.getElementById('objName').value, cible: parseFloat(document.getElementById('objTarget').value), actuel: parseFloat(document.getElementById('objCurrent').value), date_cible: document.getElementById('objDate').value, description: document.getElementById('objDesc').value, priorite: document.getElementById('objPriority').value };
-    if (!obj.nom || !obj.cible) { showNotification('Nom et cible requis', 'danger'); return; }
-    if (editObjectiveId) { const idx = objectifs.findIndex(o => o.id === editObjectiveId); objectifs[idx] = obj; } else objectifs.push(obj);
-    saveAllData(); closeObjectiveModal(); renderObjectifs(); showNotification('Objectif enregistré', 'success');
+function openObjectiveModal() {
+    document.getElementById('objectiveModal').classList.add('active');
+    editObjectiveId = null;
+    document.getElementById('objName').value = '';
+    document.getElementById('objDesc').value = '';
+    document.getElementById('objTarget').value = '';
+    document.getElementById('objCurrent').value = '0';
+    document.getElementById('objDate').value = '';
 }
-function editObjective(id) { const o = objectifs.find(x => x.id === id); openObjectiveModal(); editObjectiveId = id; document.getElementById('objName').value = o.nom; document.getElementById('objDesc').value = o.description; document.getElementById('objTarget').value = o.cible; document.getElementById('objCurrent').value = o.actuel; document.getElementById('objDate').value = o.date_cible; document.getElementById('objPriority').value = o.priorite; }
-function deleteObjective(id) { if (confirm('Supprimer ?')) { objectifs = objectifs.filter(o => o.id !== id); saveAllData(); renderObjectifs(); showNotification('Objectif supprimé', 'success'); } }
 
-function renderCalendar() {
-    const filtered = getFilteredTransactions();
+function closeObjectiveModal() {
+    document.getElementById('objectiveModal').classList.remove('active');
+}
+
+function saveObjective() {
+    const obj = {
+        id: editObjectiveId || Date.now(),
+        nom: document.getElementById('objName').value,
+        cible: parseFloat(document.getElementById('objTarget').value),
+        actuel: parseFloat(document.getElementById('objCurrent').value) || 0,
+        date_cible: document.getElementById('objDate').value,
+        description: document.getElementById('objDesc').value,
+        priorite: document.getElementById('objPriority').value,
+        categorie: 'Épargne',
+        sous_categorie: document.getElementById('objName').value
+    };
     
-    // Déterminer l'année et le mois actuels
-    let year = currentYear;
-    let month = currentMonth;
-    
-    // Si currentMonth contient l'année (ex: mai-2026)
-    if (currentMonth && currentMonth.includes('-')) {
-        const parts = currentMonth.split('-');
-        month = parts[0];
-        year = parseInt(parts[1]);
-    } else if (typeof currentMonth === 'string' && !currentMonth.includes('-')) {
-        month = currentMonth;
-    } else {
-        month = 'mai';
-    }
-    
-    const monthNames = ['janv', 'févr', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
-    const monthIndex = monthNames.indexOf(month);
-    
-    if (monthIndex === -1) {
-        document.getElementById('calendarView').innerHTML = '<div style="padding: 20px; text-align: center;">Sélectionnez un mois valide</div>';
+    if (!obj.nom || !obj.cible) {
+        showNotification('Nom et cible requis', 'danger');
         return;
     }
     
-    const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
-    const firstDay = new Date(year, monthIndex, 1).getDay();
+    if (editObjectiveId) {
+        const idx = objectifs.findIndex(o => o.id === editObjectiveId);
+        objectifs[idx] = obj;
+    } else {
+        objectifs.push(obj);
+    }
+    
+    saveAllData();
+    closeObjectiveModal();
+    renderObjectifs();
+    showNotification('Objectif enregistré', 'success');
+}
+
+function editObjective(id) {
+    const o = objectifs.find(x => x.id === id);
+    openObjectiveModal();
+    editObjectiveId = id;
+    document.getElementById('objName').value = o.nom;
+    document.getElementById('objDesc').value = o.description;
+    document.getElementById('objTarget').value = o.cible;
+    document.getElementById('objCurrent').value = o.actuel;
+    document.getElementById('objDate').value = o.date_cible;
+    document.getElementById('objPriority').value = o.priorite;
+}
+
+function deleteObjective(id) {
+    if (confirm('Supprimer cet objectif ?')) {
+        objectifs = objectifs.filter(o => o.id !== id);
+        saveAllData();
+        renderObjectifs();
+        showNotification('Objectif supprimé', 'success');
+    }
+}
+
+// ==================== CALENDRIER ====================
+function renderCalendar() {
+    const filtered = getFilteredTransactions();
+    const month = currentMonth.split('-')[0];
+    const monthIndex = ['janv', 'févr', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'].indexOf(month);
+    const firstDay = new Date(currentYear, monthIndex, 1).getDay();
+    const daysInMonth = new Date(currentYear, monthIndex + 1, 0).getDate();
     
     let html = '<div class="calendar-grid">';
     ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].forEach(d => html += `<div class="calendar-day-header">${d}</div>`);
     
-    // Ajustement pour commencer par Lundi
-    let startOffset = (firstDay + 6) % 7;
-    for (let i = 0; i < startOffset; i++) html += '<div></div>';
+    for (let i = 0; i < (firstDay + 6) % 7; i++) html += '<div></div>';
     
     for (let d = 1; d <= daysInMonth; d++) {
-        const dateStr = `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const dateStr = `${currentYear}-${String(monthIndex + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const dayEvents = filtered.filter(t => t.date === dateStr);
         
-        let eventsHtml = '';
-        if (dayEvents.length > 0) {
-            eventsHtml = dayEvents.slice(0, 3).map(e => {
-                let icon = '💰';
-                if (e.type === 'Dépense') icon = '💸';
-                else if (e.type === 'Épargne') icon = '🏦';
-                return `<div class="calendar-event">${icon} ${formatMoney(e.montant)}</div>`;
-            }).join('');
-            if (dayEvents.length > 3) eventsHtml += `<div class="calendar-event">+${dayEvents.length - 3} autres</div>`;
-        }
-        
         html += `<div class="calendar-day">
-            <div class="calendar-day-number">${d}</div>
-            ${eventsHtml}
+            <div class="calendar-day-header">${d}</div>
+            ${dayEvents.slice(0, 3).map(e => `<div class="calendar-event">${e.type === 'Revenu' ? '💰' : '💸'} ${formatMoney(e.montant)}</div>`).join('')}
         </div>`;
     }
     html += '</div>';
@@ -1648,34 +1873,19 @@ function renderCalendar() {
     if (calendarContainer) calendarContainer.innerHTML = html;
 }
 
-function updateCategorySelect() {
-    const type = document.getElementById('txType').value;
-    let cats = [];
-    if (type === 'Revenu') cats = [...new Set(transactions.filter(t => t.type === 'Revenu').map(t => t.categorie))];
-    else if (type === 'Dépense') cats = [...new Set(transactions.filter(t => t.type === 'Dépense').map(t => t.categorie))];
-    else cats = [...new Set(transactions.filter(t => t.type === 'Épargne').map(t => t.categorie))];
-    
-    if (cats.length === 0) cats = ['Salaire', 'Logement', 'Voyage'];
-    
-    const catSelect = document.getElementById('txCategory');
-    if (catSelect) {
-        catSelect.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
-    }
-}
+// ==================== RAPPORTS ====================
 function renderReports() {
     const filtered = getFilteredTransactions();
-    const revenus = filtered.filter(t => t.type === 'Revenu').reduce((s,t) => s + t.montant, 0);
-    const depenses = filtered.filter(t => t.type === 'Dépense').reduce((s,t) => s + t.montant, 0);
-    const epargne = filtered.filter(t => t.type === 'Épargne').reduce((s,t) => s + t.montant, 0);
-    const balance = revenus - depenses - epargne;
+    const revenus = filtered.filter(t => t.type === 'Revenu').reduce((s, t) => s + t.montant, 0);
+    const depenses = filtered.filter(t => t.type === 'Dépense').reduce((s, t) => s + t.montant, 0);
+    const epargne = filtered.filter(t => t.type === 'Épargne').reduce((s, t) => s + t.montant, 0);
     
     // Analyse par catégorie
     const categoriesReport = {};
     filtered.forEach(t => {
-        if (!categoriesReport[t.categorie]) categoriesReport[t.categorie] = { revenus: 0, depenses: 0, epargne: 0 };
+        if (!categoriesReport[t.categorie]) categoriesReport[t.categorie] = { revenus: 0, depenses: 0 };
         if (t.type === 'Revenu') categoriesReport[t.categorie].revenus += t.montant;
         if (t.type === 'Dépense') categoriesReport[t.categorie].depenses += t.montant;
-        if (t.type === 'Épargne') categoriesReport[t.categorie].epargne += t.montant;
     });
     
     document.getElementById('reportContent').innerHTML = `
@@ -1683,20 +1893,19 @@ function renderReports() {
             <div class="rapport-card"><div class="rapport-value" style="color:var(--success)">+${formatMoney(revenus)}</div><div class="rapport-label">Revenus totaux</div></div>
             <div class="rapport-card"><div class="rapport-value" style="color:var(--danger)">-${formatMoney(depenses)}</div><div class="rapport-label">Dépenses totales</div></div>
             <div class="rapport-card"><div class="rapport-value" style="color:var(--info)">${formatMoney(epargne)}</div><div class="rapport-label">Épargne totale</div></div>
-            <div class="rapport-card"><div class="rapport-value" style="color:${balance>=0?'var(--success)':'var(--danger)'}">${balance>=0?'+':''}${formatMoney(balance)}</div><div class="rapport-label">Balance nette</div></div>
+            <div class="rapport-card"><div class="rapport-value">${formatMoney(revenus - depenses - epargne)}</div><div class="rapport-label">Balance nette</div></div>
         </div>
         <div class="table-card">
             <div class="table-header"><div class="table-title">Analyse par catégorie</div></div>
             <table class="data-table">
-                <thead><th>Catégorie</th><th>Revenus</th><th>Dépenses</th><th>Épargne</th><th>Solde</th></thead>
+                <thead><th>Catégorie</th><th>Revenus</th><th>Dépenses</th><th>Solde</th></thead>
                 <tbody>
                     ${Object.entries(categoriesReport).map(([cat, data]) => `
                         <tr>
                             <td><strong>${cat}</strong></td>
                             <td class="amt-rev">+${formatMoney(data.revenus)}</td>
                             <td class="amt-dep">-${formatMoney(data.depenses)}</td>
-                            <td class="amt-ep">${formatMoney(data.epargne)}</td>
-                            <td style="color:${(data.revenus-data.depenses-data.epargne)>=0?'var(--success)':'var(--danger)'}">${formatMoney(data.revenus-data.depenses-data.epargne)}</td>
+                            <td style="color:${(data.revenus - data.depenses) >= 0 ? 'var(--success)' : 'var(--danger)'}">${formatMoney(data.revenus - data.depenses)}</td>
                         </tr>
                     `).join('')}
                 </tbody>
@@ -1705,24 +1914,73 @@ function renderReports() {
     `;
 }
 
+// ==================== ANALYSE AVANCÉE ====================
 function renderAdvancedAnalysis() {
     const filtered = getFilteredTransactions();
-    const revenus = filtered.filter(t => t.type === 'Revenu').reduce((s,t) => s+t.montant,0);
-    const depenses = filtered.filter(t => t.type === 'Dépense').reduce((s,t) => s+t.montant,0);
-    const epargne = filtered.filter(t => t.type === 'Épargne').reduce((s,t) => s+t.montant,0);
-    const tauxEpargne = revenus > 0 ? (epargne/revenus*100).toFixed(1) : 0;
+    const revenus = filtered.filter(t => t.type === 'Revenu').reduce((s, t) => s + t.montant, 0);
+    const depenses = filtered.filter(t => t.type === 'Dépense').reduce((s, t) => s + t.montant, 0);
+    const epargne = filtered.filter(t => t.type === 'Épargne').reduce((s, t) => s + t.montant, 0);
+    const tauxEpargne = revenus > 0 ? (epargne / revenus * 100).toFixed(1) : 0;
+    const ratioDepRevenus = revenus > 0 ? (depenses / revenus * 100).toFixed(1) : 0;
+    
     document.getElementById('advancedKPIs').innerHTML = `
-        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-percentage"></i></div><div class="kpi-label">Taux épargne</div><div class="kpi-value">${tauxEpargne}%</div></div>
-        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-balance-scale"></i></div><div class="kpi-label">Ratio D/R</div><div class="kpi-value">${revenus>0?((depenses/revenus)*100).toFixed(1):0}%</div></div>
-        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-line"></i></div><div class="kpi-label">Prévision</div><div class="kpi-value">${formatMoney((revenus-depenses)*12)}</div></div>`;
+        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-percentage"></i></div><div class="kpi-label">Taux d'épargne</div><div class="kpi-value">${tauxEpargne}%</div><div class="kpi-sub">Objectif: >20%</div></div>
+        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-balance-scale"></i></div><div class="kpi-label">Ratio Dépenses/Revenus</div><div class="kpi-value">${ratioDepRevenus}%</div><div class="kpi-sub">Idéal: <50%</div></div>
+        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-line"></i></div><div class="kpi-label">Prévision annuelle</div><div class="kpi-value">${formatMoney((revenus - depenses) * 12)}</div><div class="kpi-sub">Épargne annuelle projetée</div></div>
+    `;
 }
 
-function exportToCSV() { let csv = "Date,Type,Description,Montant\n"; getFilteredTransactions().forEach(t => csv += `${t.date},${t.type},${t.description},${t.montant}\n`); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv])); a.download = `export_${currentMonth}.csv`; a.click(); showNotification('Export CSV', 'success'); }
-function exportToPDF() { const {jsPDF}=window.jspdf; const doc=new jsPDF(); doc.text('Rapport financier',20,20); getFilteredTransactions().slice(0,15).forEach((t,i)=>doc.text(`${t.date} - ${t.description}: ${t.montant} MAD`,20,40+i*8)); doc.save('rapport.pdf'); showNotification('Export PDF', 'success'); }
-function exportToExcel() { const ws=XLSX.utils.json_to_sheet(getFilteredTransactions()); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Transactions'); XLSX.writeFile(wb,`rapport_${currentMonth}.xlsx`); showNotification('Export Excel', 'success'); }
-function printReport() { window.print(); }
-function resetData() { if(confirm('Réinitialiser ?')) { localStorage.clear(); location.reload(); } }
+// ==================== EXPORTS ====================
+function exportToCSV() {
+    let csv = "Date,Type,Description,Catégorie,Montant\n";
+    getFilteredTransactions().forEach(t => csv += `${t.date},${t.type},${t.description},${t.categorie},${t.montant}\n`);
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `transactions_${currentMonth}.csv`;
+    a.click();
+    showNotification('Export CSV réussi', 'success');
+}
 
+function exportToPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.text('Rapport financier Money Control Pro', 20, 20);
+    doc.text(`Période: ${currentMonth} ${currentYear}`, 20, 30);
+    let y = 50;
+    getFilteredTransactions().slice(0, 20).forEach(t => {
+        doc.text(`${t.date} - ${t.description}: ${t.montant} MAD`, 20, y);
+        y += 8;
+    });
+    doc.save(`Rapport_${currentMonth}.pdf`);
+    showNotification('Export PDF réussi', 'success');
+}
+
+function exportToExcel() {
+    const ws = XLSX.utils.json_to_sheet(getFilteredTransactions());
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Transactions');
+    XLSX.writeFile(wb, `rapport_${currentMonth}.xlsx`);
+    showNotification('Export Excel réussi', 'success');
+}
+
+function printReport() {
+    window.print();
+}
+
+function resetData() {
+    if (confirm('⚠️ Réinitialiser toutes vos données ? Cette action est irréversible !')) {
+        transactions = [...DEFAULT_TRANSACTIONS];
+        objectifs = [...DEFAULT_OBJECTIFS];
+        budgets = [...DEFAULT_BUDGETS];
+        categories = { ...DEFAULT_CATEGORIES };
+        saveAllData();
+        applyGlobalFilters();
+        showNotification('Données réinitialisées', 'success');
+    }
+}
+
+// Exposer les fonctions globalement
 window.showSection = showSection;
 window.openTransactionModal = openTransactionModal;
 window.closeTransactionModal = closeTransactionModal;
@@ -1731,7 +1989,6 @@ window.editTransaction = editTransaction;
 window.deleteTransaction = deleteTransaction;
 window.loginWithEmail = loginWithEmail;
 window.registerWithEmail = registerWithEmail;
-window.loginWithGoogle = loginWithGoogle;
 window.resetPassword = resetPassword;
 window.logout = logout;
 window.showLoginForm = showLoginForm;
