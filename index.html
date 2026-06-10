@@ -946,11 +946,7 @@ body {
 <body data-theme="dark">
 
  // Configuration EmailJS (à remplacer par vos identifiants)
-const EMAILJS_CONFIG = {
-    serviceId: "service_jw6x8wt",      // Ex: "service_abc123"
-    templateId: "template_3khrhny",    // Ex: "template_xyz789"
-    publicKey: "aBWWakhI_E4qhUp8J"       // Ex: "abc123def456"
-};
+
 <!-- ÉCRAN DE CONNEXION -->
 <div id="loginContainer" style="display: flex; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999;">
     <div style="margin: auto; width: 100%; max-width: 450px; padding: 20px;">
@@ -1240,20 +1236,32 @@ const EMAILJS_CONFIG = {
         </div>
     </div>
     
-    <div class="table-card">
-        <div class="table-header">
-            <div class="table-title">🔧 Activation manuelle</div>
-        </div>
-        <div class="form-group" style="margin-bottom: 15px;">
-            <label class="form-label">Email de l'utilisateur</label>
-            <div style="display: flex; gap: 10px;">
-                <input type="email" id="adminUserEmail" class="form-input" placeholder="utilisateur@email.com" style="flex: 1;">
-                <button class="btn btn-primary" onclick="manualActivateUserFirebase()">
-                    <i class="fas fa-check-circle"></i> Activer
-                </button>
-            </div>
+<div class="table-card">
+    <div class="table-header">
+        <div class="table-title">🔧 Activation manuelle</div>
+    </div>
+    <div class="form-group" style="margin-bottom: 15px;">
+        <label class="form-label">Email de l'utilisateur</label>
+        <div style="display: flex; gap: 10px;">
+            <input type="email" id="adminUserEmail" class="form-input" placeholder="utilisateur@email.com" style="flex: 1;">
+            <button class="btn btn-primary" onclick="manualActivateUserFirebase()">
+                <i class="fas fa-check-circle"></i> Activer
+            </button>
         </div>
     </div>
+</div>
+
+<!-- Ajouter cette section pour l'email admin -->
+<div class="table-card">
+    <div class="table-header">
+        <div class="table-title">📧 Configuration Admin</div>
+    </div>
+    <div class="form-group">
+        <label class="form-label">Email de l'administrateur</label>
+        <input type="email" id="adminEmailConfig" class="form-input" placeholder="admin@email.com">
+        <small style="color: var(--text-muted);">C'est sur cet email que vous recevrez les notifications</small>
+    </div>
+</div>
 </section>
         </main>
     </div>
@@ -1428,6 +1436,28 @@ const EMAILJS_CONFIG = {
 const ADMIN_EMAILS = ["abderrazak.elmakhrout@gmail.com", "autre-admin@email.com"]; // Liste des admins autorisés
 
 // Vérifier si l'utilisateur est admin
+
+ // Ajouter un bouton de demande d'activation dans le message de bienvenue
+async function addActivationButtonIfNeeded() {
+    if (!auth.currentUser) return;
+    
+    const isActivated = await isAccountActivated();
+    if (!isActivated) {
+        const welcomeDiv = document.getElementById('welcomeMessage');
+        if (welcomeDiv && !document.getElementById('activationRequestBtn')) {
+            const btnDiv = document.createElement('div');
+            btnDiv.id = 'activationRequestBtn';
+            btnDiv.style.marginTop = '15px';
+            btnDiv.innerHTML = `
+                <button class="btn btn-warning" onclick="requestActivationFirebase()" style="background: var(--warning); color: white; border: none;">
+                    <i class="fas fa-key"></i> 🔑 Demander l'activation de mon compte
+                </button>
+                <small style="display: block; margin-top: 8px; opacity: 0.8;">💡 Après avoir effectué le virement de 99 MAD, cliquez ici pour demander l'activation</small>
+            `;
+            welcomeDiv.appendChild(btnDiv);
+        }
+    }
+}
 async function isUserAdmin(uid) {
     if (!uid) return false;
     
@@ -1906,7 +1936,11 @@ const DEFAULT_CATEGORIES = {
     depenses: ["Alimentation", "Logement", "Transport", "Loisirs", "Shopping", "Santé", "Éducation", "Factures"],
     epargne: ["Voyage", "Voiture", "Urgence", "Investissement", "Projet"]
 };
-
+const EMAILJS_CONFIG = {
+    serviceId: "service_jw6x8wt",
+    templateId: "template_3khrhny",
+    publicKey: "aBWWakhI_E4qhUp8J"
+};
 // ==================== VARIABLES GLOBALES ====================
 let transactions = [];
 let objectifs = [];
@@ -1952,26 +1986,35 @@ async function isAccountActivated() {
 // Pour vérifier avant d'ajouter des transactions
 
 // Au chargement, initialiser l'admin si l'utilisateur connecté est admin
+// Au chargement, initialiser l'admin si l'utilisateur connecté est admin
 async function initAdminSection() {
-    if (!auth.currentUser) return;
+    if (!auth.currentUser) {
+        console.log('❌ initAdminSection: Pas d\'utilisateur connecté');
+        return;
+    }
+    
+    console.log('🔍 initAdminSection: Vérification pour', auth.currentUser.email);
     
     const isAdmin = await isUserAdmin(auth.currentUser.uid);
+    console.log('📊 Est admin ?', isAdmin);
+    
     if (isAdmin) {
         const adminMenuItem = document.getElementById('adminMenuItem');
-        if (adminMenuItem) adminMenuItem.style.display = 'flex';
+        if (adminMenuItem) {
+            adminMenuItem.style.display = 'flex';
+            console.log('✅ Menu Admin affiché');
+        } else {
+            console.log('❌ Élément adminMenuItem non trouvé');
+        }
         
         // Charger les données admin
         await loadPendingRequestsFirebase();
         await loadActivatedUsersFirebase();
-        
-        // Configurer l'email admin dans le formulaire
-        const adminEmailInput = document.getElementById('adminEmailConfig');
-        if (adminEmailInput) {
-            const userDoc = await db.collection('users').doc(auth.currentUser.uid).get();
-            if (userDoc.exists) {
-                adminEmailInput.value = userDoc.data().email;
-            }
-        }
+        console.log('✅ Données admin chargées');
+    } else {
+        console.log('❌ Utilisateur non admin, menu masqué');
+        const adminMenuItem = document.getElementById('adminMenuItem');
+        if (adminMenuItem) adminMenuItem.style.display = 'none';
     }
 }
 
@@ -2028,11 +2071,17 @@ function copierRIB() {
 }
 
 // Vérifier les permissions avant d'ajouter une transaction
-function checkPermissionAndOpenTransactionModal() {
-    if (!isAccountActivated()) {
-        showNotification('⚠️ Veuillez activer votre compte pour ajouter des transactions. Consultez le guide !', 'warning');
+// Pour vérifier avant d'ajouter des transactions
+async function checkPermissionAndOpenTransactionModal() {
+    const isActivated = await isAccountActivated();
+    if (!isActivated) {
+        showNotification('⚠️ Veuillez activer votre compte pour ajouter des transactions. Cliquez sur "Demander l\'activation" dans le guide !', 'warning');
         openWelcomeGuide();
-        showGuideTab('activation');
+        // Attendre que le modal s'ouvre puis changer d'onglet
+        setTimeout(() => {
+            const activationTab = document.querySelector('.guide-tab[onclick*="activation"]');
+            if (activationTab) activationTab.click();
+        }, 100);
         return false;
     }
     openTransactionModal();
@@ -2082,7 +2131,17 @@ function showNotification(msg, type) {
     panel.appendChild(el);
     setTimeout(() => el.remove(), 4000);
 }
-
+// Fonction d'alerte combinée (email + notification)
+function sendAlert(subject, message, type = 'warning') {
+    // Notification dans l'application
+    showNotification(message, type === 'danger' ? 'danger' : 'warning');
+    
+    // Envoi par email
+    sendEmailAlert(subject, message, type);
+    
+    // Log dans la console
+    console.log(`[ALERTE ${type.toUpperCase()}] ${subject}`);
+}
 function saveAllData() {
     if (!auth.currentUser) return;
     
@@ -2168,6 +2227,8 @@ document.addEventListener('DOMContentLoaded', () => {
             initFilters();
               // ⚠️ AJOUTE CETTE LIGNE ⚠️
             await initAdminSection();
+               // ⚠️ AJOUTE CETTE LIGNE ⚠️
+            await addActivationButtonIfNeeded();
             // Afficher le guide si nécessaire
             showGuideIfNeeded();
             
