@@ -2343,6 +2343,7 @@ function saveAlertConfigToLocal() {
 }
 
 // Fonction d'envoi d'email via EmailJS
+// Fonction d'envoi d'email via EmailJS - VERSION CORRIGÉE
 async function sendEmailAlert(subject, message, type = 'warning') {
     if (!alertConfig.emailEnabled) return;
     
@@ -2355,38 +2356,34 @@ async function sendEmailAlert(subject, message, type = 'warning') {
     // Vérifier qu'EmailJS est chargé
     if (typeof emailjs === 'undefined') {
         console.log('❌ EmailJS non chargé');
+        showNotification('EmailJS non disponible', 'danger');
         return;
     }
     
     try {
-await emailjs.send(
-    EMAILJS_CONFIG.serviceId,
-    EMAILJS_CONFIG.templateId,
-    {
-        subject: subject,
-        message: message,
-        type: type === 'danger' ? '🔴 Critique' : type === 'warning' ? '🟠 Attention' : '🔵 Information',
-        date: new Date().toLocaleString('fr-FR'),
-        user_email: email  // ✅ Renommé pour correspondre au template
-    }
-);
+        // 👇 MODIFICATION ICI : utiliser 'to_email' ou 'email' selon ton template
+      const templateParams = {
+    to_email: email,
+    email: email,
+    user_email: email,
+    subject: subject,
+    message: message,
+    type: type === 'danger' ? '🔴 Critique' : type === 'warning' ? '🟠 Attention' : '🔵 Information',
+    date: new Date().toLocaleString('fr-FR')
+};
+        console.log('📧 Envoi email avec params:', templateParams);
+        
+        await emailjs.send(
+            EMAILJS_CONFIG.serviceId,
+            EMAILJS_CONFIG.templateId,
+            templateParams
+        );
         console.log('✅ Email d\'alerte envoyé à:', email);
+        showNotification('📧 Alerte email envoyée', 'success');
     } catch (error) {
         console.error('❌ Erreur envoi email:', error);
-      showNotification(`Erreur envoi email: ${error.text || error.message}`, 'danger');
+        showNotification(`Erreur envoi email: ${error.text || error.message}`, 'danger');
     }
-}
-
-// Fonction d'alerte combinée (email + notification)
-function sendAlert(subject, message, type = 'warning') {
-    // Notification dans l'application
-    showNotification(message, type === 'danger' ? 'danger' : 'warning');
-    
-    // Envoi par email
-    sendEmailAlert(subject, message, type);
-    
-    // Log dans la console
-    console.log(`[ALERTE ${type.toUpperCase()}] ${subject}`);
 }
 
 // ==================== VÉRIFICATIONS DES RISQUES ====================
