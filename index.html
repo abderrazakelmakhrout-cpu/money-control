@@ -117,6 +117,37 @@ body {
     color: var(--text-muted);
 }
 
+    .kpi-sub.positive {
+    color: var(--success);
+}
+
+.kpi-sub.negative {
+    color: var(--danger);
+}
+
+.rapport-sub {
+    font-size: 11px;
+    margin-top: 5px;
+}
+
+.rapport-card {
+    background: var(--card2);
+    border-radius: 14px;
+    padding: 18px;
+    text-align: center;
+}
+
+.rapport-value {
+    font-size: 24px;
+    font-weight: 800;
+    color: #fff;
+}
+
+.rapport-label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+}
 .nav-menu {
     padding: 20px 16px;
 }
@@ -1547,6 +1578,8 @@ function applyGlobalFilters() {
 // ==================== DASHBOARD ====================
 function renderDashboard() {
     const filtered = getFilteredTransactions();
+    const prevData = getPreviousMonthData();
+    
     const revenus = filtered.filter(t => t.type === 'Revenu').reduce((s,t) => s + t.montant, 0);
     const depenses = filtered.filter(t => t.type === 'Dépense').reduce((s,t) => s + t.montant, 0);
     const epargne = filtered.filter(t => t.type === 'Épargne').reduce((s,t) => s + t.montant, 0);
@@ -1554,18 +1587,63 @@ function renderDashboard() {
     const totalBudget = budgets.reduce((s,b) => s + b.budget, 0);
     const budgetConsomme = filtered.filter(t => t.type === 'Dépense').reduce((s,t) => s + t.montant, 0);
     const pctBudget = totalBudget > 0 ? (budgetConsomme / totalBudget * 100).toFixed(1) : 0;
-    const objectifsActifs = objectifs.filter(o => o.actuel < o.cible).length;
-    const objectifsAtteints = objectifs.filter(o => o.actuel >= o.cible).length;
-    const tauxObjectifs = objectifs.reduce((s,o) => s + (o.actuel / o.cible), 0) / objectifs.length * 100;
+    
+    // Calculer le solde total (cumulé)
+    let totalSoldeCumule = 0;
+    const allTransactionsSorted = [...transactions].sort((a,b) => new Date(a.date) - new Date(b.date));
+    allTransactionsSorted.forEach(t => {
+        if (t.type === 'Revenu') totalSoldeCumule += t.montant;
+        else totalSoldeCumule -= t.montant;
+    });
     
     document.getElementById('kpiGrid').innerHTML = `
-        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-line"></i></div><div class="kpi-label">Revenus</div><div class="kpi-value">${formatMoney(revenus)}</div></div>
-        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-shopping-cart"></i></div><div class="kpi-label">Dépenses</div><div class="kpi-value">${formatMoney(depenses)}</div></div>
-        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-piggy-bank"></i></div><div class="kpi-label">Épargne</div><div class="kpi-value">${formatMoney(epargne)}</div></div>
-        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-wallet"></i></div><div class="kpi-label">Solde</div><div class="kpi-value" style="color:${solde >= 0 ? 'var(--success)' : 'var(--danger)'}">${solde >= 0 ? '+' : ''}${formatMoney(solde)}</div></div>
-        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-simple"></i></div><div class="kpi-label">Budget consommé</div><div class="kpi-value">${pctBudget}%</div><div class="kpi-sub">${formatMoney(budgetConsomme)}/${formatMoney(totalBudget)}</div></div>
-        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-bullseye"></i></div><div class="kpi-label">Objectifs</div><div class="kpi-value">${objectifsActifs}</div><div class="kpi-sub">${objectifsAtteints} atteints · ${tauxObjectifs.toFixed(1)}% global</div></div>`;
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="fas fa-wallet"></i></div>
+            <div class="kpi-label">SOLDE TOTAL</div>
+            <div class="kpi-value">${formatMoney(totalSoldeCumule)}</div>
+            <div class="kpi-sub ${prevData.solde.variation >= 0 ? 'positive' : 'negative'}" style="color:${prevData.solde.variation >= 0 ? 'var(--success)' : 'var(--danger)'}">
+                ${prevData.solde.variation >= 0 ? '↑' : '↓'} ${Math.abs(prevData.solde.variation)}% vs mois précédent
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="fas fa-arrow-up"></i></div>
+            <div class="kpi-label">REVENUS DU MOIS</div>
+            <div class="kpi-value">${formatMoney(revenus)}</div>
+            <div class="kpi-sub ${prevData.revenus.variation >= 0 ? 'positive' : 'negative'}" style="color:${prevData.revenus.variation >= 0 ? 'var(--success)' : 'var(--danger)'}">
+                ${prevData.revenus.variation >= 0 ? '↑' : '↓'} ${Math.abs(prevData.revenus.variation)}% vs mois précédent
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="fas fa-arrow-down"></i></div>
+            <div class="kpi-label">DÉPENSES DU MOIS</div>
+            <div class="kpi-value">${formatMoney(depenses)}</div>
+            <div class="kpi-sub ${prevData.depenses.variation <= 0 ? 'positive' : 'negative'}" style="color:${prevData.depenses.variation <= 0 ? 'var(--success)' : 'var(--danger)'}">
+                ${prevData.depenses.variation <= 0 ? '↓' : '↑'} ${Math.abs(prevData.depenses.variation)}% vs mois précédent
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="fas fa-piggy-bank"></i></div>
+            <div class="kpi-label">ÉPARGNE DU MOIS</div>
+            <div class="kpi-value">${formatMoney(epargne)}</div>
+            <div class="kpi-sub ${prevData.epargne.variation >= 0 ? 'positive' : 'negative'}" style="color:${prevData.epargne.variation >= 0 ? 'var(--success)' : 'var(--danger)'}">
+                ${prevData.epargne.variation >= 0 ? '↑' : '↓'} ${Math.abs(prevData.epargne.variation)}% vs mois précédent
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="fas fa-chart-simple"></i></div>
+            <div class="kpi-label">BUDGET CONSOMMÉ</div>
+            <div class="kpi-value">${pctBudget}%</div>
+            <div class="kpi-sub">${formatMoney(budgetConsomme)} / ${formatMoney(totalBudget)}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="fas fa-percentage"></i></div>
+            <div class="kpi-label">TAUX D'ÉPARGNE</div>
+            <div class="kpi-value">${revenus > 0 ? ((epargne / revenus) * 100).toFixed(1) : 0}%</div>
+            <div class="kpi-sub">${revenus > 0 ? ((depenses / revenus) * 100).toFixed(1) : 0}% de dépenses</div>
+        </div>
+    `;
     
+    // Graphiques (garder le reste identique)
     const depParCat = {};
     filtered.filter(t => t.type === 'Dépense').forEach(t => depParCat[t.categorie] = (depParCat[t.categorie] || 0) + t.montant);
     if (charts.expense) charts.expense.destroy();
@@ -1647,7 +1725,42 @@ function openTransactionModal() {
 function closeTransactionModal() {
     document.getElementById('transactionModal').classList.remove('active');
 }
-
+// Ajouter après la fonction formatMoney
+function getPreviousMonthData() {
+    const currentFiltered = getFilteredTransactions();
+    
+    // Calculer le mois précédent
+    const currentMonthObj = new Date(currentYear, ['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'].indexOf(currentMonth.split('-')[0]), 1);
+    const prevMonthObj = new Date(currentMonthObj);
+    prevMonthObj.setMonth(prevMonthObj.getMonth() - 1);
+    const prevMonthName = ['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'][prevMonthObj.getMonth()];
+    const prevMonth = `${prevMonthName}-${prevMonthObj.getFullYear()}`;
+    const prevYear = prevMonthObj.getFullYear();
+    
+    const prevTransactions = transactions.filter(t => t.mois === prevMonth && t.annee === prevYear);
+    
+    const currentRevenus = currentFiltered.filter(t => t.type === 'Revenu').reduce((s,t) => s + t.montant, 0);
+    const currentDepenses = currentFiltered.filter(t => t.type === 'Dépense').reduce((s,t) => s + t.montant, 0);
+    const currentEpargne = currentFiltered.filter(t => t.type === 'Épargne').reduce((s,t) => s + t.montant, 0);
+    const currentSolde = currentRevenus - currentDepenses - currentEpargne;
+    
+    const prevRevenus = prevTransactions.filter(t => t.type === 'Revenu').reduce((s,t) => s + t.montant, 0);
+    const prevDepenses = prevTransactions.filter(t => t.type === 'Dépense').reduce((s,t) => s + t.montant, 0);
+    const prevEpargne = prevTransactions.filter(t => t.type === 'Épargne').reduce((s,t) => s + t.montant, 0);
+    const prevSolde = prevRevenus - prevDepenses - prevEpargne;
+    
+    const calcVariation = (current, previous) => {
+        if (previous === 0) return current > 0 ? 100 : 0;
+        return ((current - previous) / previous * 100).toFixed(1);
+    };
+    
+    return {
+        revenus: { current: currentRevenus, previous: prevRevenus, variation: calcVariation(currentRevenus, prevRevenus) },
+        depenses: { current: currentDepenses, previous: prevDepenses, variation: calcVariation(currentDepenses, prevDepenses) },
+        epargne: { current: currentEpargne, previous: prevEpargne, variation: calcVariation(currentEpargne, prevEpargne) },
+        solde: { current: currentSolde, previous: prevSolde, variation: calcVariation(currentSolde, prevSolde) }
+    };
+}
 function updateCategorySelect() {
     const type = document.getElementById('txType').value;
     let cats = [];
@@ -1876,44 +1989,210 @@ function renderCalendar() {
 // ==================== RAPPORTS ====================
 function renderReports() {
     const filtered = getFilteredTransactions();
+    const prevData = getPreviousMonthData();
+    
+    // Calcul des totaux
     const revenus = filtered.filter(t => t.type === 'Revenu').reduce((s, t) => s + t.montant, 0);
     const depenses = filtered.filter(t => t.type === 'Dépense').reduce((s, t) => s + t.montant, 0);
     const epargne = filtered.filter(t => t.type === 'Épargne').reduce((s, t) => s + t.montant, 0);
+    const balance = revenus - depenses - epargne;
+    const tauxEpargne = revenus > 0 ? (epargne / revenus * 100).toFixed(1) : 0;
+    const tauxDepenses = revenus > 0 ? (depenses / revenus * 100).toFixed(1) : 0;
     
-    // Analyse par catégorie
+    // Top 5 catégories de dépenses
+    const depensesParCat = {};
+    filtered.filter(t => t.type === 'Dépense').forEach(t => {
+        depensesParCat[t.categorie] = (depensesParCat[t.categorie] || 0) + t.montant;
+    });
+    const top5Depenses = Object.entries(depensesParCat)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+    
+    // Top 5 catégories de revenus
+    const revenusParCat = {};
+    filtered.filter(t => t.type === 'Revenu').forEach(t => {
+        revenusParCat[t.categorie] = (revenusParCat[t.categorie] || 0) + t.montant;
+    });
+    const top5Revenus = Object.entries(revenusParCat)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+    
+    // Analyse par catégorie détaillée
     const categoriesReport = {};
     filtered.forEach(t => {
-        if (!categoriesReport[t.categorie]) categoriesReport[t.categorie] = { revenus: 0, depenses: 0 };
+        if (!categoriesReport[t.categorie]) categoriesReport[t.categorie] = { revenus: 0, depenses: 0, epargne: 0 };
         if (t.type === 'Revenu') categoriesReport[t.categorie].revenus += t.montant;
         if (t.type === 'Dépense') categoriesReport[t.categorie].depenses += t.montant;
+        if (t.type === 'Épargne') categoriesReport[t.categorie].epargne += t.montant;
     });
     
-    document.getElementById('reportContent').innerHTML = `
-        <div class="rapport-stats">
-            <div class="rapport-card"><div class="rapport-value" style="color:var(--success)">+${formatMoney(revenus)}</div><div class="rapport-label">Revenus totaux</div></div>
-            <div class="rapport-card"><div class="rapport-value" style="color:var(--danger)">-${formatMoney(depenses)}</div><div class="rapport-label">Dépenses totales</div></div>
-            <div class="rapport-card"><div class="rapport-value" style="color:var(--info)">${formatMoney(epargne)}</div><div class="rapport-label">Épargne totale</div></div>
-            <div class="rapport-card"><div class="rapport-value">${formatMoney(revenus - depenses - epargne)}</div><div class="rapport-label">Balance nette</div></div>
+    // Graphique d'évolution sur la période sélectionnée
+    const months = [...new Set(transactions.map(t => t.mois))].sort();
+    const revByMonth = months.map(m => transactions.filter(t => t.mois === m && t.type === 'Revenu').reduce((s,t) => s + t.montant, 0));
+    const depByMonth = months.map(m => transactions.filter(t => t.mois === m && t.type === 'Dépense').reduce((s,t) => s + t.montant, 0));
+    const balanceByMonth = months.map((m, i) => revByMonth[i] - depByMonth[i]);
+    
+    // Créer le canvas pour le graphique d'évolution si pas existant
+    let evolutionCanvas = document.getElementById('reportEvolutionChart');
+    if (!evolutionCanvas) {
+        const reportContent = document.getElementById('reportContent');
+        reportContent.innerHTML = `
+            <div class="rapport-stats" id="rapportStats"></div>
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header"><div class="chart-title">Évolution sur la période</div></div>
+                    <div class="chart-container"><canvas id="reportEvolutionChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header"><div class="chart-title">Top 5 Dépenses</div></div>
+                    <div id="top5Depenses"></div>
+                </div>
+            </div>
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header"><div class="chart-title">Top 5 Revenus</div></div>
+                    <div id="top5Revenus"></div>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header"><div class="chart-title">Indicateurs clés</div></div>
+                    <div id="indicateursCles"></div>
+                </div>
+            </div>
+            <div class="table-card">
+                <div class="table-header"><div class="table-title">Analyse détaillée par catégorie</div></div>
+                <table class="data-table">
+                    <thead><th>Catégorie</th><th>Revenus</th><th>Dépenses</th><th>Épargne</th><th>Solde</th><th>% du total</th></thead>
+                    <tbody id="rapportCategoriesTable"></tbody>
+                </table>
+            </div>
+            <div class="table-card">
+                <div class="table-header"><div class="table-title">Bilan mensuel détaillé</div></div>
+                <table class="data-table">
+                    <thead><th>Mois</th><th>Revenus</th><th>Dépenses</th><th>Balance</th><th>Évolution</th></thead>
+                    <tbody id="rapportMoisTable"></tbody>
+                </table>
+            </div>
+        `;
+    }
+    
+    // Mettre à jour les stats
+    document.getElementById('rapportStats').innerHTML = `
+        <div class="rapport-card">
+            <div class="rapport-value" style="color:var(--success)">+${formatMoney(revenus)}</div>
+            <div class="rapport-label">Revenus totaux</div>
+            <div class="rapport-sub" style="font-size:11px;color:var(--text-muted);margin-top:5px">${prevData.revenus.variation >= 0 ? '↑' : '↓'} ${Math.abs(prevData.revenus.variation)}% vs mois préc.</div>
         </div>
-        <div class="table-card">
-            <div class="table-header"><div class="table-title">Analyse par catégorie</div></div>
-            <table class="data-table">
-                <thead><th>Catégorie</th><th>Revenus</th><th>Dépenses</th><th>Solde</th></thead>
-                <tbody>
-                    ${Object.entries(categoriesReport).map(([cat, data]) => `
-                        <tr>
-                            <td><strong>${cat}</strong></td>
-                            <td class="amt-rev">+${formatMoney(data.revenus)}</td>
-                            <td class="amt-dep">-${formatMoney(data.depenses)}</td>
-                            <td style="color:${(data.revenus - data.depenses) >= 0 ? 'var(--success)' : 'var(--danger)'}">${formatMoney(data.revenus - data.depenses)}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
+        <div class="rapport-card">
+            <div class="rapport-value" style="color:var(--danger)">-${formatMoney(depenses)}</div>
+            <div class="rapport-label">Dépenses totales</div>
+            <div class="rapport-sub" style="font-size:11px;color:var(--text-muted);margin-top:5px">${prevData.depenses.variation <= 0 ? '↓' : '↑'} ${Math.abs(prevData.depenses.variation)}% vs mois préc.</div>
+        </div>
+        <div class="rapport-card">
+            <div class="rapport-value" style="color:var(--info)">${formatMoney(epargne)}</div>
+            <div class="rapport-label">Épargne totale</div>
+            <div class="rapport-sub" style="font-size:11px;color:var(--text-muted);margin-top:5px">Taux: ${tauxEpargne}% des revenus</div>
+        </div>
+        <div class="rapport-card">
+            <div class="rapport-value" style="color:${balance >= 0 ? 'var(--success)' : 'var(--danger)'}">${balance >= 0 ? '+' : ''}${formatMoney(balance)}</div>
+            <div class="rapport-label">Balance nette</div>
+            <div class="rapport-sub" style="font-size:11px;color:var(--text-muted);margin-top:5px">${prevData.solde.variation >= 0 ? '↑' : '↓'} ${Math.abs(prevData.solde.variation)}% vs mois préc.</div>
         </div>
     `;
+    
+    // Top 5 dépenses
+    document.getElementById('top5Depenses').innerHTML = top5Depenses.map(([cat, montant], i) => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="width:24px;height:24px;background:rgba(239,68,68,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--danger)">${i+1}</span>
+                <span style="font-weight:600">${cat}</span>
+            </div>
+            <div style="font-weight:700;color:var(--danger)">-${formatMoney(montant)}</div>
+        </div>
+    `).join('');
+    
+    // Top 5 revenus
+    document.getElementById('top5Revenus').innerHTML = top5Revenus.map(([cat, montant], i) => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+            <div style="display:flex;align-items:center;gap:10px">
+                <span style="width:24px;height:24px;background:rgba(16,185,129,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--success)">${i+1}</span>
+                <span style="font-weight:600">${cat}</span>
+            </div>
+            <div style="font-weight:700;color:var(--success)">+${formatMoney(montant)}</div>
+        </div>
+    `).join('');
+    
+    // Indicateurs clés
+    const soldeMoyenMensuel = balanceByMonth.reduce((a,b) => a + b, 0) / balanceByMonth.length;
+    const meilleurMois = balanceByMonth.reduce((max, val, idx) => val > balanceByMonth[max] ? idx : max, 0);
+    const pireMois = balanceByMonth.reduce((min, val, idx) => val < balanceByMonth[min] ? idx : min, 0);
+    
+    document.getElementById('indicateursCles').innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div style="background:var(--bg);border-radius:12px;padding:12px;text-align:center">
+                <div style="font-size:11px;color:var(--text-muted)">Taux d'épargne</div>
+                <div style="font-size:20px;font-weight:800;color:var(--info)">${tauxEpargne}%</div>
+            </div>
+            <div style="background:var(--bg);border-radius:12px;padding:12px;text-align:center">
+                <div style="font-size:11px;color:var(--text-muted)">Taux de dépenses</div>
+                <div style="font-size:20px;font-weight:800;color:var(--warning)">${tauxDepenses}%</div>
+            </div>
+            <div style="background:var(--bg);border-radius:12px;padding:12px;text-align:center">
+                <div style="font-size:11px;color:var(--text-muted)">Balance mensuelle moyenne</div>
+                <div style="font-size:18px;font-weight:800;color:${soldeMoyenMensuel >= 0 ? 'var(--success)' : 'var(--danger)'}">${formatMoney(soldeMoyenMensuel)}</div>
+            </div>
+            <div style="background:var(--bg);border-radius:12px;padding:12px;text-align:center">
+                <div style="font-size:11px;color:var(--text-muted)">Meilleur/Pire mois</div>
+                <div style="font-size:13px;font-weight:700"><span style="color:var(--success)">${months[meilleurMois] || '-'}</span> / <span style="color:var(--danger)">${months[pireMois] || '-'}</span></div>
+            </div>
+        </div>
+    `;
+    
+    // Graphique d'évolution
+    if (charts.reportEvolution) charts.reportEvolution.destroy();
+    charts.reportEvolution = new Chart(document.getElementById('reportEvolutionChart'), {
+        type: 'line',
+        data: {
+            labels: months,
+            datasets: [
+                { label: 'Revenus', data: revByMonth, borderColor: '#10b981', backgroundColor: 'transparent', tension: 0.4, fill: false },
+                { label: 'Dépenses', data: depByMonth, borderColor: '#ef4444', backgroundColor: 'transparent', tension: 0.4, fill: false },
+                { label: 'Balance', data: balanceByMonth, borderColor: '#6366f1', backgroundColor: 'transparent', tension: 0.4, fill: false }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+    
+    // Tableau des catégories
+    const totalGeneral = revenus + depenses + epargne;
+    document.getElementById('rapportCategoriesTable').innerHTML = Object.entries(categoriesReport).map(([cat, data]) => {
+        const soldeCat = data.revenus - data.depenses - data.epargne;
+        const pourcentage = totalGeneral > 0 ? ((data.revenus + data.depenses + data.epargne) / totalGeneral * 100).toFixed(1) : 0;
+        return `
+            <tr>
+                <td><strong>${cat}</strong></td>
+                <td class="amt-rev">+${formatMoney(data.revenus)}</td>
+                <td class="amt-dep">-${formatMoney(data.depenses)}</td>
+                <td class="amt-ep">${formatMoney(data.epargne)}</td>
+                <td style="color:${soldeCat >= 0 ? 'var(--success)' : 'var(--danger)'}">${soldeCat >= 0 ? '+' : ''}${formatMoney(soldeCat)}</td>
+                <td style="color:var(--text-muted)">${pourcentage}%</td>
+            </tr>
+        `;
+    }).join('');
+    
+    // Tableau des mois
+    document.getElementById('rapportMoisTable').innerHTML = months.map((m, i) => {
+        const evolution = i > 0 ? ((balanceByMonth[i] - balanceByMonth[i-1]) / Math.abs(balanceByMonth[i-1]) * 100).toFixed(1) : 0;
+        return `
+            <tr>
+                <td><strong>${m}</strong></td>
+                <td class="amt-rev">+${formatMoney(revByMonth[i])}</td>
+                <td class="amt-dep">-${formatMoney(depByMonth[i])}</td>
+                <td style="color:${balanceByMonth[i] >= 0 ? 'var(--success)' : 'var(--danger)'}">${balanceByMonth[i] >= 0 ? '+' : ''}${formatMoney(balanceByMonth[i])}</td>
+                <td style="color:${evolution >= 0 ? 'var(--success)' : 'var(--danger)'}">${evolution >= 0 ? '↑' : '↓'} ${Math.abs(evolution)}%</td>
+            </tr>
+        `;
+    }).join('');
 }
-
 // ==================== ANALYSE AVANCÉE ====================
 function renderAdvancedAnalysis() {
     const filtered = getFilteredTransactions();
