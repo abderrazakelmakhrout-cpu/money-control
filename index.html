@@ -15,6 +15,16 @@
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
+ <!-- EmailJS pour les alertes email -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script type="text/javascript">
+   (function(){
+      // REMPLACEZ PAR VOTRE PUBLIC KEY
+      emailjs.init({
+        publicKey: "aBWWakhI_E4qhUp8J",
+      });
+   })();
+</script>   
 <style>
 * {
     margin: 0;
@@ -2288,5 +2298,491 @@ window.exportToExcel = exportToExcel;
 window.printReport = printReport;
 window.resetData = resetData;
 </script>
+   <script>
+// ==================== CONFIGURATION DES ALERTES EMAIL ====================
+
+// Configuration EmailJS (à remplacer par vos identifiants)
+const EMAILJS_CONFIG = {
+    serviceId: "service_jw6x8wt",      // Ex: "service_abc123"
+    templateId: "template_3khrhny",    // Ex: "template_xyz789"
+    publicKey: "aBWWakhI_E4qhUp8J"       // Ex: "abc123def456"
+};
+
+// Configuration des alertes utilisateur
+let alertConfig = {
+    emailEnabled: true,
+    alertEmail: "",  // Sera rempli automatiquement avec l'email de l'utilisateur
+    alertSeuils: {
+        budget: 80,         // Alerte à 80% du budget
+        objectif: 85,       // Alerte à 85% de l'objectif
+        tauxEpargneMin: 10, // Alerte si taux épargne < 10%
+        depenseMax: 5000,   // Alerte si dépense unique > 5000 MAD
+        soldeNegatif: true  // Alerte si solde négatif
+    }
+};
+
+// Charger la config utilisateur
+function loadAlertConfig() {
+    if (!auth.currentUser) return;
+    const saved = localStorage.getItem(`alertConfig_${auth.currentUser.uid}`);
+    if (saved) {
+        try {
+            const config = JSON.parse(saved);
+            alertConfig = { ...alertConfig, ...config };
+        } catch(e) {}
+    }
+    // Utiliser l'email de l'utilisateur connecté
+    if (auth.currentUser && auth.currentUser.email) {
+        alertConfig.alertEmail = auth.currentUser.email;
+    }
+}
+
+// Sauvegarder la config utilisateur
+function saveAlertConfigToLocal() {
+    if (!auth.currentUser) return;
+    localStorage.setItem(`alertConfig_${auth.currentUser.uid}`, JSON.stringify(alertConfig));
+}
+
+// Fonction d'envoi d'email via EmailJS
+async function sendEmailAlert(subject, message, type = 'warning') {
+    if (!alertConfig.emailEnabled) return;
+    
+    const email = alertConfig.alertEmail || auth.currentUser?.email;
+    if (!email) {
+        console.log('📧 Email non configuré pour les alertes');
+        return;
+    }
+    
+    // Vérifier qu'EmailJS est chargé
+    if (typeof emailjs === 'undefined') {
+        console.log('❌ EmailJS non chargé');
+        return;
+    }
+    
+    try {
+        await emailjs.send(
+            EMAILJS_CONFIG.serviceId,
+            EMAILJS_CONFIG.templateId,
+            {
+                to_email: email,
+                subject: subject,
+                message: message,
+                type: type === 'danger' ? '🔴 Critique' : type === 'warning' ? '🟠 Attention' : '🔵 Information',
+                date: new Date().toLocaleString('fr-FR')
+            }
+        );
+        console.log('✅ Email d\'alerte envoyé à:', email);
+    } catch (error) {
+        console.error('❌ Erreur envoi email:', error);
+    }
+}
+
+// Fonction d'alerte combinée (email + notification)
+function sendAlert(subject, message, type = 'warning') {
+    // Notification dans l'application
+    showNotification(message, type === 'danger' ? 'danger' : 'warning');
+    
+    // Envoi par email
+    sendEmailAlert(subject, message, type);
+    
+    // Log dans la console
+    console.log(`[ALERTE ${type.toUpperCase()}] ${subject}`);
+}
+
+// ==================== VÉRIFICATIONS DES RISQUES ====================
+
+// 1. Vérification des budgets
+function checkBudgetAlerts() {
+    const filtered = getFilteredTransactions().filter(t => t.type === 'Dépense');
+    const alertSeuil = alertConfig.alertSeuils.budget;
+    
+    budgets.forEach(b => {
+        const realise = filtered.filter(t => t.categorie === b.categorie).reduce((s, t) => s + t.montant, 0);
+        const pourcentage = (realise / b.budget) * 100;
+        
+        if (pourcentage > 100) {
+            sendAlert(
+                `🚨 DÉPASSEMENT BUDGET - ${b.categorie}`,
+                `⚠️ Vous avez dépassé votre budget pour "${b.categorie}" !\n\n` +
+                `Budget prévu: ${formatMoney(b.budget)}\n` +
+                `Dépenses réelles: ${formatMoney(realise)}\n` +
+                `Dépassement: ${(pourcentage - 100).toFixed(1)}%\n\n` +
+                `👉 Action: Réduisez vos dépenses dans cette catégorie.`,
+                'danger'
+            );
+        } else if (pourcentage > alertSeuil && pourcentage < 100) {
+            const restant = b.budget - realise;
+            sendAlert(
+                `⚠️ ALERTE BUDGET - ${b.categorie}`,
+                `Attention, votre budget "${b.categorie}" est à ${pourcentage.toFixed(1)}% !\n\n` +
+                `Budget prévu: ${formatMoney(b.budget)}\n` +
+                `Dépenses actuelles: ${formatMoney(realise)}\n` +
+                `Restant: ${formatMoney(restant)}\n\n` +
+                `👉 Il vous reste ${formatMoney(restant)} avant dépassement.`,
+                'warning'
+            );
+        }
+    });
+}
+
+// 2. Vérification des objectifs
+function checkObjectifsAlerts() {
+    const alertSeuil = alertConfig.alertSeuils.objectif;
+    
+    objectifs.forEach(obj => {
+        const pourcentage = (obj.actuel / obj.cible) * 100;
+        
+        if (pourcentage >= 100 && obj.actuel < obj.cible + 0.01) {
+            sendAlert(
+                `🎉 OBJECTIF ATTEINT - ${obj.nom}`,
+                `Félicitations ! Vous avez atteint votre objectif "${obj.nom}" !\n\n` +
+                `🎯 Cible: ${formatMoney(obj.cible)}\n` +
+                `✅ Atteint: ${formatMoney(obj.actuel)}\n\n` +
+                `👏 Bravo pour cette réussite financière !`,
+                'success'
+            );
+            // Marquer comme déjà notifié pour éviter les doublons
+            obj.actuel = obj.cible + 1;
+        } else if (pourcentage >= alertSeuil && pourcentage < 100) {
+            const restant = obj.cible - obj.actuel;
+            sendAlert(
+                `🎯 OBJECTIF PRESQUE ATTEINT - ${obj.nom}`,
+                `Votre objectif "${obj.nom}" est à ${pourcentage.toFixed(1)}% !\n\n` +
+                `🎯 Cible: ${formatMoney(obj.cible)}\n` +
+                `💰 Actuel: ${formatMoney(obj.actuel)}\n` +
+                `📈 Restant: ${formatMoney(restant)}\n\n` +
+                `👉 Encore un effort, vous y êtes presque !`,
+                'warning'
+            );
+        }
+    });
+}
+
+// 3. Vérification des grosses dépenses
+function checkLargeExpenses() {
+    const filtered = getFilteredTransactions();
+    const seuilMax = alertConfig.alertSeuils.depenseMax;
+    const today = new Date();
+    const thirtyDaysAgo = new Date(today.setDate(today.getDate() - 30));
+    
+    // Vérifier les dépenses des 30 derniers jours seulement
+    const recentExpenses = filtered.filter(t => 
+        t.type === 'Dépense' && 
+        new Date(t.date) >= thirtyDaysAgo &&
+        t.montant > seuilMax
+    );
+    
+    // Éviter les doublons d'alerte pour la même dépense
+    const alertedIds = JSON.parse(localStorage.getItem('alertedExpenses') || '[]');
+    
+    recentExpenses.forEach(t => {
+        if (!alertedIds.includes(t.id)) {
+            sendAlert(
+                `💸 GROSSE DÉPENSE DÉTECTÉE`,
+                `Une dépense inhabituelle de ${formatMoney(t.montant)} a été enregistrée.\n\n` +
+                `📝 Description: ${t.description}\n` +
+                `📂 Catégorie: ${t.categorie}\n` +
+                `📅 Date: ${formatDate(t.date)}\n\n` +
+                `👉 Vérifiez que cette dépense est bien justifiée.`,
+                'warning'
+            );
+            alertedIds.push(t.id);
+            localStorage.setItem('alertedExpenses', JSON.stringify(alertedIds));
+        }
+    });
+}
+
+// 4. Vérification du solde négatif
+function checkNegativeBalance() {
+    if (!alertConfig.alertSeuils.soldeNegatif) return;
+    
+    let soldeCumule = 0;
+    const transactionsTriees = [...transactions].sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    for (const t of transactionsTriees) {
+        if (t.type === 'Revenu') soldeCumule += t.montant;
+        else soldeCumule -= t.montant;
+        
+        if (soldeCumule < 0) {
+            // Ne pas alerter plusieurs fois
+            const lastAlert = localStorage.getItem('lastNegativeBalanceAlert');
+            const today = new Date().toDateString();
+            
+            if (lastAlert !== today) {
+                sendAlert(
+                    `⚠️ ALERTE SOLDE NÉGATIF`,
+                    `Votre compte est en situation de découvert !\n\n` +
+                    `💰 Solde actuel: ${formatMoney(soldeCumule)}\n` +
+                    `📅 Date: ${formatDate(t.date)}\n` +
+                    `📝 Dernière transaction: ${t.description}\n\n` +
+                    `👉 Action urgente: Rééquilibrez vos finances.`,
+                    'danger'
+                );
+                localStorage.setItem('lastNegativeBalanceAlert', today);
+            }
+            break;
+        }
+    }
+}
+
+// 5. Vérification du taux d'épargne
+function checkSavingsRate() {
+    const filtered = getFilteredTransactions();
+    const revenus = filtered.filter(t => t.type === 'Revenu').reduce((s, t) => s + t.montant, 0);
+    const epargne = filtered.filter(t => t.type === 'Épargne').reduce((s, t) => s + t.montant, 0);
+    const tauxEpargne = revenus > 0 ? (epargne / revenus) * 100 : 0;
+    const seuilMin = alertConfig.alertSeuils.tauxEpargneMin;
+    
+    if (tauxEpargne < seuilMin && revenus > 0) {
+        const lastAlert = localStorage.getItem('lastTauxEpargneAlert');
+        const today = new Date().toDateString();
+        
+        if (lastAlert !== today) {
+            sendAlert(
+                `📉 TAUX D'ÉPARGNE TROP BAS`,
+                `Votre taux d'épargne est de ${tauxEpargne.toFixed(1)}% seulement.\n\n` +
+                `💰 Revenus: ${formatMoney(revenus)}\n` +
+                `🏦 Épargne: ${formatMoney(epargne)}\n\n` +
+                `🎯 Objectif recommandé: ${seuilMin}%\n\n` +
+                `👉 Essayez d'augmenter votre épargne mensuelle.`,
+                'warning'
+            );
+            localStorage.setItem('lastTauxEpargneAlert', today);
+        }
+    }
+}
+
+// 6. Vérification des variations importantes
+function checkUnusualTransactions() {
+    const currentFiltered = getFilteredTransactions();
+    const prevData = getPreviousMonthData();
+    
+    const currentRevenus = currentFiltered.filter(t => t.type === 'Revenu').reduce((s, t) => s + t.montant, 0);
+    const currentDepenses = currentFiltered.filter(t => t.type === 'Dépense').reduce((s, t) => s + t.montant, 0);
+    
+    const variationRevenus = Math.abs(parseFloat(prevData.revenus.variation));
+    const variationDepenses = Math.abs(parseFloat(prevData.depenses.variation));
+    
+    const lastAlert = localStorage.getItem('lastVariationAlert');
+    const today = new Date().toDateString();
+    
+    if (lastAlert !== today) {
+        if (variationRevenus > 30 && prevData.revenus.previous > 0) {
+            const sens = currentRevenus > prevData.revenus.previous ? 'augmentation' : 'baisse';
+            sendAlert(
+                `📊 VARIATION DES REVENUS`,
+                `Vos revenus ont connu une ${sens} de ${variationRevenus}% ce mois-ci.\n\n` +
+                `📈 Mois précédent: ${formatMoney(prevData.revenus.previous)}\n` +
+                `📉 Mois actuel: ${formatMoney(currentRevenus)}\n\n` +
+                `👉 Analysez l'origine de cette variation.`,
+                'info'
+            );
+        }
+        
+        if (variationDepenses > 30 && prevData.depenses.previous > 0) {
+            const sens = currentDepenses > prevData.depenses.previous ? 'augmentation' : 'baisse';
+            sendAlert(
+                `📊 VARIATION DES DÉPENSES`,
+                `Vos dépenses ont connu une ${sens} de ${variationDepenses}% ce mois-ci.\n\n` +
+                `📈 Mois précédent: ${formatMoney(prevData.depenses.previous)}\n` +
+                `📉 Mois actuel: ${formatMoney(currentDepenses)}\n\n` +
+                `👉 Vérifiez vos dépenses pour comprendre cette variation.`,
+                'warning'
+            );
+        }
+        
+        if (variationRevenus > 30 || variationDepenses > 30) {
+            localStorage.setItem('lastVariationAlert', today);
+        }
+    }
+}
+
+// Exécuter toutes les vérifications
+function checkAllAlerts() {
+    if (!auth.currentUser) return;
+    
+    console.log('🔍 Vérification des alertes financières...');
+    
+    checkBudgetAlerts();
+    checkObjectifsAlerts();
+    checkLargeExpenses();
+    checkNegativeBalance();
+    checkSavingsRate();
+    checkUnusualTransactions();
+    
+    console.log('✅ Vérification terminée');
+}
+
+// ==================== INTERFACE DE CONFIGURATION ====================
+
+// Ajouter la section de configuration des alertes dans les paramètres
+function renderAlertSettings() {
+    const settingsContainer = document.querySelector('#parametres .table-card:last-child');
+    if (!settingsContainer) return;
+    
+    const alertHTML = `
+        <div class="table-card" style="margin-top: 20px;">
+            <div class="table-header">
+                <div class="table-title">
+                    <i class="fas fa-bell"></i> 📧 Configuration des Alertes Email
+                </div>
+            </div>
+            <div class="form-group" style="margin-bottom: 15px;">
+                <label class="form-label">
+                    <i class="fas fa-envelope"></i> Email de réception
+                </label>
+                <input type="email" id="alertEmail" class="form-input" value="${alertConfig.alertEmail || ''}" readonly style="background:var(--card2);">
+                <small style="color:var(--text-muted);font-size:11px">✓ Les alertes seront envoyées à votre email de connexion</small>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">🔔 Seuil alerte budget (%)</label>
+                    <input type="number" id="alertBudgetSeuil" class="form-input" value="${alertConfig.alertSeuils.budget}">
+                    <small>Alerte quand budget atteint ce pourcentage</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">🎯 Seuil alerte objectif (%)</label>
+                    <input type="number" id="alertObjSeuil" class="form-input" value="${alertConfig.alertSeuils.objectif}">
+                    <small>Alerte quand objectif atteint ce pourcentage</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">📉 Taux épargne minimum (%)</label>
+                    <input type="number" id="alertTauxEpargne" class="form-input" value="${alertConfig.alertSeuils.tauxEpargneMin}">
+                    <small>Alerte si épargne < ce pourcentage</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">💸 Dépense max unique (MAD)</label>
+                    <input type="number" id="alertDepenseMax" class="form-input" value="${alertConfig.alertSeuils.depenseMax}">
+                    <small>Alerte pour toute dépense > ce montant</small>
+                </div>
+            </div>
+            <div class="form-group" style="flex-direction: row; align-items: center; gap: 15px;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" id="alertSoldeNegatif" ${alertConfig.alertSeuils.soldeNegatif ? 'checked' : ''}>
+                    ⚠️ Alerte en cas de solde négatif
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" id="alertEmailEnabled" ${alertConfig.emailEnabled ? 'checked' : ''}>
+                    📧 Activer les alertes email
+                </label>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-primary" onclick="saveAlertSettings()">
+                    <i class="fas fa-save"></i> Enregistrer
+                </button>
+                <button class="btn btn-secondary" onclick="testAlert()">
+                    <i class="fas fa-paper-plane"></i> Tester l'envoi
+                </button>
+                <button class="btn btn-secondary" onclick="checkAllAlerts()">
+                    <i class="fas fa-chart-line"></i> Vérifier maintenant
+                </button>
+            </div>
+        </div>
+    `;
+    
+    settingsContainer.insertAdjacentHTML('afterend', alertHTML);
+}
+
+// Sauvegarder la configuration
+function saveAlertSettings() {
+    alertConfig.alertSeuils.budget = parseInt(document.getElementById('alertBudgetSeuil').value) || 80;
+    alertConfig.alertSeuils.objectif = parseInt(document.getElementById('alertObjSeuil').value) || 85;
+    alertConfig.alertSeuils.tauxEpargneMin = parseInt(document.getElementById('alertTauxEpargne').value) || 10;
+    alertConfig.alertSeuils.depenseMax = parseFloat(document.getElementById('alertDepenseMax').value) || 5000;
+    alertConfig.alertSeuils.soldeNegatif = document.getElementById('alertSoldeNegatif').checked;
+    alertConfig.emailEnabled = document.getElementById('alertEmailEnabled').checked;
+    
+    saveAlertConfigToLocal();
+    
+    showNotification('✅ Configuration des alertes sauvegardée', 'success');
+    
+    // Tester avec un petit message
+    if (alertConfig.emailEnabled) {
+        sendEmailAlert(
+            '✅ Configuration sauvegardée',
+            'Vos préférences d\'alertes ont été mises à jour.\n\nVous recevrez désormais des notifications financières par email.',
+            'info'
+        );
+    }
+}
+
+// Tester le système d'alertes
+function testAlert() {
+    if (!alertConfig.emailEnabled) {
+        showNotification('⚠️ Les alertes email sont désactivées', 'warning');
+        return;
+    }
+    
+    sendEmailAlert(
+        '🧪 TEST D\'ALERTE Money Control Pro',
+        'Ceci est un test de votre système d\'alertes financières.\n\n' +
+        '✅ Si vous recevez ce message, la configuration est correcte.\n\n' +
+        `📅 Test effectué le: ${new Date().toLocaleString('fr-FR')}\n\n` +
+        `🔔 Vous recevrez automatiquement des alertes pour :\n` +
+        `   • Dépassement de budget\n` +
+        `   • Objectifs d'épargne\n` +
+        `   • Grosses dépenses\n` +
+        `   • Solde négatif\n` +
+        `   • Taux d'épargne trop bas`,
+        'success'
+    );
+    
+    showNotification('📧 Test d\'alerte envoyé ! Vérifiez votre boîte email', 'success');
+}
+
+// ==================== INITIALISATION ====================
+
+// Surcharger les fonctions existantes pour déclencher les alertes
+const originalSaveTransactionForAlert = window.saveTransaction;
+if (originalSaveTransactionForAlert) {
+    window.saveTransaction = function() {
+        originalSaveTransactionForAlert();
+        setTimeout(() => checkAllAlerts(), 1000);
+    };
+}
+
+const originalDeleteTransactionForAlert = window.deleteTransaction;
+if (originalDeleteTransactionForAlert) {
+    window.deleteTransaction = function(id) {
+        originalDeleteTransactionForAlert(id);
+        setTimeout(() => checkAllAlerts(), 1000);
+    };
+}
+
+const originalSaveObjectiveForAlert = window.saveObjective;
+if (originalSaveObjectiveForAlert) {
+    window.saveObjective = function() {
+        originalSaveObjectiveForAlert();
+        setTimeout(() => checkObjectifsAlerts(), 1000);
+    };
+}
+
+// Initialiser au chargement
+document.addEventListener('DOMContentLoaded', () => {
+    // Attendre que l'utilisateur soit connecté
+    const checkUserInterval = setInterval(() => {
+        if (auth.currentUser) {
+            clearInterval(checkUserInterval);
+            loadAlertConfig();
+            renderAlertSettings();
+            
+            // Première vérification après 30 secondes
+            setTimeout(() => {
+                checkAllAlerts();
+            }, 30000);
+            
+            // Vérification quotidienne
+            setInterval(() => {
+                checkAllAlerts();
+            }, 24 * 60 * 60 * 1000);
+        }
+    }, 1000);
+});
+
+// Exposer les fonctions globalement
+window.saveAlertSettings = saveAlertSettings;
+window.testAlert = testAlert;
+window.checkAllAlerts = checkAllAlerts;
+</script> 
 </body>
 </html>
