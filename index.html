@@ -18,13 +18,12 @@
  <!-- EmailJS pour les alertes email -->
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script type="text/javascript">
-   (function(){
-      // REMPLACEZ PAR VOTRE PUBLIC KEY
+   window.addEventListener('load', function() {
       emailjs.init({
         publicKey: "aBWWakhI_E4qhUp8J",
       });
-   })();
-</script>   
+   });
+</script>  
 <style>
 * {
     margin: 0;
@@ -2360,20 +2359,21 @@ async function sendEmailAlert(subject, message, type = 'warning') {
     }
     
     try {
-        await emailjs.send(
-            EMAILJS_CONFIG.serviceId,
-            EMAILJS_CONFIG.templateId,
-            {
-                to_email: email,
-                subject: subject,
-                message: message,
-                type: type === 'danger' ? '🔴 Critique' : type === 'warning' ? '🟠 Attention' : '🔵 Information',
-                date: new Date().toLocaleString('fr-FR')
-            }
-        );
+await emailjs.send(
+    EMAILJS_CONFIG.serviceId,
+    EMAILJS_CONFIG.templateId,
+    {
+        subject: subject,
+        message: message,
+        type: type === 'danger' ? '🔴 Critique' : type === 'warning' ? '🟠 Attention' : '🔵 Information',
+        date: new Date().toLocaleString('fr-FR'),
+        user_email: email  // ✅ Renommé pour correspondre au template
+    }
+);
         console.log('✅ Email d\'alerte envoyé à:', email);
     } catch (error) {
         console.error('❌ Erreur envoi email:', error);
+      showNotification(`Erreur envoi email: ${error.text || error.message}`, 'danger');
     }
 }
 
