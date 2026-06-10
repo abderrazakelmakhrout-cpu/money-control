@@ -913,6 +913,34 @@ body {
         grid-template-columns: 1fr;
     }
 }
+ /* Styles pour le guide */
+.guide-tab {
+    transition: all 0.3s ease;
+}
+
+.guide-tab.active {
+    color: var(--primary);
+    border-bottom: 2px solid var(--primary);
+}
+
+.guide-content h3 {
+    margin-bottom: 15px;
+    font-size: 20px;
+}
+
+.guide-content h4 {
+    margin-bottom: 8px;
+    font-size: 16px;
+    color: var(--primary-light);
+}
+
+.guide-content code {
+    background: var(--bg);
+    padding: 8px 12px;
+    border-radius: 8px;
+    display: inline-block;
+    font-size: 12px;
+}
 </style>
 </head>
 <body data-theme="dark">
@@ -1003,6 +1031,10 @@ body {
         <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
         <button class="logout-btn btn btn-secondary btn-sm" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
         <div class="notif-panel" id="notifPanel"></div>
+     <!-- Ajouter ce bouton quelque part dans l'interface, par exemple près du bouton de thème -->
+<button class="theme-toggle" style="right: 80px;" onclick="openWelcomeGuide()">
+    <i class="fas fa-question"></i>
+</button>
 
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
@@ -1202,7 +1234,138 @@ body {
         </div>
     </div>
 </div>
-
+<!-- PAGE D'ACCUEIL PRÉSENTATION - À AJOUTER APRÈS LE MODAL OVERLAY -->
+<div class="modal-overlay" id="welcomeGuideModal">
+    <div class="modal" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+        <div class="modal-header">
+            <div class="modal-title">
+                <i class="fas fa-rocket"></i> Bienvenue sur Money Control Pro
+            </div>
+            <button class="modal-close" onclick="closeWelcomeGuide()"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div style="padding: 10px 0;">
+            <!-- Onglets -->
+            <div style="display: flex; gap: 10px; border-bottom: 2px solid var(--border); margin-bottom: 20px;">
+                <button class="guide-tab active" onclick="showGuideTab('presentation')" style="background: none; border: none; padding: 10px 20px; cursor: pointer; color: var(--text); font-weight: 600;">
+                    <i class="fas fa-info-circle"></i> Présentation
+                </button>
+                <button class="guide-tab" onclick="showGuideTab('guide')" style="background: none; border: none; padding: 10px 20px; cursor: pointer; color: var(--text); font-weight: 600;">
+                    <i class="fas fa-graduation-cap"></i> Guide d'utilisation
+                </button>
+                <button class="guide-tab" onclick="showGuideTab('activation')" style="background: none; border: none; padding: 10px 20px; cursor: pointer; color: var(--text); font-weight: 600;">
+                    <i class="fas fa-key"></i> Activation
+                </button>
+            </div>
+            
+            <!-- Onglet Présentation -->
+            <div id="guide-presentation" class="guide-content active">
+                <h3 style="color: var(--primary); margin-bottom: 15px;">🎯 Qu'est-ce que Money Control Pro ?</h3>
+                <p style="margin-bottom: 20px;">Une application complète de gestion financière personnelle qui vous aide à :</p>
+                <ul style="margin-bottom: 25px; list-style: none; padding-left: 0;">
+                    <li style="margin-bottom: 10px;">✅ <strong>Suivre vos revenus et dépenses</strong> en temps réel</li>
+                    <li style="margin-bottom: 10px;">✅ <strong>Créer des budgets</strong> par catégorie</li>
+                    <li style="margin-bottom: 10px;">✅ <strong>Définir des objectifs d'épargne</strong> avec suivi visuel</li>
+                    <li style="margin-bottom: 10px;">✅ <strong>Visualiser des graphiques</strong> et analyses financières</li>
+                    <li style="margin-bottom: 10px;">✅ <strong>Exporter vos rapports</strong> en PDF/CSV/Excel</li>
+                    <li style="margin-bottom: 10px;">✅ <strong>Recevoir des alertes</strong> par email</li>
+                </ul>
+                
+                <div style="background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 16px; padding: 20px; color: white; text-align: center; margin: 20px 0;">
+                    <i class="fas fa-chart-line" style="font-size: 48px; margin-bottom: 10px;"></i>
+                    <h3 style="margin-bottom: 10px;">+500 utilisateurs satisfaits</h3>
+                    <p style="opacity: 0.9;">Rejoignez la communauté Money Control Pro !</p>
+                </div>
+            </div>
+            
+            <!-- Onglet Guide d'utilisation -->
+            <div id="guide-guide" class="guide-content" style="display: none;">
+                <h3 style="color: var(--primary); margin-bottom: 15px;">📖 Comment utiliser l'application ?</h3>
+                
+                <div style="margin-bottom: 25px;">
+                    <h4><i class="fas fa-tachometer-alt"></i> 1. Tableau de Bord</h4>
+                    <p>Visualisez vos indicateurs clés : solde total, revenus, dépenses, taux d'épargne, et graphiques d'évolution.</p>
+                </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <h4><i class="fas fa-exchange-alt"></i> 2. Transactions</h4>
+                    <p>Ajoutez vos revenus, dépenses et épargnes. Chaque transaction peut avoir une catégorie et sous-catégorie personnalisée.</p>
+                    <div style="background: var(--bg); padding: 10px; border-radius: 8px; margin-top: 8px;">
+                        <code>💡 Astuce : Utilisez les filtres (année, mois, catégorie) pour analyser vos dépenses</code>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <h4><i class="fas fa-chart-simple"></i> 3. Budgets</h4>
+                    <p>Définissez des budgets mensuels par catégorie. Une barre de progression vous alerte quand vous approchez du dépassement.</p>
+                </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <h4><i class="fas fa-bullseye"></i> 4. Objectifs d'épargne</h4>
+                    <p>Créez des objectifs (voyage, voiture, etc.) et suivez votre progression en pourcentage.</p>
+                </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <h4><i class="fas fa-calendar-alt"></i> 5. Calendrier</h4>
+                    <p>Visualisez toutes vos transactions triées par date dans un calendrier interactif.</p>
+                </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <h4><i class="fas fa-file-alt"></i> 6. Rapports & Analyse</h4>
+                    <p>Générez des rapports détaillés, exportez vos données, et consultez des analyses avancées.</p>
+                </div>
+            </div>
+            
+            <!-- Onglet Activation -->
+            <div id="guide-activation" class="guide-content" style="display: none;">
+                <h3 style="color: var(--primary); margin-bottom: 15px;">🔑 Activer votre compte</h3>
+                
+                <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid var(--warning); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                    <h4 style="color: var(--warning); margin-bottom: 10px;">⚠️ IMPORTANT</h4>
+                    <p>Pour accéder à toutes les fonctionnalités (ajout de transactions, création d'objectifs, etc.), vous devez activer votre compte.</p>
+                </div>
+                
+                <h4>📋 Procédure d'activation :</h4>
+                <ol style="margin: 15px 0 15px 20px; line-height: 1.8;">
+                    <li>Effectuez un virement de <strong>99 MAD</strong> vers le RIB CIH ci-dessous</li>
+                    <li>Prenez une capture d'écran de votre virement</li>
+                    <li>Envoyez la capture par email à <strong>support@moneycontrolpro.com</strong></li>
+                    <li>Vous recevrez un email de confirmation sous 24h</li>
+                    <li>Une fois activé, vous pourrez ajouter vos transactions</li>
+                </ol>
+                
+                <!-- RIB CIH -->
+                <div style="background: var(--bg); border-radius: 16px; padding: 20px; margin: 20px 0; text-align: center; border: 2px solid var(--primary);">
+                    <i class="fas fa-university" style="font-size: 40px; color: var(--primary); margin-bottom: 10px;"></i>
+                    <h4 style="margin-bottom: 15px;">🏦 CIH BANK - RIB</h4>
+                    <div style="font-family: monospace; font-size: 18px; font-weight: bold; letter-spacing: 2px; margin: 15px 0;">
+                        007 123 4567890123456789 01
+                    </div>
+                    <p><strong>Titulaire :</strong> MONEY CONTROL PRO</p>
+                    <p><strong>Montant :</strong> 99 MAD</p>
+                    <p><strong>Référence :</strong> Votre email + "ACTIVATION"</p>
+                    
+                    <button class="btn btn-primary" onclick="copierRIB()" style="margin-top: 15px;">
+                        <i class="fas fa-copy"></i> Copier le RIB
+                    </button>
+                </div>
+                
+                <!-- Email de contact -->
+                <div style="background: rgba(99, 102, 241, 0.1); border-radius: 12px; padding: 15px; text-align: center;">
+                    <i class="fas fa-envelope"></i>
+                    <strong>Envoyer la preuve à :</strong>
+                    <a href="mailto:support@moneycontrolpro.com" style="color: var(--primary);">support@moneycontrolpro.com</a>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border);">
+            <button class="btn btn-primary" onclick="closeWelcomeGuide()">
+                <i class="fas fa-check"></i> J'ai compris
+            </button>
+        </div>
+    </div>
+</div>
 <script>
 // Configuration Firebase
 const firebaseConfig = {
@@ -1269,7 +1432,123 @@ let charts = {};
 // ==================== UTILITAIRES ====================
 const formatMoney = (n) => n.toLocaleString('fr-FR') + ' MAD';
 const formatDate = (d) => new Date(d).toLocaleDateString('fr-FR');
+// ==================== GESTION DU GUIDE D'ACTIVATION ====================
 
+// Vérifier si l'utilisateur a déjà vu le guide
+function hasSeenGuide() {
+    if (!auth.currentUser) return false;
+    return localStorage.getItem(`guide_seen_${auth.currentUser.uid}`) === 'true';
+}
+
+// Marquer le guide comme vu
+function markGuideAsSeen() {
+    if (!auth.currentUser) return;
+    localStorage.setItem(`guide_seen_${auth.currentUser.uid}`, 'true');
+}
+
+// Vérifier si le compte est activé
+function isAccountActivated() {
+    if (!auth.currentUser) return false;
+    return localStorage.getItem(`account_activated_${auth.currentUser.uid}`) === 'true';
+}
+
+// Activer le compte (à appeler après validation admin)
+function activateAccount(email) {
+    // Chercher l'utilisateur par email et activer
+    if (auth.currentUser && auth.currentUser.email === email) {
+        localStorage.setItem(`account_activated_${auth.currentUser.uid}`, 'true');
+        localStorage.setItem(`guide_seen_${auth.currentUser.uid}`, 'true');
+        showNotification('✅ Votre compte est maintenant activé ! Vous pouvez ajouter des transactions.', 'success');
+        location.reload();
+    }
+}
+
+// Ouvrir le guide
+function openWelcomeGuide() {
+    document.getElementById('welcomeGuideModal').classList.add('active');
+}
+
+// Fermer le guide
+function closeWelcomeGuide() {
+    document.getElementById('welcomeGuideModal').classList.remove('active');
+    markGuideAsSeen();
+}
+
+// Changer d'onglet dans le guide
+function showGuideTab(tabName) {
+    // Cacher tous les contenus
+    document.querySelectorAll('.guide-content').forEach(content => {
+        content.style.display = 'none';
+    });
+    
+    // Désactiver tous les onglets
+    document.querySelectorAll('.guide-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Afficher le contenu sélectionné
+    document.getElementById(`guide-${tabName}`).style.display = 'block';
+    
+    // Activer l'onglet cliqué
+    event.target.classList.add('active');
+}
+
+// Copier le RIB
+function copierRIB() {
+    const rib = "007 123 4567890123456789 01";
+    navigator.clipboard.writeText(rib).then(() => {
+        showNotification('RIB copié dans le presse-papier !', 'success');
+    }).catch(() => {
+        showNotification('Impossible de copier', 'danger');
+    });
+}
+
+// Vérifier les permissions avant d'ajouter une transaction
+function checkPermissionAndOpenTransactionModal() {
+    if (!isAccountActivated()) {
+        showNotification('⚠️ Veuillez activer votre compte pour ajouter des transactions. Consultez le guide !', 'warning');
+        openWelcomeGuide();
+        showGuideTab('activation');
+        return false;
+    }
+    openTransactionModal();
+    return true;
+}
+
+// Surcharger la fonction d'ouverture de transaction
+const originalOpenTransactionModal = window.openTransactionModal;
+window.openTransactionModal = function() {
+    if (!checkPermissionAndOpenTransactionModal()) return;
+    originalOpenTransactionModal();
+};
+
+// Vérifier les permissions pour les objectifs
+function checkPermissionAndOpenObjectiveModal() {
+    if (!isAccountActivated()) {
+        showNotification('⚠️ Veuillez activer votre compte pour créer des objectifs.', 'warning');
+        openWelcomeGuide();
+        showGuideTab('activation');
+        return false;
+    }
+    openObjectiveModal();
+    return true;
+}
+
+// Surcharger l'ouverture des objectifs
+const originalOpenObjectiveModal = window.openObjectiveModal;
+window.openObjectiveModal = function() {
+    if (!checkPermissionAndOpenObjectiveModal()) return;
+    originalOpenObjectiveModal();
+};
+
+// Afficher le guide automatiquement après connexion si pas encore vu
+function showGuideIfNeeded() {
+    if (auth.currentUser && !hasSeenGuide()) {
+        setTimeout(() => {
+            openWelcomeGuide();
+        }, 1000);
+    }
+}
 function showNotification(msg, type) {
     const panel = document.getElementById('notifPanel');
     const el = document.createElement('div');
@@ -1297,7 +1576,29 @@ function saveAllData() {
         lastSync: new Date().toISOString()
     }, { merge: true });
 }
+// Fonction pour activer un compte (à utiliser via console admin)
+function adminActivateUser(email) {
+    // À implémenter avec Firestore pour une vraie gestion admin
+    const users = JSON.parse(localStorage.getItem('activated_users') || '[]');
+    if (!users.includes(email)) {
+        users.push(email);
+        localStorage.setItem('activated_users', JSON.stringify(users));
+        console.log(`✅ Compte ${email} activé !`);
+        
+        // Si l'utilisateur est connecté en ce moment
+        if (auth.currentUser && auth.currentUser.email === email) {
+            localStorage.setItem(`account_activated_${auth.currentUser.uid}`, 'true');
+            showNotification('Votre compte a été activé !', 'success');
+            location.reload();
+        }
+    }
+}
 
+// Vérifier si un email est activé
+function isEmailActivated(email) {
+    const users = JSON.parse(localStorage.getItem('activated_users') || '[]');
+    return users.includes(email);
+}
 async function loadUserData(uid) {
     // D'abord essayer de charger depuis localStorage spécifique à l'utilisateur
     const localTransactions = localStorage.getItem(`transactions_${uid}`);
@@ -1332,6 +1633,7 @@ async function loadUserData(uid) {
 }
 
 // ==================== AUTHENTIFICATION ====================
+// Modifier la fonction onAuthStateChanged
 document.addEventListener('DOMContentLoaded', () => {
     auth.onAuthStateChanged(async (user) => {
         if (user) {
@@ -1340,6 +1642,15 @@ document.addEventListener('DOMContentLoaded', () => {
             await loadUserData(user.uid);
             await displayWelcomeMessage();
             initFilters();
+            
+            // Afficher le guide si nécessaire
+            showGuideIfNeeded();
+            
+            // Désactiver l'ajout de transactions si compte non activé
+            if (!isAccountActivated()) {
+                showNotification('ℹ️ Activez votre compte pour ajouter des transactions et des objectifs', 'info');
+            }
+            
             renderDashboard();
             renderTransactions();
             renderBudgets();
