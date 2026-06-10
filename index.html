@@ -929,24 +929,27 @@ body {
                 <p style="color: var(--text-muted); font-size: 14px; margin-top: 8px;">Gestion financière professionnelle</p>
             </div>
 
-            <div id="loginForm">
-                <div class="form-group" style="margin-bottom: 20px;">
-                    <label class="form-label">EMAIL</label>
-                    <input type="email" id="loginEmail" class="form-input" placeholder="exemple@email.com">
-                </div>
-                <div class="form-group" style="margin-bottom: 20px;">
-                    <label class="form-label">MOT DE PASSE</label>
-                    <input type="password" id="loginPassword" class="form-input" placeholder="••••••••">
-                </div>
-                <button class="btn btn-primary" style="width: 100%; margin-bottom: 12px;" onclick="loginWithEmail()">
-                    <i class="fas fa-sign-in-alt"></i> Se connecter
-                </button>
-                <div style="text-align: center; margin-top: 20px;">
-                    <a href="#" onclick="showRegisterForm(); return false;" style="color: var(--primary);">Créer un compte</a>
-                    <span style="margin: 0 10px; color: var(--text-muted);">|</span>
-                    <a href="#" onclick="showResetForm(); return false;" style="color: var(--text-muted);">Mot de passe oublié ?</a>
-                </div>
-            </div>
+      <div id="loginForm">
+    <div class="form-group" style="margin-bottom: 20px;">
+        <label class="form-label">EMAIL</label>
+        <input type="email" id="loginEmail" class="form-input" placeholder="exemple@email.com" autocomplete="email">
+        <small id="loginEmailError" style="color: var(--danger); font-size: 11px; display: none;">Email invalide</small>
+    </div>
+    <div class="form-group" style="margin-bottom: 20px;">
+        <label class="form-label">MOT DE PASSE</label>
+        <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" autocomplete="current-password">
+        <small id="loginPasswordError" style="color: var(--danger); font-size: 11px; display: none;">Mot de passe requis</small>
+    </div>
+    <button class="btn btn-primary" style="width: 100%; margin-bottom: 12px;" onclick="loginWithEmail()">
+        <i class="fas fa-sign-in-alt"></i> Se connecter
+    </button>
+    <div id="loginErrorMessage" style="color: var(--danger); font-size: 12px; text-align: center; margin-top: 10px; display: none;"></div>
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="#" onclick="showRegisterForm(); return false;" style="color: var(--primary);">Créer un compte</a>
+        <span style="margin: 0 10px; color: var(--text-muted);">|</span>
+        <a href="#" onclick="showResetForm(); return false;" style="color: var(--text-muted);">Mot de passe oublié ?</a>
+    </div>
+</div>
 
             <div id="registerForm" style="display: none;">
                 <div class="form-group" style="margin-bottom: 20px;">
@@ -1352,6 +1355,35 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+ // Validation email en temps réel
+document.addEventListener('DOMContentLoaded', function() {
+    const loginEmail = document.getElementById('loginEmail');
+    if (loginEmail) {
+        loginEmail.addEventListener('input', function() {
+            const email = this.value.trim();
+            const errorSpan = document.getElementById('loginEmailError');
+            if (email && (!email.includes('@') || !email.includes('.'))) {
+                errorSpan.style.display = 'block';
+            } else {
+                errorSpan.style.display = 'none';
+            }
+        });
+    }
+    
+    const loginPassword = document.getElementById('loginPassword');
+    if (loginPassword) {
+        loginPassword.addEventListener('input', function() {
+            const errorSpan = document.getElementById('loginPasswordError');
+            if (this.value.length > 0 && this.value.length < 6) {
+                errorSpan.textContent = '❌ Minimum 6 caractères';
+                errorSpan.style.display = 'block';
+            } else {
+                errorSpan.style.display = 'none';
+            }
+        });
+    }
+});
+
 async function displayWelcomeMessage() {
     const user = auth.currentUser;
     if (!user) return;
@@ -1380,45 +1412,114 @@ async function displayWelcomeMessage() {
     }
 }
 
+// Fonction de connexion avec messages d'erreur clairs
 async function loginWithEmail() {
-    const email = document.getElementById('loginEmail').value;
+    const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
+    
+    // Vérifier que les champs ne sont pas vides
+    if (!email) {
+        showNotification('❌ Veuillez entrer votre adresse email', 'danger');
+        return;
+    }
+    
+    if (!password) {
+        showNotification('❌ Veuillez entrer votre mot de passe', 'danger');
+        return;
+    }
+    
+    // Afficher un message de chargement
+    const loginBtn = event.target;
+    const originalText = loginBtn.innerHTML;
+    loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connexion...';
+    loginBtn.disabled = true;
+    
     try {
         await auth.signInWithEmailAndPassword(email, password);
-        showNotification('Connexion réussie !', 'success');
+        showNotification('✅ Connexion réussie ! Bienvenue !', 'success');
+        // La redirection se fera automatiquement via onAuthStateChanged
     } catch (error) {
-        showNotification(error.message, 'danger');
+        console.error('Erreur connexion:', error);
+        
+        // Messages d'erreur personnalisés en français
+        let errorMessage = '';
+        switch (error.code) {
+            case 'auth/invalid-email':
+                errorMessage = '❌ Format d\'email invalide. Exemple: nom@domaine.com';
+                break;
+            case 'auth/user-not-found':
+                errorMessage = '❌ Aucun compte trouvé avec cet email. Vérifiez votre email ou créez un compte.';
+                break;
+            case 'auth/wrong-password':
+                errorMessage = '❌ Mot de passe incorrect. Vérifiez votre mot de passe ou cliquez sur "Mot de passe oublié ?"';
+                break;
+            case 'auth/too-many-requests':
+                errorMessage = '🔒 Trop de tentatives échouées. Réessayez plus tard ou réinitialisez votre mot de passe.';
+                break;
+            case 'auth/user-disabled':
+                errorMessage = '🚫 Ce compte a été désactivé. Contactez le support.';
+                break;
+            default:
+                errorMessage = `❌ Erreur: ${error.message}`;
+        }
+        
+        showNotification(errorMessage, 'danger');
+    } finally {
+        // Réactiver le bouton
+        loginBtn.innerHTML = originalText;
+        loginBtn.disabled = false;
     }
 }
 
+// Fonction d'inscription avec validation
 async function registerWithEmail() {
-    const firstName = document.getElementById('registerFirstName').value;
-    const lastName = document.getElementById('registerLastName').value;
-    const email = document.getElementById('registerEmail').value;
+    const firstName = document.getElementById('registerFirstName').value.trim();
+    const lastName = document.getElementById('registerLastName').value.trim();
+    const email = document.getElementById('registerEmail').value.trim();
     const password = document.getElementById('registerPassword').value;
     const confirm = document.getElementById('registerConfirmPassword').value;
     
+    // Validation des champs
     if (!firstName || !lastName) {
-        showNotification('Veuillez entrer votre nom et prénom', 'danger');
+        showNotification('❌ Veuillez entrer votre prénom et nom', 'danger');
+        return;
+    }
+    
+    if (!email) {
+        showNotification('❌ Veuillez entrer votre adresse email', 'danger');
         return;
     }
     
     if (password !== confirm) {
-        showNotification('Les mots de passe ne correspondent pas', 'danger');
+        showNotification('❌ Les mots de passe ne correspondent pas', 'danger');
         return;
     }
     
     if (password.length < 6) {
-        showNotification('Le mot de passe doit faire au moins 6 caractères', 'danger');
+        showNotification('❌ Le mot de passe doit contenir au moins 6 caractères', 'danger');
         return;
     }
     
+    // Validation simple de l'email
+    if (!email.includes('@') || !email.includes('.')) {
+        showNotification('❌ Format d\'email invalide. Exemple: nom@domaine.com', 'danger');
+        return;
+    }
+    
+    // Afficher chargement
+    const registerBtn = event.target;
+    const originalText = registerBtn.innerHTML;
+    registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Création...';
+    registerBtn.disabled = true;
+    
     try {
         const result = await auth.createUserWithEmailAndPassword(email, password);
-        const fullName = `${firstName} ${lastName}`;
         
+        // Mettre à jour le profil
+        const fullName = `${firstName} ${lastName}`;
         await result.user.updateProfile({ displayName: fullName });
         
+        // Créer le document utilisateur dans Firestore
         await db.collection('users').doc(result.user.uid).set({
             uid: result.user.uid,
             email: email,
@@ -1432,26 +1533,81 @@ async function registerWithEmail() {
             categories: DEFAULT_CATEGORIES
         });
         
-        showNotification(`Bienvenue ${firstName} !`, 'success');
+        showNotification(`✅ Compte créé avec succès ! Bienvenue ${firstName} !`, 'success');
+        
     } catch (error) {
-        let message = 'Erreur d\'inscription';
-        if (error.code === 'auth/email-already-in-use') {
-            message = 'Cet email est déjà utilisé';
+        console.error('Erreur inscription:', error);
+        
+        // Messages d'erreur personnalisés
+        let errorMessage = '';
+        switch (error.code) {
+            case 'auth/email-already-in-use':
+                errorMessage = '❌ Cet email est déjà utilisé. Connectez-vous ou utilisez un autre email.';
+                break;
+            case 'auth/invalid-email':
+                errorMessage = '❌ Format d\'email invalide. Exemple: nom@domaine.com';
+                break;
+            case 'auth/weak-password':
+                errorMessage = '❌ Mot de passe trop faible. Utilisez au moins 6 caractères.';
+                break;
+            case 'auth/operation-not-allowed':
+                errorMessage = '❌ L\'inscription est temporairement désactivée.';
+                break;
+            default:
+                errorMessage = `❌ Erreur: ${error.message}`;
         }
-        showNotification(message, 'danger');
+        
+        showNotification(errorMessage, 'danger');
+    } finally {
+        registerBtn.innerHTML = originalText;
+        registerBtn.disabled = false;
     }
 }
 
+// Fonction de réinitialisation mot de passe
 async function resetPassword() {
-    const email = document.getElementById('resetEmail').value;
+    const email = document.getElementById('resetEmail').value.trim();
+    
+    if (!email) {
+        showNotification('❌ Veuillez entrer votre adresse email', 'danger');
+        return;
+    }
+    
+    // Afficher chargement
+    const resetBtn = event.target;
+    const originalText = resetBtn.innerHTML;
+    resetBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...';
+    resetBtn.disabled = true;
+    
     try {
         await auth.sendPasswordResetEmail(email);
-        showNotification('Email envoyé !', 'success');
-        showLoginForm();
+        showNotification('✅ Un email de réinitialisation a été envoyé ! Vérifiez votre boîte de réception.', 'success');
+        // Retourner au formulaire de connexion après 2 secondes
+        setTimeout(() => {
+            showLoginForm();
+        }, 2000);
     } catch (error) {
-        showNotification('Email non trouvé', 'danger');
+        console.error('Erreur reset:', error);
+        
+        let errorMessage = '';
+        switch (error.code) {
+            case 'auth/user-not-found':
+                errorMessage = '❌ Aucun compte trouvé avec cet email. Vérifiez votre email ou créez un compte.';
+                break;
+            case 'auth/invalid-email':
+                errorMessage = '❌ Format d\'email invalide. Exemple: nom@domaine.com';
+                break;
+            default:
+                errorMessage = `❌ Erreur: ${error.message}`;
+        }
+        
+        showNotification(errorMessage, 'danger');
+    } finally {
+        resetBtn.innerHTML = originalText;
+        resetBtn.disabled = false;
     }
 }
+
 
 async function logout() {
     await auth.signOut();
