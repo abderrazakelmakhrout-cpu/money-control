@@ -1367,6 +1367,440 @@ body {
     </div>
 </div>
 <script>
+ // ==================== ADMINISTRATION AVEC FIREBASE ====================
+
+// Configuration admin - À MODIFIER AVEC TON EMAIL
+const ADMIN_EMAILS = ["abderrazak.elmakhrout@gmail.com", "autre-admin@email.com"]; // Liste des admins autorisés
+
+// Vérifier si l'utilisateur est admin
+async function isUserAdmin(uid) {
+    if (!uid) return false;
+    
+    try {
+        const adminDoc = await db.collection('admins').doc(uid).get();
+        if (adminDoc.exists && adminDoc.data().role === 'super_admin') {
+            return true;
+        }
+        
+        // Vérifier aussi par email (sécurité supplémentaire)
+        const userDoc = await db.collection('users').doc(uid).get();
+        if (userDoc.exists && ADMIN_EMAILS.includes(userDoc.data().email)) {
+            // Ajouter automatiquement comme admin dans Firestore
+            await db.collection('admins').doc(uid).set({
+                email: userDoc.data().email,
+                role: 'super_admin',
+                canActivate: true,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            return true;
+        }
+        
+        return false;
+    } catch (error) {
+        console.error('Erreur vérification admin:', error);
+        return false;
+    }
+}
+
+// Demander l'activation (par l'utilisateur)
+async function requestActivationFirebase() {
+    if (!auth.currentUser) {
+        showNotification('❌ Veuillez vous connecter', 'danger');
+        return;
+    }
+    
+    const user = auth.currentUser;
+    const userEmail = user.email;
+    const userName = user.displayName || userEmail.split('@')[0];
+    
+    // Vérifier si déjà activé
+    const userDoc = await db.collection('users').doc(user.uid).get();
+    if (userDoc.exists && userDoc.data().isActivated === true) {
+        showNotification('✅ Votre compte est déjà activé !', 'success');
+        return;
+    }
+    
+    // Vérifier si une demande existe déjà
+    const existingRequests = await db.collection('activation_requests')
+        .where('userId', '==', user.uid)
+        .where('status', 'in', ['pending', 'approved'])
+        .get();
+    
+    if (!existingRequests.empty) {
+        const existing = existingRequests.docs[0].data();
+        if (existing.status === 'pending') {
+            showNotification('⏳ Vous avez déjà une demande en attente. L\'administrateur va la traiter sous 24h.', 'info');
+            return;
+        } else if (existing.status === 'approved') {
+            showNotification('✅ Votre compte est déjà activé !', 'success');
+            return;
+        }
+    }
+    
+    try {
+        // Créer la demande d'activation
+        const requestData = {
+            userId: user.uid,
+            email: userEmail,
+            userName: userName,
+            status: 'pending',
+            screenshotProvided: true,
+            requestDate: firebase.firestore.FieldValue.serverTimestamp(),
+            userCreatedAt: user.metadata.creationTime || new Date().toISOString()
+        };
+        
+        const requestRef = await db.collection('activation_requests').add(requestData);
+        
+        // Envoyer notification aux admins
+        await sendAdminNotificationFirebase(userEmail, userName);
+        
+        showNotification('✅ Demande envoyée ! Vous recevrez une confirmation par email sous 24h.', 'success');
+        
+    } catch (error) {
+        console.error('Erreur demande activation:', error);
+        showNotification('❌ Erreur lors de la demande', 'danger');
+    }
+}
+
+// Envoyer notification aux admins via EmailJS
+async function sendAdminNotificationFirebase(userEmail, userName) {
+    // Récupérer tous les admins
+    const adminsSnapshot = await db.collection('admins')
+        .where('role', '==', 'super_admin')
+        .where('canActivate', '==', true)
+        .get();
+    
+    if (adminsSnapshot.empty) {
+        console.log('Aucun admin trouvé');
+        return;
+    }
+    
+    if (typeof emailjs === 'undefined') return;
+    
+    for (const adminDoc of adminsSnapshot.docs) {
+        const adminData = adminDoc.data();
+        const adminEmail = adminData.email;
+        
+        try {
+            await emailjs.send(
+                EMAILJS_CONFIG.serviceId,
+                EMAILJS_CONFIG.templateId,
+                {
+                    user_email: adminEmail,
+                    subject: "🆕 Nouvelle demande d'activation - Money Control Pro",
+                    message: `Un nouvel utilisateur demande l'activation de son compte :\n\n` +
+                             `👤 Nom : ${userName}\n` +
+                             `📧 Email : ${userEmail}\n` +
+                             `📅 Date : ${new Date().toLocaleString('fr-FR')}\n\n` +
+                             `💰 Virement de 99 MAD effectué vers le RIB CIH.\n\n` +
+                             `👉 Connectez-vous à l'application et allez dans la section Administration pour activer ce compte.`,
+                    type: "🔵 Nouvelle demande",
+                    date: new Date().toLocaleString('fr-FR')
+                }
+            );
+            console.log(`✅ Notification envoyée à l'admin ${adminEmail}`);
+        } catch(e) {
+            console.error(`❌ Erreur envoi à ${adminEmail}:`, e);
+        }
+    }
+}
+
+// Vérifier si un utilisateur est activé (Firebase)
+async function isAccountActivatedFirebase(uid) {
+    if (!uid) return false;
+    
+    try {
+        const userDoc = await db.collection('users').doc(uid).get();
+        if (userDoc.exists) {
+            return userDoc.data().isActivated === true;
+        }
+        return false;
+    } catch (error) {
+        console.error('Erreur vérification activation:', error);
+        return false;
+    }
+}
+
+// Activer un utilisateur (par l'admin)
+async function activateUserByEmailFirebase(email) {
+    if (!auth.currentUser) {
+        showNotification('❌ Vous devez être connecté en tant qu\'admin', 'danger');
+        return;
+    }
+    
+    // Vérifier que l'utilisateur est admin
+    const isAdmin = await isUserAdmin(auth.currentUser.uid);
+    if (!isAdmin) {
+        showNotification('❌ Accès refusé. Vous n\'êtes pas administrateur.', 'danger');
+        return;
+    }
+    
+    if (!confirm(`Activer le compte de ${email} ? L'utilisateur pourra alors ajouter des transactions.`)) return;
+    
+    try {
+        // Trouver l'utilisateur par email
+        const usersSnapshot = await db.collection('users')
+            .where('email', '==', email)
+            .limit(1)
+            .get();
+        
+        if (usersSnapshot.empty) {
+            showNotification(`❌ Aucun utilisateur trouvé avec l'email ${email}`, 'danger');
+            return;
+        }
+        
+        const userDoc = usersSnapshot.docs[0];
+        const userId = userDoc.id;
+        
+        // Mettre à jour l'utilisateur
+        await db.collection('users').doc(userId).update({
+            isActivated: true,
+            activationDate: firebase.firestore.FieldValue.serverTimestamp(),
+            activatedBy: auth.currentUser.uid,
+            activatedByEmail: auth.currentUser.email
+        });
+        
+        // Mettre à jour la demande d'activation
+        const requestsSnapshot = await db.collection('activation_requests')
+            .where('userId', '==', userId)
+            .where('status', '==', 'pending')
+            .get();
+        
+        for (const requestDoc of requestsSnapshot.docs) {
+            await requestDoc.ref.update({
+                status: 'approved',
+                activationDate: firebase.firestore.FieldValue.serverTimestamp(),
+                activatedBy: auth.currentUser.uid
+            });
+        }
+        
+        showNotification(`✅ Compte ${email} activé avec succès !`, 'success');
+        
+        // Recharger les listes
+        loadPendingRequestsFirebase();
+        loadActivatedUsersFirebase();
+        
+        // Envoyer email de confirmation
+        await sendActivationConfirmationFirebase(email);
+        
+    } catch(error) {
+        console.error('Erreur activation:', error);
+        showNotification(`❌ Erreur: ${error.message}`, 'danger');
+    }
+}
+
+// Envoyer confirmation d'activation
+async function sendActivationConfirmationFirebase(userEmail) {
+    if (typeof emailjs === 'undefined') return;
+    
+    try {
+        await emailjs.send(
+            EMAILJS_CONFIG.serviceId,
+            EMAILJS_CONFIG.templateId,
+            {
+                user_email: userEmail,
+                subject: "✅ Votre compte Money Control Pro est activé !",
+                message: `Félicitations ! Votre compte a été activé.\n\n` +
+                         `Vous pouvez maintenant :\n` +
+                         `• Ajouter des transactions (revenus, dépenses, épargne)\n` +
+                         `• Créer des objectifs d'épargne\n` +
+                         `• Gérer vos budgets personnalisés\n` +
+                         `• Exporter vos rapports financiers\n\n` +
+                         `Connectez-vous à l'application pour profiter de toutes ces fonctionnalités.\n\n` +
+                         `Merci de votre confiance !\nL'équipe Money Control Pro`,
+                type: "🟢 Activation confirmée",
+                date: new Date().toLocaleString('fr-FR')
+            }
+        );
+        console.log('✅ Email de confirmation envoyé à', userEmail);
+    } catch(e) {
+        console.error('❌ Erreur envoi confirmation:', e);
+    }
+}
+
+// Charger les demandes en attente (Firebase)
+async function loadPendingRequestsFirebase() {
+    if (!auth.currentUser) return;
+    
+    // Vérifier que l'utilisateur est admin
+    const isAdmin = await isUserAdmin(auth.currentUser.uid);
+    if (!isAdmin) return;
+    
+    const container = document.getElementById('pendingRequestsList');
+    if (!container) return;
+    
+    try {
+        const pendingSnapshot = await db.collection('activation_requests')
+            .where('status', '==', 'pending')
+            .orderBy('requestDate', 'desc')
+            .get();
+        
+        const pending = [];
+        pendingSnapshot.forEach(doc => {
+            pending.push({ id: doc.id, ...doc.data() });
+        });
+        
+        if (pending.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: var(--text-muted);">✅ Aucune demande en attente</p>';
+            if (document.getElementById('pendingCount')) {
+                document.getElementById('pendingCount').textContent = '0';
+            }
+            return;
+        }
+        
+        if (document.getElementById('pendingCount')) {
+            document.getElementById('pendingCount').textContent = pending.length;
+        }
+        
+        container.innerHTML = pending.map(req => `
+            <div style="background: var(--bg); border-radius: 12px; padding: 15px; margin-bottom: 10px; border-left: 4px solid var(--warning);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <strong>👤 ${req.userName || req.email}</strong><br>
+                        <small style="color: var(--text-muted);">📧 ${req.email}</small><br>
+                        <small style="color: var(--text-muted);">📅 ${req.requestDate ? new Date(req.requestDate.toDate()).toLocaleString('fr-FR') : 'Date inconnue'}</small>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-success btn-sm" onclick="activateUserByEmailFirebase('${req.email}')">
+                            <i class="fas fa-check"></i> Activer
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="rejectActivationFirebase('${req.id}')">
+                            <i class="fas fa-times"></i> Rejeter
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+    } catch(error) {
+        console.error('Erreur chargement demandes:', error);
+        container.innerHTML = '<p style="text-align: center; color: var(--danger);">❌ Erreur de chargement</p>';
+    }
+}
+
+// Rejeter une demande
+async function rejectActivationFirebase(requestId) {
+    if (!auth.currentUser) return;
+    
+    const isAdmin = await isUserAdmin(auth.currentUser.uid);
+    if (!isAdmin) {
+        showNotification('❌ Accès refusé', 'danger');
+        return;
+    }
+    
+    const reason = prompt('Raison du rejet (optionnel) :');
+    
+    if (!confirm('Rejeter cette demande ?')) return;
+    
+    try {
+        await db.collection('activation_requests').doc(requestId).update({
+            status: 'rejected',
+            rejectionDate: firebase.firestore.FieldValue.serverTimestamp(),
+            rejectedBy: auth.currentUser.uid,
+            rejectionReason: reason || 'Non spécifiée'
+        });
+        
+        showNotification('✅ Demande rejetée', 'warning');
+        loadPendingRequestsFirebase();
+        
+    } catch(error) {
+        console.error('Erreur rejet:', error);
+        showNotification('❌ Erreur lors du rejet', 'danger');
+    }
+}
+
+// Charger les utilisateurs activés
+async function loadActivatedUsersFirebase() {
+    if (!auth.currentUser) return;
+    
+    const isAdmin = await isUserAdmin(auth.currentUser.uid);
+    if (!isAdmin) return;
+    
+    const container = document.getElementById('activatedUsersList');
+    if (!container) return;
+    
+    try {
+        const activatedSnapshot = await db.collection('users')
+            .where('isActivated', '==', true)
+            .orderBy('activationDate', 'desc')
+            .get();
+        
+        const activatedUsers = [];
+        activatedSnapshot.forEach(doc => {
+            activatedUsers.push({ id: doc.id, ...doc.data() });
+        });
+        
+        if (activatedUsers.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Aucun utilisateur activé pour le moment</p>';
+            return;
+        }
+        
+        container.innerHTML = `
+            <table class="data-table">
+                <thead>
+                    <tr><th>Email</th><th>Nom</th><th>Date d'activation</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                    ${activatedUsers.map(user => `
+                        <tr>
+                            <td>${user.email}</td>
+                            <td>${user.fullName || user.firstName || '-'}</td>
+                            <td>${user.activationDate ? new Date(user.activationDate.toDate()).toLocaleDateString('fr-FR') : 'Date inconnue'}</td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" onclick="deactivateUserFirebase('${user.id}')">
+                                    <i class="fas fa-ban"></i> Désactiver
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+        
+    } catch(error) {
+        console.error('Erreur chargement utilisateurs activés:', error);
+        container.innerHTML = '<p style="text-align: center; color: var(--danger);">❌ Erreur de chargement</p>';
+    }
+}
+
+// Désactiver un utilisateur
+async function deactivateUserFirebase(uid) {
+    if (!auth.currentUser) return;
+    
+    const isAdmin = await isUserAdmin(auth.currentUser.uid);
+    if (!isAdmin) {
+        showNotification('❌ Accès refusé', 'danger');
+        return;
+    }
+    
+    if (!confirm('Désactiver ce compte ? L\'utilisateur perdra l\'accès aux fonctionnalités.')) return;
+    
+    try {
+        await db.collection('users').doc(uid).update({
+            isActivated: false,
+            deactivatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            deactivatedBy: auth.currentUser.uid
+        });
+        
+        showNotification('✅ Utilisateur désactivé', 'warning');
+        loadActivatedUsersFirebase();
+        
+    } catch(error) {
+        console.error('Erreur désactivation:', error);
+        showNotification('❌ Erreur lors de la désactivation', 'danger');
+    }
+}
+
+// Activation manuelle par l'admin
+function manualActivateUserFirebase() {
+    const email = document.getElementById('adminUserEmail').value.trim();
+    if (!email) {
+        showNotification('❌ Entrez un email', 'danger');
+        return;
+    }
+    activateUserByEmailFirebase(email);
+    document.getElementById('adminUserEmail').value = '';
+}
 // Configuration Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyD96LYWo2w914A-H0UWGMtcRjzGns72v4g",
@@ -1447,11 +1881,56 @@ function markGuideAsSeen() {
 }
 
 // Vérifier si le compte est activé
-function isAccountActivated() {
+// Remplacer isAccountActivated par cette version
+async function isAccountActivated() {
     if (!auth.currentUser) return false;
-    return localStorage.getItem(`account_activated_${auth.currentUser.uid}`) === 'true';
+    
+    try {
+        const userDoc = await db.collection('users').doc(auth.currentUser.uid).get();
+        return userDoc.exists && userDoc.data().isActivated === true;
+    } catch(error) {
+        console.error('Erreur:', error);
+        return false;
+    }
 }
 
+// Pour vérifier avant d'ajouter des transactions
+async function checkPermissionAndOpenTransactionModal() {
+    const isActivated = await isAccountActivated();
+    if (!isActivated) {
+        showNotification('⚠️ Veuillez activer votre compte pour ajouter des transactions. Cliquez sur "Demander l\'activation" !', 'warning');
+        openWelcomeGuide();
+        if (typeof showGuideTab === 'function') showGuideTab('activation');
+        return false;
+    }
+    openTransactionModal();
+    return true;
+}
+// Au chargement, initialiser l'admin si l'utilisateur connecté est admin
+async function initAdminSection() {
+    if (!auth.currentUser) return;
+    
+    const isAdmin = await isUserAdmin(auth.currentUser.uid);
+    if (isAdmin) {
+        const adminMenuItem = document.getElementById('adminMenuItem');
+        if (adminMenuItem) adminMenuItem.style.display = 'flex';
+        
+        // Charger les données admin
+        await loadPendingRequestsFirebase();
+        await loadActivatedUsersFirebase();
+        
+        // Configurer l'email admin dans le formulaire
+        const adminEmailInput = document.getElementById('adminEmailConfig');
+        if (adminEmailInput) {
+            const userDoc = await db.collection('users').doc(auth.currentUser.uid).get();
+            if (userDoc.exists) {
+                adminEmailInput.value = userDoc.data().email;
+            }
+        }
+    }
+}
+
+// Appeler dans onAuthStateChanged
 // Activer le compte (à appeler après validation admin)
 function activateAccount(email) {
     // Chercher l'utilisateur par email et activer
@@ -1823,28 +2302,40 @@ async function registerWithEmail() {
     registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Création...';
     registerBtn.disabled = true;
     
-    try {
+  try {
         const result = await auth.createUserWithEmailAndPassword(email, password);
-        
-        // Mettre à jour le profil
         const fullName = `${firstName} ${lastName}`;
         await result.user.updateProfile({ displayName: fullName });
         
-        // Créer le document utilisateur dans Firestore
+        // Créer le document utilisateur dans Firestore avec isActivated = false
         await db.collection('users').doc(result.user.uid).set({
             uid: result.user.uid,
             email: email,
             firstName: firstName,
             lastName: lastName,
             fullName: fullName,
-            createdAt: new Date().toISOString(),
+            isActivated: false,  // ⚠️ Par défaut non activé
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             transactions: DEFAULT_TRANSACTIONS,
             objectifs: DEFAULT_OBJECTIFS,
             budgets: DEFAULT_BUDGETS,
             categories: DEFAULT_CATEGORIES
         });
         
-        showNotification(`✅ Compte créé avec succès ! Bienvenue ${firstName} !`, 'success');
+        // Créer automatiquement une demande d'activation
+        await db.collection('activation_requests').add({
+            userId: result.user.uid,
+            email: email,
+            userName: fullName,
+            status: 'pending',
+            screenshotProvided: false,
+            requestDate: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        // Notifier les admins
+        await sendAdminNotificationFirebase(email, fullName);
+        
+        showNotification(`✅ Compte créé ! Un admin va valider votre compte sous 24h.`, 'success');
         
     } catch (error) {
         console.error('Erreur inscription:', error);
