@@ -19,10 +19,11 @@
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script type="text/javascript">
    window.addEventListener('load', function() {
-      emailjs.init({
-        publicKey: "aBWWakhI_E4qhUp8J",
-      });
-   });
+    emailjs.init({
+        publicKey: EMAILJS_CONFIG.publicKey  // Utilise la variable plutôt qu'en dur
+    });
+    console.log('✅ EmailJS initialisé avec la clé:', EMAILJS_CONFIG.publicKey);
+});
 </script>  
 <style>
 * {
@@ -2344,12 +2345,14 @@ function saveAlertConfigToLocal() {
 
 // Fonction d'envoi d'email via EmailJS
 // Fonction d'envoi d'email via EmailJS - VERSION CORRIGÉE
+// Fonction d'envoi d'email via EmailJS - VERSION CORRIGÉE pour ton template
 async function sendEmailAlert(subject, message, type = 'warning') {
     if (!alertConfig.emailEnabled) return;
     
     const email = alertConfig.alertEmail || auth.currentUser?.email;
     if (!email) {
         console.log('📧 Email non configuré pour les alertes');
+        showNotification('Email non configuré', 'danger');
         return;
     }
     
@@ -2360,32 +2363,66 @@ async function sendEmailAlert(subject, message, type = 'warning') {
         return;
     }
     
+    // Convertir le type en texte lisible pour l'affichage dans le template
+    let typeText = '';
+    let typeClass = '';
+    switch(type) {
+        case 'danger':
+            typeText = '🔴 Critique - Action urgente requise';
+            typeClass = 'danger';
+            break;
+        case 'warning':
+            typeText = '🟠 Attention - À surveiller';
+            typeClass = 'warning';
+            break;
+        case 'success':
+            typeText = '🟢 Succès - Félicitations !';
+            typeClass = 'success';
+            break;
+        default:
+            typeText = '🔵 Information';
+            typeClass = 'info';
+    }
+    
     try {
-        // 👇 MODIFICATION ICI : utiliser 'to_email' ou 'email' selon ton template
-      const templateParams = {
-    to_email: email,
-    email: email,
-    user_email: email,
-    subject: subject,
-    message: message,
-    type: type === 'danger' ? '🔴 Critique' : type === 'warning' ? '🟠 Attention' : '🔵 Information',
-    date: new Date().toLocaleString('fr-FR')
-};
-        console.log('📧 Envoi email avec params:', templateParams);
+        // Paramètres correspondant EXACTEMENT au template
+        const templateParams = {
+            user_email: email,    // ⚠️ IMPORTANT: doit s'appeler 'user_email'
+            subject: subject,      // Le sujet de l'alerte
+            message: message,      // Le message détaillé
+            type: typeText,        // Le type d'alerte (texte)
+            date: new Date().toLocaleString('fr-FR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })
+        };
         
-        await emailjs.send(
-            EMAILJS_CONFIG.serviceId,
-            EMAILJS_CONFIG.templateId,
+        console.log('📧 Envoi email vers:', email);
+        console.log('📧 Paramètres:', templateParams);
+        
+        const response = await emailjs.send(
+            EMAILJS_CONFIG.serviceId,   // "service_jw6x8wt"
+            EMAILJS_CONFIG.templateId,  // "template_3khrhny"
             templateParams
         );
-        console.log('✅ Email d\'alerte envoyé à:', email);
-        showNotification('📧 Alerte email envoyée', 'success');
+        
+        console.log('✅ Email envoyé avec succès:', response);
+        showNotification('📧 Alerte email envoyée avec succès', 'success');
+        
     } catch (error) {
         console.error('❌ Erreur envoi email:', error);
-        showNotification(`Erreur envoi email: ${error.text || error.message}`, 'danger');
+        
+        // Afficher un message plus détaillé
+        let errorMsg = 'Erreur lors de l\'envoi';
+        if (error.text) {
+            errorMsg += `: ${error.text}`;
+        }
+        showNotification(errorMsg, 'danger');
     }
 }
-
 // ==================== VÉRIFICATIONS DES RISQUES ====================
 
 // 1. Vérification des budgets
