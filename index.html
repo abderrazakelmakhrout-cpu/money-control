@@ -1253,16 +1253,35 @@ function isAccountActivatedSync() {
         } catch(e) { container.innerHTML = '<p style="text-align:center;color:var(--danger)">❌ Erreur</p>'; }
     }
 
-    async function deactivateUserFirebase(uid) {
-        if (!auth.currentUser || !await isUserAdmin(auth.currentUser.uid)) return;
-        if (!confirm('Désactiver ?')) return;
-        try {
-            await db.collection('users').doc(uid).update({ isActivated: false, deactivatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-            showNotification('✅ Désactivé', 'warning');
-            loadActivatedUsersFirebase();
-        } catch(e) { showNotification('❌ Erreur', 'danger'); }
+   async function deactivateUserFirebase(uid) {
+    if (!auth.currentUser || !await isUserAdmin(auth.currentUser.uid)) return;
+    if (!confirm('⚠️ Désactiver ce compte ? L\'utilisateur ne pourra plus ajouter de transactions.')) return;
+    
+    try {
+        await db.collection('users').doc(uid).update({ 
+            isActivated: false, 
+            deactivatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            deactivatedBy: auth.currentUser.uid
+        });
+        
+        // Mettre à jour le cache
+        localStorage.setItem(`activated_${uid}`, 'false');
+        
+        // Si l'utilisateur désactivé est celui connecté, rafraîchir
+        if (auth.currentUser.uid === uid) {
+            localStorage.setItem(`activated_${auth.currentUser.uid}`, 'false');
+            showNotification('⚠️ Votre compte a été désactivé par un administrateur', 'warning');
+            renderBudgets();
+        }
+        
+        showNotification('✅ Utilisateur désactivé', 'warning');
+        loadActivatedUsersFirebase();
+        
+    } catch(e) { 
+        console.error('Erreur désactivation:', e);
+        showNotification('❌ Erreur', 'danger'); 
     }
-
+}
     function manualActivateUserFirebase() {
         const email = document.getElementById('adminUserEmail').value.trim();
         if (!email) { showNotification('❌ Email requis', 'danger'); return; }
