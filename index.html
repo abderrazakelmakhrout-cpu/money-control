@@ -867,53 +867,62 @@
     }
 
     async function registerWithEmail() {
-        const firstName = document.getElementById('registerFirstName').value.trim();
-        const lastName = document.getElementById('registerLastName').value.trim();
-        const email = document.getElementById('registerEmail').value.trim();
-        const password = document.getElementById('registerPassword').value;
-        const confirm = document.getElementById('registerConfirmPassword').value;
+    const firstName = document.getElementById('registerFirstName').value.trim();
+    const lastName = document.getElementById('registerLastName').value.trim();
+    const email = document.getElementById('registerEmail').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    const confirm = document.getElementById('registerConfirmPassword').value;
+    
+    if (!firstName || !lastName) { showNotification('❌ Prénom et nom requis', 'danger'); return; }
+    if (!email) { showNotification('❌ Email requis', 'danger'); return; }
+    if (password !== confirm) { showNotification('❌ Mots de passe différents', 'danger'); return; }
+    if (password.length < 6) { showNotification('❌ 6 caractères minimum', 'danger'); return; }
+    
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Création...';
+    btn.disabled = true;
+    
+    try {
+        const result = await auth.createUserWithEmailAndPassword(email, password);
+        const fullName = `${firstName} ${lastName}`;
+        await result.user.updateProfile({ displayName: fullName });
         
-        if (!firstName || !lastName) { showNotification('❌ Prénom et nom requis', 'danger'); return; }
-        if (!email) { showNotification('❌ Email requis', 'danger'); return; }
-        if (password !== confirm) { showNotification('❌ Mots de passe différents', 'danger'); return; }
-        if (password.length < 6) { showNotification('❌ 6 caractères minimum', 'danger'); return; }
+        await db.collection('users').doc(result.user.uid).set({
+            uid: result.user.uid, email: email, firstName: firstName, lastName: lastName,
+            fullName: fullName, isActivated: false,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            transactions: DEFAULT_TRANSACTIONS, objectifs: DEFAULT_OBJECTIFS,
+            budgets: DEFAULT_BUDGETS, categories: DEFAULT_CATEGORIES
+        });
         
-        const btn = event.target;
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Création...';
-        btn.disabled = true;
+        // Initialiser le cache localStorage pour ce nouvel utilisateur
+        localStorage.setItem(`activated_${result.user.uid}`, 'false');
         
-        try {
-            const result = await auth.createUserWithEmailAndPassword(email, password);
-            const fullName = `${firstName} ${lastName}`;
-            await result.user.updateProfile({ displayName: fullName });
-            
-            await db.collection('users').doc(result.user.uid).set({
-                uid: result.user.uid, email: email, firstName: firstName, lastName: lastName,
-                fullName: fullName, isActivated: false,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                transactions: DEFAULT_TRANSACTIONS, objectifs: DEFAULT_OBJECTIFS,
-                budgets: DEFAULT_BUDGETS, categories: DEFAULT_CATEGORIES
-            });
-            
-            await db.collection('activation_requests').add({
-                userId: result.user.uid, email: email, userName: fullName,
-                status: 'pending', screenshotProvided: false,
-                requestDate: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            
-            await sendAdminNotificationFirebase(email, fullName);
-            showNotification('✅ Compte créé ! Validation sous 24h.', 'success');
-        } catch (error) {
-            let msg = '❌ Erreur inscription';
-            if (error.code === 'auth/email-already-in-use') msg = '❌ Email déjà utilisé';
-            else if (error.code === 'auth/weak-password') msg = '❌ Mot de passe trop faible';
-            showNotification(msg, 'danger');
-        } finally {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        }
+        await db.collection('activation_requests').add({
+            userId: result.user.uid, email: email, userName: fullName,
+            status: 'pending', screenshotProvided: false,
+            requestDate: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        await sendAdminNotificationFirebase(email, fullName);
+        showNotification('✅ Compte créé ! Validation sous 24h.', 'success');
+        
+        // Connecter l'utilisateur automatiquement après inscription
+        setTimeout(() => {
+            location.reload();
+        }, 2000);
+        
+    } catch (error) {
+        let msg = '❌ Erreur inscription';
+        if (error.code === 'auth/email-already-in-use') msg = '❌ Email déjà utilisé';
+        else if (error.code === 'auth/weak-password') msg = '❌ Mot de passe trop faible';
+        showNotification(msg, 'danger');
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
     }
+}
 
     async function resetPassword() {
         const email = document.getElementById('resetEmail').value.trim();
@@ -1006,13 +1015,29 @@
     // =============================================================
     // 7.9 ACTIVATION & ADMIN
     // =============================================================
-    async function isAccountActivated() {
-        if (!auth.currentUser) return false;
-        try {
-            const doc = await db.collection('users').doc(auth.currentUser.uid).get();
-            return doc.exists && doc.data().isActivated === true;
-        } catch(e) { return false; }
-    }
+  async function isAccountActivated() {
+    if (!auth.currentUser) return false;
+    const uid = auth.currentUser.uid;
+    
+    // Vérifier en cache local d'abord
+    const cached = localStorage.getItem(`activated_${uid}`);
+    if (cached === 'true') return true;
+    if (cached === 'false') return false;
+    
+    try {
+        const doc = await db.collection('users').doc(uid).get();
+        const isActive = doc.exists && doc.data().isActivated === true;
+        localStorage.setItem(`activated_${uid}`, isActive);
+        return isActive;
+    } catch(e) { return false; }
+}
+
+function isAccountActivatedSync() {
+    if (!auth.currentUser) return false;
+    const uid = auth.currentUser.uid;
+    const cached = localStorage.getItem(`activated_${uid}`);
+    return cached === 'true';
+}
 
     async function addActivationButtonIfNeeded() {
         if (!auth.currentUser) return;
@@ -1103,29 +1128,70 @@
     }
 
     async function activateUserByEmailFirebase(email) {
-        if (!auth.currentUser) return;
-        if (!await isUserAdmin(auth.currentUser.uid)) { showNotification('❌ Accès refusé', 'danger'); return; }
-        if (!confirm(`Activer ${email} ?`)) return;
-        
-        try {
-            const users = await db.collection('users').where('email', '==', email).limit(1).get();
-            if (users.empty) { showNotification('❌ Utilisateur non trouvé', 'danger'); return; }
-            
-            const userId = users.docs[0].id;
-            await db.collection('users').doc(userId).update({
-                isActivated: true, activationDate: firebase.firestore.FieldValue.serverTimestamp(),
-                activatedBy: auth.currentUser.uid
-            });
-            
-            const requests = await db.collection('activation_requests').where('userId', '==', userId).where('status', '==', 'pending').get();
-            for (const doc of requests.docs) await doc.ref.update({ status: 'approved' });
-            
-            showNotification(`✅ ${email} activé !`, 'success');
-            await loadPendingRequestsFirebase();
-            await loadActivatedUsersFirebase();
-            await sendActivationConfirmationFirebase(email);
-        } catch(e) { showNotification('❌ Erreur', 'danger'); }
+    if (!auth.currentUser) return;
+    if (!await isUserAdmin(auth.currentUser.uid)) { 
+        showNotification('❌ Accès refusé', 'danger'); 
+        return; 
     }
+    if (!confirm(`Activer ${email} ?`)) return;
+    
+    try {
+        const users = await db.collection('users').where('email', '==', email).limit(1).get();
+        if (users.empty) { 
+            showNotification('❌ Utilisateur non trouvé', 'danger'); 
+            return; 
+        }
+        
+        const userId = users.docs[0].id;
+        const userData = users.docs[0].data();
+        
+        // Mise à jour Firestore
+        await db.collection('users').doc(userId).update({
+            isActivated: true, 
+            activationDate: firebase.firestore.FieldValue.serverTimestamp(),
+            activatedBy: auth.currentUser.uid
+        });
+        
+        // Mettre à jour le cache localStorage
+        localStorage.setItem(`activated_${userId}`, 'true');
+        
+        // Mettre à jour également le cache pour l'email (si l'utilisateur activé est celui connecté)
+        if (auth.currentUser.uid === userId) {
+            localStorage.setItem(`activated_${auth.currentUser.uid}`, 'true');
+        }
+        
+        // Mettre à jour les demandes d'activation
+        const requests = await db.collection('activation_requests')
+            .where('userId', '==', userId)
+            .where('status', '==', 'pending').get();
+        for (const doc of requests.docs) {
+            await doc.ref.update({ status: 'approved' });
+        }
+        
+        showNotification(`✅ ${email} activé !`, 'success');
+        
+        // Rafraîchir les listes admin
+        await loadPendingRequestsFirebase();
+        await loadActivatedUsersFirebase();
+        
+        // Envoyer email de confirmation à l'utilisateur
+        await sendActivationConfirmationFirebase(email);
+        
+        // Si l'utilisateur activé est celui actuellement connecté, rafraîchir l'interface
+        if (auth.currentUser.uid === userId) {
+            showNotification('✅ Votre compte est maintenant activé ! Vous pouvez ajouter des transactions.', 'success');
+            // Masquer le bouton d'activation
+            const btn = document.getElementById('activationRequestBtn');
+            if (btn) btn.style.display = 'none';
+            // Re-rendre les sections qui nécessitent l'activation
+            renderBudgets();
+        }
+        
+    } catch(e) { 
+        console.error('Erreur activation:', e);
+        showNotification('❌ Erreur lors de l\'activation', 'danger'); 
+    }
+}
 
     async function sendActivationConfirmationFirebase(userEmail) {
         if (typeof emailjs === 'undefined') return;
@@ -1413,12 +1479,26 @@
         document.getElementById('txCount').textContent = transactions.length;
     }
 
-    function openTransactionModal() {
-        document.getElementById('transactionModal').classList.add('active');
-        document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
-        editTransactionId = null;
-        updateCategorySelect();
+ function openTransactionModal() {
+    if (!isAccountActivatedSync()) {
+        showNotification('🔒 Veuillez activer votre compte pour ajouter des transactions. Cliquez sur "Demander l\'activation" dans le message de bienvenue.', 'warning');
+        openWelcomeGuide();
+        return;
     }
+    document.getElementById('transactionModal').classList.add('active');
+    document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
+    editTransactionId = null;
+    updateCategorySelect();
+}
+        function isAccountActivatedSync() {
+    // Vérification synchrone pour les modals
+    if (!auth.currentUser) return false;
+    const uid = auth.currentUser.uid;
+    const stored = localStorage.getItem(`activated_${uid}`);
+    if (stored === 'true') return true;
+    if (stored === 'false') return false;
+    return true; // Par défaut on autorise, la vérification async se fera à l'enregistrement
+}
     function closeTransactionModal() { document.getElementById('transactionModal').classList.remove('active'); }
     function updateCategorySelect() {
         const type = document.getElementById('txType').value;
@@ -1427,17 +1507,29 @@
         if (catSelect) catSelect.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
     }
     function saveTransaction() {
-        const t = {
-            id: editTransactionId || Date.now(), date: document.getElementById('txDate').value,
-            mois: currentMonth, annee: currentYear, type: document.getElementById('txType').value,
-            description: document.getElementById('txDesc').value, categorie: document.getElementById('txCategory').value,
-            sous_categorie: document.getElementById('txSubCategory').value, montant: parseFloat(document.getElementById('txAmount').value)
-        };
-        if (!t.montant || !t.description) { showNotification('Champs requis', 'danger'); return; }
-        if (editTransactionId) { const idx = transactions.findIndex(x => x.id === editTransactionId); if (idx !== -1) transactions[idx] = t; }
-        else transactions.unshift(t);
-        saveAllData(); closeTransactionModal(); applyGlobalFilters(); showNotification('Transaction enregistrée', 'success');
+    // Vérification activation
+    if (!isAccountActivatedSync()) {
+        showNotification('🔒 Activation requise pour ajouter des transactions', 'warning');
+        openWelcomeGuide();
+        return;
     }
+    
+    const t = {
+        id: editTransactionId || Date.now(),
+        date: document.getElementById('txDate').value,
+        mois: currentMonth,
+        annee: currentYear,
+        type: document.getElementById('txType').value,
+        description: document.getElementById('txDesc').value,
+        categorie: document.getElementById('txCategory').value,
+        sous_categorie: document.getElementById('txSubCategory').value,
+        montant: parseFloat(document.getElementById('txAmount').value)
+    };
+    if (!t.montant || !t.description) { showNotification('Champs requis', 'danger'); return; }
+    if (editTransactionId) { const idx = transactions.findIndex(x => x.id === editTransactionId); if (idx !== -1) transactions[idx] = t; }
+    else transactions.unshift(t);
+    saveAllData(); closeTransactionModal(); applyGlobalFilters(); showNotification('Transaction enregistrée', 'success');
+}
     function editTransaction(id) {
         const t = transactions.find(x => x.id === id);
         if (!t) return;
@@ -1457,22 +1549,63 @@
     // =============================================================
     // 7.15 BUDGETS
     // =============================================================
-    function renderBudgets() {
-        const filtered = getFilteredTransactions().filter(t => t.type === 'Dépense');
-        document.getElementById('budgetCards').innerHTML = budgets.map(b => {
-            const realise = filtered.filter(t => t.categorie === b.categorie).reduce((s, t) => s + t.montant, 0);
-            const pct = (realise / b.budget * 100).toFixed(1);
-            return `<div class="kpi-card"><div class="kpi-label">${b.categorie}</div><div class="kpi-value" style="font-size:18px">${formatMoney(realise)} / ${formatMoney(b.budget)}</div><div class="progress-bg"><div class="progress-fill ${pct > 100 ? 'progress-danger' : pct > 80 ? 'progress-warning' : 'progress-success'}" style="width:${Math.min(pct, 100)}%"></div></div><div>${pct}%</div></div>`;
-        }).join('');
-        document.getElementById('budgetTable').innerHTML = budgets.map(b => {
-            const realise = filtered.filter(t => t.categorie === b.categorie).reduce((s, t) => s + t.montant, 0);
-            const pct = (realise / b.budget * 100).toFixed(1);
-            let status = '<span style="color:var(--success)">✅ OK</span>';
-            if (pct > 100) status = '<span style="color:var(--danger)">🔴 Dépassement</span>';
-            else if (pct > 80) status = '<span style="color:var(--warning)">🟠 Attention</span>';
-            return `<tr><td><strong>${b.categorie}</strong></td><td>${formatMoney(b.budget)}</td><td>${formatMoney(realise)}</td><td>${formatMoney(b.budget - realise)}</td><td>${pct}%</td><td>${status}</td></tr>`;
-        }).join('');
+  function renderBudgets() {
+    const filtered = getFilteredTransactions().filter(t => t.type === 'Dépense');
+    
+    // Vérification activation pour savoir si on affiche les boutons d'édition
+    const isActivated = isAccountActivatedSync();
+    
+    document.getElementById('budgetCards').innerHTML = budgets.map((b, index) => {
+        const realise = filtered.filter(t => t.categorie === b.categorie).reduce((s, t) => s + t.montant, 0);
+        const pct = (realise / b.budget * 100).toFixed(1);
+        return `<div class="kpi-card" data-categorie="${b.categorie}" data-budget="${b.budget}">
+            <div class="kpi-label">${b.categorie}</div>
+            <div class="kpi-value" style="font-size:18px">${formatMoney(realise)} / ${formatMoney(b.budget)}</div>
+            <div class="progress-bg"><div class="progress-fill ${pct > 100 ? 'progress-danger' : pct > 80 ? 'progress-warning' : 'progress-success'}" style="width:${Math.min(pct, 100)}%"></div></div>
+            <div>${pct}%</div>
+            ${isActivated ? `<div style="margin-top: 12px;"><button class="btn btn-secondary btn-sm" onclick="editBudget('${b.categorie}', ${b.budget})"><i class="fas fa-edit"></i> Modifier</button></div>` : '<div style="margin-top: 12px; color:var(--warning); font-size:11px;"><i class="fas fa-lock"></i> Activer pour modifier</div>'}
+        </div>`;
+    }).join('');
+    
+    document.getElementById('budgetTable').innerHTML = budgets.map(b => {
+        const realise = filtered.filter(t => t.categorie === b.categorie).reduce((s, t) => s + t.montant, 0);
+        const pct = (realise / b.budget * 100).toFixed(1);
+        let status = '<span style="color:var(--success)">✅ OK</span>';
+        if (pct > 100) status = '<span style="color:var(--danger)">🔴 Dépassement</span>';
+        else if (pct > 80) status = '<span style="color:var(--warning)">🟠 Attention</span>';
+        return `<tr>
+            <td><strong>${b.categorie}</strong></td>
+            <td>${formatMoney(b.budget)}</td>
+            <td>${formatMoney(realise)}</td>
+            <td>${formatMoney(b.budget - realise)}</td>
+            <td>${pct}%</td>
+            <td>${status}</td>
+        </tr>`;
+    }).join('');
+}
+
+// Ajouter cette fonction pour éditer un budget
+function editBudget(categorie, budgetActuel) {
+    if (!isAccountActivatedSync()) {
+        showNotification('🔒 Activation requise pour modifier les budgets', 'warning');
+        openWelcomeGuide();
+        return;
     }
+    
+    const nouveauBudget = prompt(`Modifier le budget pour "${categorie}"\nBudget actuel: ${budgetActuel} MAD`, budgetActuel);
+    if (nouveauBudget !== null && !isNaN(parseFloat(nouveauBudget)) && parseFloat(nouveauBudget) > 0) {
+        const index = budgets.findIndex(b => b.categorie === categorie);
+        if (index !== -1) {
+            budgets[index].budget = parseFloat(nouveauBudget);
+            saveAllData();
+            renderBudgets();
+            renderDashboard();
+            showNotification(`Budget ${categorie} modifié à ${formatMoney(parseFloat(nouveauBudget))}`, 'success');
+        }
+    } else if (nouveauBudget !== null) {
+        showNotification('Montant invalide', 'danger');
+    }
+}
 
     // =============================================================
     // 7.16 OBJECTIFS
@@ -1486,23 +1619,44 @@
         document.getElementById('objCount').textContent = objectifs.length;
     }
 
-    function openObjectiveModal() {
-        document.getElementById('objectiveModal').classList.add('active');
-        editObjectiveId = null;
-        document.getElementById('objName').value = '';
-        document.getElementById('objDesc').value = '';
-        document.getElementById('objTarget').value = '';
-        document.getElementById('objCurrent').value = '0';
-        document.getElementById('objDate').value = '';
+  function openObjectiveModal() {
+    if (!isAccountActivatedSync()) {
+        showNotification('🔒 Veuillez activer votre compte pour créer des objectifs d\'épargne', 'warning');
+        openWelcomeGuide();
+        return;
     }
+    document.getElementById('objectiveModal').classList.add('active');
+    editObjectiveId = null;
+    document.getElementById('objName').value = '';
+    document.getElementById('objDesc').value = '';
+    document.getElementById('objTarget').value = '';
+    document.getElementById('objCurrent').value = '0';
+    document.getElementById('objDate').value = '';
+}
     function closeObjectiveModal() { document.getElementById('objectiveModal').classList.remove('active'); }
-    function saveObjective() {
-        const obj = { id: editObjectiveId || Date.now(), nom: document.getElementById('objName').value, cible: parseFloat(document.getElementById('objTarget').value), actuel: parseFloat(document.getElementById('objCurrent').value) || 0, date_cible: document.getElementById('objDate').value, description: document.getElementById('objDesc').value, priorite: document.getElementById('objPriority').value, categorie: 'Épargne', sous_categorie: document.getElementById('objName').value };
-        if (!obj.nom || !obj.cible) { showNotification('Nom et cible requis', 'danger'); return; }
-        if (editObjectiveId) { const idx = objectifs.findIndex(o => o.id === editObjectiveId); if (idx !== -1) objectifs[idx] = obj; }
-        else objectifs.push(obj);
-        saveAllData(); closeObjectiveModal(); renderObjectifs(); showNotification('Objectif enregistré', 'success');
+ function saveObjective() {
+    if (!isAccountActivatedSync()) {
+        showNotification('🔒 Activation requise pour créer/modifier des objectifs', 'warning');
+        openWelcomeGuide();
+        return;
     }
+    
+    const obj = { 
+        id: editObjectiveId || Date.now(), 
+        nom: document.getElementById('objName').value, 
+        cible: parseFloat(document.getElementById('objTarget').value), 
+        actuel: parseFloat(document.getElementById('objCurrent').value) || 0, 
+        date_cible: document.getElementById('objDate').value, 
+        description: document.getElementById('objDesc').value, 
+        priorite: document.getElementById('objPriority').value, 
+        categorie: 'Épargne', 
+        sous_categorie: document.getElementById('objName').value 
+    };
+    if (!obj.nom || !obj.cible) { showNotification('Nom et cible requis', 'danger'); return; }
+    if (editObjectiveId) { const idx = objectifs.findIndex(o => o.id === editObjectiveId); if (idx !== -1) objectifs[idx] = obj; }
+    else objectifs.push(obj);
+    saveAllData(); closeObjectiveModal(); renderObjectifs(); showNotification('Objectif enregistré', 'success');
+}
     function editObjective(id) {
         const o = objectifs.find(x => x.id === id);
         if (!o) return;
