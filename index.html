@@ -1679,29 +1679,52 @@ async function executeActivation(email) {
         return filtered;
     }
 
-    function initFilters() {
-        const years = [...new Set(transactions.map(t => t.annee))].sort((a,b) => b - a);
-        if (years.length === 0) years.push(currentYear);
-        const yearSelect = document.getElementById('globalYear');
-        if (yearSelect) {
-            yearSelect.innerHTML = years.map(y => `<option value="${y}" ${y == currentYear ? 'selected' : ''}>${y}</option>`).join('');
-            yearSelect.onchange = () => { currentYear = parseInt(yearSelect.value); applyGlobalFilters(); };
-        }
-        const monthsList = ['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
-        const monthSelect = document.getElementById('globalMonth');
-        if (monthSelect) {
-            monthSelect.innerHTML = '<option value="all">Tous mois</option>' + monthsList.map(m => `<option value="${m}-${currentYear}">${m} ${currentYear}</option>`).join('');
-            monthSelect.onchange = () => { currentMonth = monthSelect.value; applyGlobalFilters(); };
-        }
-        const allCats = [...categories.revenus, ...categories.depenses, ...categories.epargne];
-        const catSelect = document.getElementById('globalCategory');
-        if (catSelect) catSelect.innerHTML = '<option value="all">Toutes catégories</option>' + allCats.map(c => `<option value="${c}">${c}</option>`).join('');
+  /** Initialiser les filtres avec les catégories de budget */
+function initFilters() {
+    const years = [...new Set(transactions.map(t => t.annee))].sort((a,b) => b - a);
+    if (years.length === 0) years.push(currentYear);
+    
+    const yearSelect = document.getElementById('globalYear');
+    if (yearSelect) {
+        yearSelect.innerHTML = years.map(y => `<option value="${y}" ${y == currentYear ? 'selected' : ''}>${y}</option>`).join('');
+        yearSelect.onchange = () => { currentYear = parseInt(yearSelect.value); applyGlobalFilters(); };
     }
+    
+    const monthsList = ['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
+    const monthSelect = document.getElementById('globalMonth');
+    if (monthSelect) {
+        monthSelect.innerHTML = '<option value="all">Tous mois</option>' + monthsList.map(m => `<option value="${m}-${currentYear}">${m} ${currentYear}</option>`).join('');
+        monthSelect.onchange = () => { currentMonth = monthSelect.value; applyGlobalFilters(); };
+    }
+    
+    // ===== CATÉGORIES : inclure les budgets + les catégories existantes =====
+    const budgetCats = budgets.map(b => b.categorie);
+    const allCats = [...new Set([
+        ...budgetCats,
+        ...(categories.revenus || []),
+        ...(categories.depenses || []),
+        ...(categories.epargne || [])
+    ])].sort();
+    
+    const catSelect = document.getElementById('globalCategory');
+    if (catSelect) {
+        catSelect.innerHTML = '<option value="all">Toutes catégories</option>' + allCats.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+}
 
-    function applyGlobalFilters() {
-        renderDashboard(); renderTransactions(); renderBudgets(); renderObjectifs();
-        renderCalendar(); renderReports(); renderAdvancedAnalysis();
-    }
+  /** Appliquer tous les filtres et rafraîchir les vues */
+function applyGlobalFilters() {
+    renderDashboard();
+    renderTransactions();
+    renderBudgets();
+    renderObjectifs();
+    renderCalendar();
+    renderReports();
+    renderAdvancedAnalysis();
+    
+    // Mettre à jour les catégories dans le modal de transaction
+    updateCategorySelect();
+}
 
     function getPreviousMonthData() {
         const monthsList = ['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
@@ -1833,35 +1856,36 @@ async function executeActivation(email) {
     return true; // Par défaut on autorise, la vérification async se fera à l'enregistrement
 }
     function closeTransactionModal() { document.getElementById('transactionModal').classList.remove('active'); }
-    function updateCategorySelect() {
-        const type = document.getElementById('txType').value;
-        let cats = type === 'Revenu' ? categories.revenus : type === 'Dépense' ? categories.depenses : categories.epargne;
-        const catSelect = document.getElementById('txCategory');
-        if (catSelect) catSelect.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
-    }
-    function saveTransaction() {
-    // Vérification activation
-    if (!isAccountActivatedSync()) {
-        showNotification('🔒 Activation requise pour ajouter des transactions', 'warning');
-        openWelcomeGuide();
-        return;
+    /** Mettre à jour la liste des catégories dans le modal de transaction */
+function updateCategorySelect() {
+    const type = document.getElementById('txType').value;
+    const catSelect = document.getElementById('txCategory');
+    if (!catSelect) return;
+    
+    let cats = [];
+    
+    if (type === 'Revenu') {
+        cats = categories.revenus || ['Salaire', 'Freelance', 'Investissement', 'Autre Revenu'];
+    } else if (type === 'Dépense') {
+        // ===== PRIORITÉ : Utiliser les catégories de budget =====
+        const budgetCats = budgets.map(b => b.categorie);
+        const depenseCats = categories.depenses || [];
+        
+        // Fusionner les deux listes sans doublons
+        cats = [...new Set([...budgetCats, ...depenseCats])];
+        
+        // Si aucune catégorie, utiliser les défaut
+        if (cats.length === 0) {
+            cats = ['Alimentation', 'Logement', 'Transport', 'Loisirs', 'Shopping', 'Santé', 'Éducation', 'Factures'];
+        }
+        
+        // Trier par ordre alphabétique
+        cats.sort();
+    } else { // Épargne
+        cats = categories.epargne || ['Voyage', 'Voiture', 'Urgence', 'Investissement', 'Projet'];
     }
     
-    const t = {
-        id: editTransactionId || Date.now(),
-        date: document.getElementById('txDate').value,
-        mois: currentMonth,
-        annee: currentYear,
-        type: document.getElementById('txType').value,
-        description: document.getElementById('txDesc').value,
-        categorie: document.getElementById('txCategory').value,
-        sous_categorie: document.getElementById('txSubCategory').value,
-        montant: parseFloat(document.getElementById('txAmount').value)
-    };
-    if (!t.montant || !t.description) { showNotification('Champs requis', 'danger'); return; }
-    if (editTransactionId) { const idx = transactions.findIndex(x => x.id === editTransactionId); if (idx !== -1) transactions[idx] = t; }
-    else transactions.unshift(t);
-    saveAllData(); closeTransactionModal(); applyGlobalFilters(); showNotification('Transaction enregistrée', 'success');
+    catSelect.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
 }
     function editTransaction(id) {
         const t = transactions.find(x => x.id === id);
@@ -1882,24 +1906,53 @@ async function executeActivation(email) {
     // =============================================================
     // 7.15 BUDGETS
     // =============================================================
-  function renderBudgets() {
+  // =============================================================
+// 7.15 BUDGETS - Version avec ajout de catégories
+// =============================================================
+function renderBudgets() {
     const filtered = getFilteredTransactions().filter(t => t.type === 'Dépense');
-    
-    // Vérification activation pour savoir si on affiche les boutons d'édition
     const isActivated = isAccountActivatedSync();
     
-    document.getElementById('budgetCards').innerHTML = budgets.map((b, index) => {
-        const realise = filtered.filter(t => t.categorie === b.categorie).reduce((s, t) => s + t.montant, 0);
-        const pct = (realise / b.budget * 100).toFixed(1);
-        return `<div class="kpi-card" data-categorie="${b.categorie}" data-budget="${b.budget}">
-            <div class="kpi-label">${b.categorie}</div>
-            <div class="kpi-value" style="font-size:18px">${formatMoney(realise)} / ${formatMoney(b.budget)}</div>
-            <div class="progress-bg"><div class="progress-fill ${pct > 100 ? 'progress-danger' : pct > 80 ? 'progress-warning' : 'progress-success'}" style="width:${Math.min(pct, 100)}%"></div></div>
-            <div>${pct}%</div>
-            ${isActivated ? `<div style="margin-top: 12px;"><button class="btn btn-secondary btn-sm" onclick="editBudget('${b.categorie}', ${b.budget})"><i class="fas fa-edit"></i> Modifier</button></div>` : '<div style="margin-top: 12px; color:var(--warning); font-size:11px;"><i class="fas fa-lock"></i> Activer pour modifier</div>'}
-        </div>`;
-    }).join('');
+    // ===== Afficher les cartes des budgets =====
+    document.getElementById('budgetCards').innerHTML = `
+        <div style="grid-column:1/-1;display:flex;justify-content:flex-end;margin-bottom:8px;">
+            ${isActivated ? `
+                <button class="btn btn-primary btn-sm" onclick="ajouterCategorieBudget()">
+                    <i class="fas fa-plus"></i> Nouvelle catégorie
+                </button>
+            ` : `
+                <button class="btn btn-secondary btn-sm" onclick="showNotification('🔒 Activez votre compte pour ajouter des catégories', 'warning')">
+                    <i class="fas fa-lock"></i> Activer pour ajouter
+                </button>
+            `}
+        </div>
+        ${budgets.map((b, index) => {
+            const realise = filtered.filter(t => t.categorie === b.categorie).reduce((s, t) => s + t.montant, 0);
+            const pct = (realise / b.budget * 100).toFixed(1);
+            return `<div class="kpi-card" data-categorie="${b.categorie}" data-budget="${b.budget}">
+                <div class="kpi-label" style="display:flex;justify-content:space-between;align-items:center;">
+                    <span>${b.categorie}</span>
+                    ${isActivated ? `
+                        <div style="display:flex;gap:4px;">
+                            <button class="btn btn-secondary btn-sm" onclick="editBudget('${b.categorie}', ${b.budget})" style="padding:2px 8px;font-size:10px;">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="supprimerCategorieBudget('${b.categorie}')" style="padding:2px 8px;font-size:10px;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    ` : `
+                        <span style="font-size:10px;color:var(--warning);"><i class="fas fa-lock"></i></span>
+                    `}
+                </div>
+                <div class="kpi-value" style="font-size:18px">${formatMoney(realise)} / ${formatMoney(b.budget)}</div>
+                <div class="progress-bg"><div class="progress-fill ${pct > 100 ? 'progress-danger' : pct > 80 ? 'progress-warning' : 'progress-success'}" style="width:${Math.min(pct, 100)}%"></div></div>
+                <div>${pct}%</div>
+            </div>`;
+        }).join('')}
+    `;
     
+    // ===== Afficher le tableau des budgets =====
     document.getElementById('budgetTable').innerHTML = budgets.map(b => {
         const realise = filtered.filter(t => t.categorie === b.categorie).reduce((s, t) => s + t.montant, 0);
         const pct = (realise / b.budget * 100).toFixed(1);
@@ -1918,6 +1971,7 @@ async function executeActivation(email) {
 }
 
 // Ajouter cette fonction pour éditer un budget
+/** Éditer un budget (modifier montant) */
 function editBudget(categorie, budgetActuel) {
     if (!isAccountActivatedSync()) {
         showNotification('🔒 Activation requise pour modifier les budgets', 'warning');
@@ -1925,21 +1979,276 @@ function editBudget(categorie, budgetActuel) {
         return;
     }
     
-    const nouveauBudget = prompt(`Modifier le budget pour "${categorie}"\nBudget actuel: ${budgetActuel} MAD`, budgetActuel);
-    if (nouveauBudget !== null && !isNaN(parseFloat(nouveauBudget)) && parseFloat(nouveauBudget) > 0) {
-        const index = budgets.findIndex(b => b.categorie === categorie);
-        if (index !== -1) {
-            budgets[index].budget = parseFloat(nouveauBudget);
-            saveAllData();
-            renderBudgets();
-            renderDashboard();
-            showNotification(`Budget ${categorie} modifié à ${formatMoney(parseFloat(nouveauBudget))}`, 'success');
-        }
-    } else if (nouveauBudget !== null) {
-        showNotification('Montant invalide', 'danger');
-    }
+    // Créer un modal personnalisé
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);
+        backdrop-filter:blur(8px);z-index:10000;display:flex;align-items:center;
+        justify-content:center;font-family:'Inter',sans-serif;
+    `;
+    
+    modal.innerHTML = `
+        <div style="background:var(--bg-card);border-radius:24px;max-width:450px;width:90%;padding:28px;border:1px solid var(--border);">
+            <div style="text-align:center;margin-bottom:20px;">
+                <div style="width:60px;height:60px;background:linear-gradient(135deg,var(--primary),var(--secondary));border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 15px;">
+                    <i class="fas fa-edit" style="font-size:28px;color:white;"></i>
+                </div>
+                <h3 style="font-size:20px;">Modifier "${categorie}"</h3>
+            </div>
+            <div style="margin-bottom:15px;">
+                <label class="form-label">NOUVEAU NOM (optionnel)</label>
+                <input type="text" id="editCategorieNom" class="form-input" value="${categorie}" style="width:100%;">
+            </div>
+            <div style="margin-bottom:20px;">
+                <label class="form-label">BUDGET MENSUEL (MAD)</label>
+                <input type="number" id="editCategorieBudget" class="form-input" value="${budgetActuel}" style="width:100%;" min="0">
+            </div>
+            <div style="display:flex;gap:12px;justify-content:center;">
+                <button class="btn btn-secondary" onclick="this.closest('div[style*=fixed]').remove()">
+                    <i class="fas fa-times"></i> Annuler
+                </button>
+                <button class="btn btn-primary" onclick="validerEditBudget('${categorie}'); this.closest('div[style*=fixed]').remove();">
+                    <i class="fas fa-save"></i> Enregistrer
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    setTimeout(() => {
+        document.getElementById('editCategorieNom').focus();
+        document.getElementById('editCategorieNom').select();
+    }, 100);
 }
 
+/** Valider les modifications du budget */
+function validerEditBudget(ancienNom) {
+    const nouveauNom = document.getElementById('editCategorieNom').value.trim();
+    const nouveauBudget = parseFloat(document.getElementById('editCategorieBudget').value);
+    
+    if (!nouveauNom) {
+        showNotification('❌ Le nom ne peut pas être vide', 'danger');
+        return;
+    }
+    
+    if (!nouveauBudget || nouveauBudget <= 0) {
+        showNotification('❌ Budget invalide', 'danger');
+        return;
+    }
+    
+    // Si le nom a changé, appeler la fonction de renommage
+    if (nouveauNom !== ancienNom) {
+        modifierNomCategorie(ancienNom, nouveauNom);
+    }
+    
+    // Modifier le budget
+    const budget = budgets.find(b => b.categorie === nouveauNom);
+    if (budget) {
+        budget.budget = nouveauBudget;
+        saveAllData();
+        renderBudgets();
+        renderDashboard();
+        showNotification(`✅ Budget "${nouveauNom}" modifié à ${formatMoney(nouveauBudget)}`, 'success');
+    }
+}
+// =============================================================
+// GESTION DES CATÉGORIES DE BUDGET
+// =============================================================
+
+/** Ajouter une nouvelle catégorie de budget */
+function ajouterCategorieBudget() {
+    if (!isAccountActivatedSync()) {
+        showNotification('🔒 Activation requise pour ajouter des catégories', 'warning');
+        openWelcomeGuide();
+        return;
+    }
+    
+    // Créer un modal personnalisé pour l'ajout
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);
+        backdrop-filter:blur(8px);z-index:10000;display:flex;align-items:center;
+        justify-content:center;font-family:'Inter',sans-serif;
+    `;
+    
+    modal.innerHTML = `
+        <div style="background:var(--bg-card);border-radius:24px;max-width:450px;width:90%;padding:28px;border:1px solid var(--border);">
+            <div style="text-align:center;margin-bottom:20px;">
+                <div style="width:60px;height:60px;background:linear-gradient(135deg,var(--primary),var(--secondary));border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 15px;">
+                    <i class="fas fa-plus-circle" style="font-size:28px;color:white;"></i>
+                </div>
+                <h3 style="font-size:20px;">Nouvelle catégorie de budget</h3>
+                <p style="color:var(--text-muted);font-size:13px;">La catégorie sera disponible dans les transactions</p>
+            </div>
+            <div style="margin-bottom:15px;">
+                <label class="form-label">NOM DE LA CATÉGORIE</label>
+                <input type="text" id="nouvelleCategorieInput" class="form-input" placeholder="Ex: Restaurants, Vêtements, etc." style="width:100%;">
+            </div>
+            <div style="margin-bottom:20px;">
+                <label class="form-label">BUDGET MENSUEL (MAD)</label>
+                <input type="number" id="nouveauBudgetInput" class="form-input" placeholder="0" style="width:100%;" min="0">
+            </div>
+            <div style="display:flex;gap:12px;justify-content:center;">
+                <button class="btn btn-secondary" onclick="this.closest('div[style*=fixed]').remove()">
+                    <i class="fas fa-times"></i> Annuler
+                </button>
+                <button class="btn btn-primary" onclick="validerNouvelleCategorie(); this.closest('div[style*=fixed]').remove();">
+                    <i class="fas fa-check"></i> Ajouter
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Focus sur le champ
+    setTimeout(() => {
+        const input = document.getElementById('nouvelleCategorieInput');
+        if (input) input.focus();
+    }, 100);
+}
+
+/** Valider et ajouter la nouvelle catégorie */
+function validerNouvelleCategorie() {
+    const nom = document.getElementById('nouvelleCategorieInput').value.trim();
+    const budget = parseFloat(document.getElementById('nouveauBudgetInput').value);
+    
+    if (!nom) {
+        showNotification('❌ Veuillez entrer un nom de catégorie', 'danger');
+        document.getElementById('nouvelleCategorieInput').style.borderColor = 'var(--danger)';
+        return;
+    }
+    
+    if (!budget || budget <= 0) {
+        showNotification('❌ Veuillez entrer un budget valide', 'danger');
+        document.getElementById('nouveauBudgetInput').style.borderColor = 'var(--danger)';
+        return;
+    }
+    
+    // Vérifier si la catégorie existe déjà
+    if (budgets.some(b => b.categorie.toLowerCase() === nom.toLowerCase())) {
+        showNotification(`⚠️ La catégorie "${nom}" existe déjà`, 'warning');
+        document.getElementById('nouvelleCategorieInput').style.borderColor = 'var(--warning)';
+        return;
+    }
+    
+    // ===== AJOUTER LA CATÉGORIE DANS LES BUDGETS =====
+    budgets.push({
+        categorie: nom,
+        budget: budget
+    });
+    
+    // ===== AJOUTER LA CATÉGORIE DANS LES CATÉGORIES DE DÉPENSES =====
+    if (!categories.depenses) {
+        categories.depenses = [];
+    }
+    categories.depenses.push(nom);
+    
+    // Sauvegarder
+    saveAllData();
+    
+    // Rafraîchir l'affichage
+    renderBudgets();
+    renderDashboard();
+    
+    // Mettre à jour les filtres
+    initFilters();
+    
+    showNotification(`✅ Catégorie "${nom}" ajoutée avec succès !`, 'success');
+    showNotification(`💡 Vous pouvez maintenant l'utiliser dans les transactions`, 'info');
+}
+
+/** Supprimer une catégorie de budget */
+function supprimerCategorieBudget(categorie) {
+    if (!isAccountActivatedSync()) {
+        showNotification('🔒 Activation requise', 'warning');
+        return;
+    }
+    
+    // Vérifier si des transactions utilisent cette catégorie
+    const transactionsLiees = transactions.filter(t => t.categorie === categorie);
+    if (transactionsLiees.length > 0) {
+        if (!confirm(`⚠️ La catégorie "${categorie}" est utilisée dans ${transactionsLiees.length} transaction(s).\n\nVoulez-vous vraiment la supprimer ? Les transactions resteront mais la catégorie sera marquée comme "Non catégorisée".`)) {
+            return;
+        }
+        
+        // Renommer les transactions liées
+        transactionsLiees.forEach(t => {
+            t.categorie = 'Non catégorisée';
+        });
+    } else {
+        if (!confirm(`🗑️ Supprimer la catégorie "${categorie}" ?`)) {
+            return;
+        }
+    }
+    
+    // Supprimer des budgets
+    budgets = budgets.filter(b => b.categorie !== categorie);
+    
+    // Supprimer des catégories de dépenses
+    if (categories.depenses) {
+        categories.depenses = categories.depenses.filter(c => c !== categorie);
+    }
+    
+    // Sauvegarder
+    saveAllData();
+    
+    // Rafraîchir
+    renderBudgets();
+    renderDashboard();
+    initFilters();
+    
+    showNotification(`🗑️ Catégorie "${categorie}" supprimée`, 'warning');
+}
+
+/** Modifier une catégorie de budget (renommer) */
+function modifierNomCategorie(ancienNom, nouveauNom) {
+    if (!isAccountActivatedSync()) {
+        showNotification('🔒 Activation requise', 'warning');
+        return;
+    }
+    
+    if (!nouveauNom || ancienNom === nouveauNom) return;
+    
+    // Vérifier si le nouveau nom existe déjà
+    if (budgets.some(b => b.categorie === nouveauNom && b.categorie !== ancienNom)) {
+        showNotification(`⚠️ La catégorie "${nouveauNom}" existe déjà`, 'warning');
+        return;
+    }
+    
+    // Modifier dans les budgets
+    const budget = budgets.find(b => b.categorie === ancienNom);
+    if (budget) {
+        budget.categorie = nouveauNom;
+    }
+    
+    // Modifier dans les catégories de dépenses
+    if (categories.depenses) {
+        const index = categories.depenses.indexOf(ancienNom);
+        if (index !== -1) {
+            categories.depenses[index] = nouveauNom;
+        }
+    }
+    
+    // Modifier dans les transactions
+    transactions.forEach(t => {
+        if (t.categorie === ancienNom) {
+            t.categorie = nouveauNom;
+        }
+    });
+    
+    // Sauvegarder
+    saveAllData();
+    
+    // Rafraîchir
+    renderBudgets();
+    renderDashboard();
+    initFilters();
+    renderTransactions();
+    
+    showNotification(`✅ Catégorie renommée en "${nouveauNom}"`, 'success');
+}
     // =============================================================
     // 7.16 OBJECTIFS
     // =============================================================
@@ -2567,6 +2876,11 @@ document.addEventListener('DOMContentLoaded', () => {
     window.refreshActivationRequests = refreshActivationRequests;
     window.deactivateUserFirebase = deactivateUserFirebase;
         window.ajouterEpargnePourObjectif = ajouterEpargnePourObjectif;
+        window.ajouterCategorieBudget = ajouterCategorieBudget;
+window.validerNouvelleCategorie = validerNouvelleCategorie;
+window.supprimerCategorieBudget = supprimerCategorieBudget;
+window.modifierNomCategorie = modifierNomCategorie;
+window.validerEditBudget = validerEditBudget;
     </script>
 </body>
 </html>
