@@ -1379,6 +1379,7 @@ function escapeHtml(str) {
         showNotification('❌ Erreur', 'danger'); 
     }
 }
+// Activation manuelle avec confirmation
 function manualActivateUserFirebase() {
     const email = document.getElementById('adminUserEmail').value.trim();
     if (!email) { 
@@ -1386,7 +1387,6 @@ function manualActivateUserFirebase() {
         return; 
     }
     
-    // Afficher la confirmation
     const confirmModal = document.createElement('div');
     confirmModal.style.cssText = `
         position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);
@@ -1417,49 +1417,16 @@ function manualActivateUserFirebase() {
     
     document.body.appendChild(confirmModal);
 }
-    
-    // Afficher la confirmation
-    const confirmModal = document.createElement('div');
-    confirmModal.style.cssText = `
-        position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);
-        backdrop-filter:blur(8px);z-index:10000;display:flex;align-items:center;
-        justify-content:center;font-family:'Inter',sans-serif;
-    `;
-    
-    confirmModal.innerHTML = `
-        <div style="background:var(--bg-card);border-radius:24px;max-width:450px;width:90%;padding:28px;text-align:center;border:1px solid var(--border);">
-            <div style="width:70px;height:70px;background:linear-gradient(135deg,var(--primary),var(--success));border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
-                <i class="fas fa-user-plus" style="font-size:32px;color:white;"></i>
-            </div>
-            <h3 style="margin-bottom:10px;">Activation manuelle</h3>
-            <p style="color:var(--text-muted);margin-bottom:20px;">
-                Activer le compte de :<br>
-                <strong style="color:var(--success);">${escapeHtml(email)}</strong>
-            </p>
-            <div style="display:flex;gap:12px;justify-content:center;">
-                <button class="btn btn-secondary" onclick="this.closest('div[style*=fixed]').remove()">
-                    <i class="fas fa-times"></i> Annuler
-                </button>
-                <button class="btn btn-success" onclick="executeActivation('${escapeHtml(email)}'); this.closest('div[style*=fixed]').remove(); document.getElementById('adminUserEmail').value = '';">
-                    <i class="fas fa-check"></i> Confirmer l'activation
-                </button>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(confirmModal);
-}
-
     function refreshActivationRequests() {
         loadPendingRequestsFirebase();
         loadActivatedUsersFirebase();
         showNotification('Listes rafraîchies', 'success');
     }
 // Confirmation d'activation avec popup
+// Confirmation d'activation avec popup
 function confirmActivation(email, userName) {
     if (!auth.currentUser) return;
     
-    // Créer une modal de confirmation personnalisée
     const confirmModal = document.createElement('div');
     confirmModal.style.cssText = `
         position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);
@@ -1492,6 +1459,7 @@ function confirmActivation(email, userName) {
     document.body.appendChild(confirmModal);
 }
 
+
 // Exécuter l'activation
 async function executeActivation(email) {
     if (!auth.currentUser) return;
@@ -1508,7 +1476,6 @@ async function executeActivation(email) {
         }
         
         const userId = users.docs[0].id;
-        const userData = users.docs[0].data();
         
         await db.collection('users').doc(userId).update({
             isActivated: true,
@@ -1517,13 +1484,11 @@ async function executeActivation(email) {
             activatedByEmail: auth.currentUser.email
         });
         
-        // Mettre à jour le cache
         localStorage.setItem(`activated_${userId}`, 'true');
         if (auth.currentUser.uid === userId) {
             localStorage.setItem(`activated_${auth.currentUser.uid}`, 'true');
         }
         
-        // Mettre à jour les demandes
         const requests = await db.collection('activation_requests')
             .where('userId', '==', userId)
             .where('status', '==', 'pending').get();
@@ -1538,14 +1503,10 @@ async function executeActivation(email) {
         
         showNotification(`✅ ${email} a été activé avec succès !`, 'success');
         
-        // Rafraîchir les listes
         await loadPendingRequestsFirebase();
         await loadActivatedUsersFirebase();
-        
-        // Envoyer email de confirmation
         await sendActivationConfirmationFirebase(email);
         
-        // Si c'est l'utilisateur connecté, rafraîchir l'interface
         if (auth.currentUser.uid === userId) {
             const btn = document.getElementById('activationRequestBtn');
             if (btn) btn.style.display = 'none';
@@ -1557,144 +1518,6 @@ async function executeActivation(email) {
         console.error('Erreur activation:', e);
         showNotification('❌ Erreur lors de l\'activation', 'danger');
     }
-}
-
-// Confirmation de rejet
-function confirmRejection(requestId, userName) {
-    if (!auth.currentUser) return;
-    
-    const confirmModal = document.createElement('div');
-    confirmModal.style.cssText = `
-        position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);
-        backdrop-filter:blur(8px);z-index:10000;display:flex;align-items:center;
-        justify-content:center;font-family:'Inter',sans-serif;
-    `;
-    
-    confirmModal.innerHTML = `
-        <div style="background:var(--bg-card);border-radius:24px;max-width:450px;width:90%;padding:28px;text-align:center;border:1px solid var(--border);">
-            <div style="width:70px;height:70px;background:linear-gradient(135deg,var(--danger),var(--warning));border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
-                <i class="fas fa-user-slash" style="font-size:32px;color:white;"></i>
-            </div>
-            <h3 style="margin-bottom:10px;">Rejeter la demande</h3>
-            <p style="color:var(--text-muted);margin-bottom:20px;">
-                Êtes-vous sûr de vouloir rejeter la demande de<br>
-                <strong style="color:var(--danger);font-size:18px;">${escapeHtml(userName)}</strong>
-            </p>
-            <div style="display:flex;gap:12px;justify-content:center;">
-                <button class="btn btn-secondary" onclick="this.closest('div[style*=fixed]').remove()">
-                    <i class="fas fa-times"></i> Annuler
-                </button>
-                <button class="btn btn-danger" onclick="executeRejection('${requestId}'); this.closest('div[style*=fixed]').remove()">
-                    <i class="fas fa-trash"></i> Confirmer le rejet
-                </button>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(confirmModal);
-}
-
-// Exécuter le rejet
-async function executeRejection(requestId) {
-    if (!auth.currentUser || !await isUserAdmin(auth.currentUser.uid)) return;
-    
-    try {
-        await db.collection('activation_requests').doc(requestId).update({
-            status: 'rejected',
-            rejectionDate: firebase.firestore.FieldValue.serverTimestamp(),
-            rejectedBy: auth.currentUser.uid,
-            rejectedByEmail: auth.currentUser.email
-        });
-        
-        showNotification('✅ Demande rejetée', 'warning');
-        await loadPendingRequestsFirebase();
-        
-    } catch(e) {
-        console.error('Erreur rejet:', e);
-        showNotification('❌ Erreur lors du rejet', 'danger');
-    }
-}
-
-// Confirmation de désactivation
-function confirmDeactivation(userId, userName, email) {
-    if (!auth.currentUser) return;
-    
-    const confirmModal = document.createElement('div');
-    confirmModal.style.cssText = `
-        position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);
-        backdrop-filter:blur(8px);z-index:10000;display:flex;align-items:center;
-        justify-content:center;font-family:'Inter',sans-serif;
-    `;
-    
-    confirmModal.innerHTML = `
-        <div style="background:var(--bg-card);border-radius:24px;max-width:450px;width:90%;padding:28px;text-align:center;border:1px solid var(--border);">
-            <div style="width:70px;height:70px;background:linear-gradient(135deg,var(--danger),var(--dark));border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
-                <i class="fas fa-exclamation-triangle" style="font-size:32px;color:white;"></i>
-            </div>
-            <h3 style="margin-bottom:10px;">⚠️ Désactiver le compte</h3>
-            <p style="color:var(--text-muted);margin-bottom:20px;">
-                Attention : Cette action est réversible.<br>
-                Utilisateur : <strong style="color:var(--warning);">${escapeHtml(userName)}</strong><br>
-                <span style="font-size:12px;">${escapeHtml(email)}</span>
-            </p>
-            <div style="display:flex;gap:12px;justify-content:center;">
-                <button class="btn btn-secondary" onclick="this.closest('div[style*=fixed]').remove()">
-                    <i class="fas fa-times"></i> Annuler
-                </button>
-                <button class="btn btn-danger" onclick="executeDeactivation('${userId}', '${escapeHtml(email)}'); this.closest('div[style*=fixed]').remove()">
-                    <i class="fas fa-ban"></i> Confirmer la désactivation
-                </button>
-            </div>
-        </div>
-    `;
-    
-    document.body.appendChild(confirmModal);
-}
-
-// Exécuter la désactivation
-async function executeDeactivation(userId, email) {
-    if (!auth.currentUser || !await isUserAdmin(auth.currentUser.uid)) return;
-    
-    try {
-        await db.collection('users').doc(userId).update({ 
-            isActivated: false,
-            deactivatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-            deactivatedBy: auth.currentUser.uid,
-            deactivatedByEmail: auth.currentUser.email
-        });
-        
-        localStorage.setItem(`activated_${userId}`, 'false');
-        
-        if (auth.currentUser.uid === userId) {
-            localStorage.setItem(`activated_${auth.currentUser.uid}`, 'false');
-            showNotification('⚠️ Votre compte a été désactivé par un administrateur', 'warning');
-            renderBudgets();
-        }
-        
-        showNotification(`✅ ${email} a été désactivé`, 'warning');
-        await loadActivatedUsersFirebase();
-        
-        // Envoyer notification email à l'utilisateur désactivé
-        await sendDeactivationNotificationFirebase(email);
-        
-    } catch(e) {
-        console.error('Erreur désactivation:', e);
-        showNotification('❌ Erreur lors de la désactivation', 'danger');
-    }
-}
-
-// Envoyer notification de désactivation par email
-async function sendDeactivationNotificationFirebase(userEmail) {
-    if (typeof emailjs === 'undefined') return;
-    try {
-        await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
-            user_email: userEmail,
-            subject: "⚠️ Votre compte a été désactivé",
-            message: "Votre compte Money Control Pro a été désactivé par un administrateur. Contactez le support pour plus d'informations.",
-            type: "🔴 Désactivation",
-            date: new Date().toLocaleString('fr-FR')
-        });
-    } catch(e) { console.error('Erreur envoi email désactivation:', e); }
 }
     // =============================================================
     // 7.10 GUIDE
