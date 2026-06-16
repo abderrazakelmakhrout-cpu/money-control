@@ -499,8 +499,10 @@
                 <section id="dashboard" class="section active">
                     <div class="page-header">
                         <div class="page-title"><h2>Tableau de Bord</h2><p>Vue d'ensemble de vos finances personnelles</p></div>
-                        <button class="btn btn-primary" onclick="showSection('transactions', null)"><i class="fas fa-plus"></i> Transaction</button>
-                    </div>
+                       <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <button class="btn btn-primary" onclick="showSection('transactions', null)"><i class="fas fa-plus"></i> Transaction</button>
+    <button class="btn btn-success" onclick="ajouterEpargnePourObjectif()"><i class="fas fa-piggy-bank"></i> Épargne Objectif</button>
+</div>
                     <div id="alertsContainer"></div>
                     <div class="cards-grid" id="kpiGrid"></div>
                     <div class="charts-grid">
@@ -553,7 +555,10 @@
                 <section id="objectifs" class="section">
                     <div class="page-header">
                         <div class="page-title"><h2>Objectifs d'Épargne</h2><p>Suivez la progression de vos projets</p></div>
-                        <button class="btn btn-primary" onclick="openObjectiveModal()"><i class="fas fa-plus"></i> Nouvel objectif</button>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <button class="btn btn-primary" onclick="openObjectiveModal()"><i class="fas fa-plus"></i> Nouvel objectif</button>
+    <button class="btn btn-success" onclick="ajouterEpargnePourObjectif()"><i class="fas fa-piggy-bank"></i> Épargne + Objectif</button>
+</div>
                     </div>
                     <div class="objectifs-grid" id="objectifsGrid"></div>
                 </section>
@@ -1938,36 +1943,135 @@ function editBudget(categorie, budgetActuel) {
     // =============================================================
     // 7.16 OBJECTIFS
     // =============================================================
-    function renderObjectifs() {
-        document.getElementById('objectifsGrid').innerHTML = objectifs.map(o => {
-            const pct = (o.actuel / o.cible * 100).toFixed(1);
-            const joursRestants = Math.ceil((new Date(o.date_cible) - new Date()) / (1000 * 60 * 60 * 24));
-            return `<div class="obj-card ${o.priorite === 'Haute' ? 'high' : o.priorite === 'Moyenne' ? 'medium' : 'low'}"><div class="obj-header"><div><div class="obj-name">${o.nom}</div><div class="obj-desc">${o.description}</div><div class="obj-desc">📅 ${o.date_cible} · ${joursRestants > 0 ? joursRestants + ' jours' : 'Terminé'}</div></div><div class="obj-amt"><div class="obj-current">${formatMoney(o.actuel)}</div><div class="obj-target">/${formatMoney(o.cible)}</div></div></div><div class="obj-pct">${pct}%</div><div class="progress-bg"><div class="progress-fill progress-success" style="width:${Math.min(pct, 100)}%"></div></div><div class="obj-actions"><button class="btn btn-secondary btn-sm" onclick="editObjective(${o.id})"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-sm" onclick="deleteObjective(${o.id})"><i class="fas fa-trash"></i></button></div></div>`;
-        }).join('');
-        document.getElementById('objCount').textContent = objectifs.length;
-    }
+// =============================================================
+// 7.16 OBJECTIFS - Version avec auto-actualisation
+// =============================================================
+function renderObjectifs() {
+    // ===== 1. Récupérer toutes les transactions d'épargne =====
+    const transactionsEpargne = transactions.filter(t => t.type === 'Épargne');
+    
+    // ===== 2. Pour chaque objectif, calculer le montant actuel =====
+    const objectifsMisAJour = objectifs.map(objectif => {
+        // Trouver toutes les transactions d'épargne qui correspondent à cet objectif
+        const transactionsLiees = transactionsEpargne.filter(t => 
+            t.categorie === 'Épargne' && 
+            t.sous_categorie === objectif.nom
+        );
+        
+        // Calculer le total des montants
+        const totalEpargne = transactionsLiees.reduce((sum, t) => sum + t.montant, 0);
+        
+        // Mettre à jour l'objectif avec le nouveau montant
+        return {
+            ...objectif,
+            actuel: totalEpargne
+        };
+    });
+    
+    // Sauvegarder les montants mis à jour
+    objectifs = objectifsMisAJour;
+    saveAllData();
+    
+    // ===== 3. Afficher les objectifs =====
+    document.getElementById('objectifsGrid').innerHTML = objectifs.map(o => {
+        const pct = (o.actuel / o.cible * 100).toFixed(1);
+        const joursRestants = Math.ceil((new Date(o.date_cible) - new Date()) / (1000 * 60 * 60 * 24));
+        const statut = o.actuel >= o.cible ? '✅ Objectif atteint !' : `${joursRestants > 0 ? joursRestants + ' jours restants' : '⏰ Délai dépassé'}`;
+        
+        return `
+            <div class="obj-card ${o.priorite === 'Haute' ? 'high' : o.priorite === 'Moyenne' ? 'medium' : 'low'}">
+                <div class="obj-header">
+                    <div>
+                        <div class="obj-name">
+                            ${o.nom}
+                            ${o.actuel >= o.cible ? '<span style="color:var(--success);font-size:14px;"> 🎉</span>' : ''}
+                        </div>
+                        <div class="obj-desc">${o.description || 'Objectif d\'épargne'}</div>
+                        <div class="obj-desc">
+                            📅 ${o.date_cible} · ${statut}
+                        </div>
+                        <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">
+                            <i class="fas fa-arrow-up"></i> 
+                            ${transactions.filter(t => t.type === 'Épargne' && t.sous_categorie === o.nom).length} transaction(s) d'épargne
+                        </div>
+                    </div>
+                    <div class="obj-amt">
+                        <div class="obj-current">${formatMoney(o.actuel)}</div>
+                        <div class="obj-target">/${formatMoney(o.cible)}</div>
+                    </div>
+                </div>
+                <div class="obj-pct">${pct}%</div>
+                <div class="progress-bg">
+                    <div class="progress-fill ${pct >= 100 ? 'progress-success' : pct > 80 ? 'progress-warning' : 'progress-success'}" 
+                         style="width:${Math.min(pct, 100)}%">
+                    </div>
+                </div>
+                <div class="obj-actions">
+                    <button class="btn btn-secondary btn-sm" onclick="editObjective(${o.id})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteObjective(${o.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    document.getElementById('objCount').textContent = objectifs.length;
+}
 
-  function openObjectiveModal() {
+ function openObjectiveModal() {
     if (!isAccountActivatedSync()) {
         showNotification('🔒 Veuillez activer votre compte pour créer des objectifs d\'épargne', 'warning');
         openWelcomeGuide();
         return;
     }
+    
     document.getElementById('objectiveModal').classList.add('active');
     editObjectiveId = null;
+    
+    // Réinitialiser les champs
     document.getElementById('objName').value = '';
     document.getElementById('objDesc').value = '';
     document.getElementById('objTarget').value = '';
     document.getElementById('objCurrent').value = '0';
     document.getElementById('objDate').value = '';
-}
-    function closeObjectiveModal() { document.getElementById('objectiveModal').classList.remove('active'); }
- function saveObjective() {
-    if (!isAccountActivatedSync()) {
-        showNotification('🔒 Activation requise pour créer/modifier des objectifs', 'warning');
-        openWelcomeGuide();
-        return;
+    document.getElementById('objPriority').value = 'Moyenne';
+    
+    // Réinitialiser les bordures
+    document.getElementById('objName').style.borderColor = '';
+    document.getElementById('objTarget').style.borderColor = '';
+    document.getElementById('objDate').style.borderColor = '';
+    
+    // Ajouter un petit message d'info
+    const infoMsg = document.createElement('div');
+    infoMsg.id = 'objInfoMessage';
+    infoMsg.style.cssText = `
+        background: rgba(16, 185, 129, 0.15);
+        border: 1px solid var(--success);
+        border-radius: 12px;
+        padding: 12px 16px;
+        margin-bottom: 16px;
+        font-size: 13px;
+        color: var(--text);
+    `;
+    infoMsg.innerHTML = `
+        <i class="fas fa-info-circle" style="color:var(--success);"></i>
+        Le montant actuel sera automatiquement calculé à partir de vos transactions d'épargne
+        portant le même nom que cet objectif.
+    `;
+    
+    // Supprimer l'ancien message s'il existe
+    const oldMsg = document.getElementById('objInfoMessage');
+    if (oldMsg) oldMsg.remove();
+    
+    // Insérer le message après le titre du modal
+    const modalHeader = document.querySelector('#objectiveModal .modal-header');
+    if (modalHeader) {
+        modalHeader.after(infoMsg);
     }
+}
     
     const obj = { 
         id: editObjectiveId || Date.now(), 
@@ -2022,7 +2126,110 @@ function editBudget(categorie, budgetActuel) {
         const container = document.getElementById('calendarView');
         if (container) container.innerHTML = html;
     }
-
+function editObjective(id) {
+    const o = objectifs.find(x => x.id === id);
+    if (!o) {
+        showNotification('❌ Objectif non trouvé', 'danger');
+        return;
+    }
+    
+    // Ouvrir le modal
+    openObjectiveModal();
+    editObjectiveId = id;
+    
+    // Remplir les champs
+    document.getElementById('objName').value = o.nom;
+    document.getElementById('objDesc').value = o.description || '';
+    document.getElementById('objTarget').value = o.cible;
+    document.getElementById('objCurrent').value = o.actuel;
+    document.getElementById('objDate').value = o.date_cible;
+    document.getElementById('objPriority').value = o.priorite || 'Moyenne';
+    
+    // Mettre à jour le message d'info
+    const infoMsg = document.getElementById('objInfoMessage');
+    if (infoMsg) {
+        infoMsg.innerHTML = `
+            <i class="fas fa-info-circle" style="color:var(--success);"></i>
+            Montant actuel: <strong>${formatMoney(o.actuel)}</strong> (calculé automatiquement à partir des transactions d'épargne)
+            <br><span style="font-size:11px;color:var(--text-muted);">
+                Si vous changez le nom, le montant actuel sera recalculé avec les nouvelles transactions.
+            </span>
+        `;
+    }
+}
+        // =============================================================
+// AJOUTER UNE TRANSACTION D'ÉPARGNE LIÉE À UN OBJECTIF
+// =============================================================
+function ajouterEpargnePourObjectif() {
+    if (!isAccountActivatedSync()) {
+        showNotification('🔒 Activation requise', 'warning');
+        openWelcomeGuide();
+        return;
+    }
+    
+    // Si aucun objectif n'existe, proposer d'en créer un
+    if (objectifs.length === 0) {
+        showNotification('ℹ️ Créez d\'abord un objectif d\'épargne', 'info');
+        setTimeout(() => openObjectiveModal(), 1000);
+        return;
+    }
+    
+    // Créer une liste des objectifs pour le sélecteur
+    const objectifsList = objectifs.map(o => o.nom).join(', ');
+    
+    // Demander le nom de l'objectif
+    const nomObjectif = prompt(
+        'Entrez le nom de l\'objectif pour cette épargne :\n' +
+        'Objectifs existants : ' + objectifsList,
+        objectifs[0]?.nom || ''
+    );
+    
+    if (!nomObjectif) return;
+    
+    // Vérifier si l'objectif existe
+    const objectifExistant = objectifs.find(o => o.nom === nomObjectif);
+    if (!objectifExistant) {
+        if (!confirm(`L'objectif "${nomObjectif}" n'existe pas. Voulez-vous le créer ?`)) {
+            return;
+        }
+        // Créer l'objectif automatiquement
+        const cible = prompt('Entrez le montant cible pour cet objectif :', '10000');
+        if (!cible || isNaN(parseFloat(cible))) {
+            showNotification('❌ Montant invalide', 'danger');
+            return;
+        }
+        const date = prompt('Entrez la date cible (AAAA-MM-JJ) :', new Date().toISOString().split('T')[0]);
+        if (!date) return;
+        
+        const nouvelObjectif = {
+            id: Date.now(),
+            nom: nomObjectif,
+            cible: parseFloat(cible),
+            actuel: 0,
+            date_cible: date,
+            description: 'Créé automatiquement depuis une transaction',
+            priorite: 'Moyenne',
+            categorie: 'Épargne',
+            sous_categorie: nomObjectif
+        };
+        objectifs.push(nouvelObjectif);
+        saveAllData();
+        showNotification(`✅ Objectif "${nomObjectif}" créé !`, 'success');
+    }
+    
+    // Ouvrir le modal de transaction avec le type Épargne pré-sélectionné
+    openTransactionModal();
+    document.getElementById('txType').value = 'Épargne';
+    updateCategorySelect();
+    
+    // Pré-remplir la sous-catégorie avec le nom de l'objectif
+    document.getElementById('txSubCategory').value = nomObjectif;
+    
+    // Ajouter une info dans le champ description
+    document.getElementById('txDesc').placeholder = `Épargne pour: ${nomObjectif}`;
+    
+    showNotification(`💰 Ajoutez votre épargne pour "${nomObjectif}"`, 'info');
+}
     // =============================================================
     // 7.18 RAPPORTS
     // =============================================================
@@ -2359,6 +2566,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.manualActivateUserFirebase = manualActivateUserFirebase;
     window.refreshActivationRequests = refreshActivationRequests;
     window.deactivateUserFirebase = deactivateUserFirebase;
+        window.ajouterEpargnePourObjectif = ajouterEpargnePourObjectif;
     </script>
 </body>
 </html>
