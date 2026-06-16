@@ -379,7 +379,7 @@
                         <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" autocomplete="current-password">
                         <small id="loginPasswordError" style="color: var(--danger); font-size: 11px; display: none;">Mot de passe requis</small>
                     </div>
-                    <button class="btn btn-primary" style="width: 100%; margin-bottom: 12px;" onclick="loginWithEmail()">
+                    <button class="btn btn-primary" style="width: 100%; margin-bottom: 12px;" onclick="loginWithEmail(event)">
                         <i class="fas fa-sign-in-alt"></i> Se connecter
                     </button>
                     <div id="loginErrorMessage" style="color: var(--danger); font-size: 12px; text-align: center; margin-top: 10px; display: none;"></div>
@@ -412,7 +412,7 @@
                         <label class="form-label">CONFIRMER</label>
                         <input type="password" id="registerConfirmPassword" class="form-input" placeholder="••••••••">
                     </div>
-                    <button class="btn btn-primary" style="width: 100%; margin-bottom: 12px;" onclick="registerWithEmail()">
+                    <button class="btn btn-primary" style="width: 100%; margin-bottom: 12px;" onclick="registerWithEmail(event)">
                         <i class="fas fa-user-plus"></i> Créer un compte
                     </button>
                     <div style="text-align: center;">
@@ -731,8 +731,18 @@
             <div class="form-group"><label class="form-label">Montant (MAD)</label><input type="number" id="recMontant" class="form-input" placeholder="0.00"></div>
             <div class="form-group"><label class="form-label">Jour du mois (1-31)</label>
                 <select id="recJour" class="form-select">
-                    ${Array.from({length:31}, (_,i) => `<option value="${i+1}">${i+1}</option>`).join('')}
-                </select>
+    <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+    <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+    <option value="7">7</option><option value="8">8</option><option value="9">9</option>
+    <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+    <option value="13">13</option><option value="14">14</option><option value="15">15</option>
+    <option value="16">16</option><option value="17">17</option><option value="18">18</option>
+    <option value="19">19</option><option value="20">20</option><option value="21">21</option>
+    <option value="22">22</option><option value="23">23</option><option value="24">24</option>
+    <option value="25">25</option><option value="26">26</option><option value="27">27</option>
+    <option value="28">28</option><option value="29">29</option><option value="30">30</option>
+    <option value="31">31</option>
+</select>
             </div>
             <div class="form-group"><label class="form-label">Date de début</label><input type="date" id="recDateDebut" class="form-input"></div>
             <div class="form-group"><label class="form-label">Date de fin (optionnel)</label><input type="date" id="recDateFin" class="form-input"></div>
@@ -962,7 +972,7 @@ let dernierRappelRecurrent = null;
     // =============================================================
     // 7.7 AUTHENTIFICATION
     // =============================================================
-async function loginWithEmail() {
+async function loginWithEmail(event) {
     const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
     const errorDiv = document.getElementById('loginErrorMessage');
@@ -1038,7 +1048,7 @@ async function loginWithEmail() {
     }
 }
 
-    async function registerWithEmail() {
+    async function registerWithEmail(event) {
     const firstName = document.getElementById('registerFirstName').value.trim();
     const lastName = document.getElementById('registerLastName').value.trim();
     const email = document.getElementById('registerEmail').value.trim();
@@ -2882,43 +2892,30 @@ function renderObjectifs() {
     else objectifs.push(obj);
     saveAllData(); closeObjectiveModal(); renderObjectifs(); showNotification('Objectif enregistré', 'success');
 }
-    function editObjective(id) {
-        const o = objectifs.find(x => x.id === id);
-        if (!o) return;
-        openObjectiveModal(); editObjectiveId = id;
-        document.getElementById('objName').value = o.nom;
-        document.getElementById('objDesc').value = o.description;
-        document.getElementById('objTarget').value = o.cible;
-        document.getElementById('objCurrent').value = o.actuel;
-        document.getElementById('objDate').value = o.date_cible;
-        document.getElementById('objPriority').value = o.priorite;
+   function saveObjective() {
+    const obj = { 
+        id: editObjectiveId || Date.now(), 
+        nom: document.getElementById('objName').value, 
+        cible: parseFloat(document.getElementById('objTarget').value), 
+        actuel: parseFloat(document.getElementById('objCurrent').value) || 0, 
+        date_cible: document.getElementById('objDate').value, 
+        description: document.getElementById('objDesc').value, 
+        priorite: document.getElementById('objPriority').value, 
+        categorie: 'Épargne', 
+        sous_categorie: document.getElementById('objName').value 
+    };
+    if (!obj.nom || !obj.cible) { showNotification('Nom et cible requis', 'danger'); return; }
+    if (editObjectiveId) { 
+        const idx = objectifs.findIndex(o => o.id === editObjectiveId); 
+        if (idx !== -1) objectifs[idx] = obj; 
+    } else {
+        objectifs.push(obj);
     }
-    function deleteObjective(id) {
-        if (confirm('Supprimer ?')) { objectifs = objectifs.filter(o => o.id !== id); saveAllData(); renderObjectifs(); showNotification('Supprimé', 'success'); }
-    }
-
-    // =============================================================
-    // 7.17 CALENDRIER
-    // =============================================================
-    function renderCalendar() {
-        const filtered = getFilteredTransactions();
-        const month = currentMonth.split('-')[0];
-        const monthsList = ['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
-        const monthIndex = monthsList.indexOf(month);
-        const firstDay = new Date(currentYear, monthIndex, 1).getDay();
-        const daysInMonth = new Date(currentYear, monthIndex + 1, 0).getDate();
-        let html = '<div class="calendar-grid">';
-        ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].forEach(d => html += `<div class="calendar-day-header">${d}</div>`);
-        for (let i = 0; i < (firstDay + 6) % 7; i++) html += '<div></div>';
-        for (let d = 1; d <= daysInMonth; d++) {
-            const dateStr = `${currentYear}-${String(monthIndex + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-            const events = filtered.filter(t => t.date === dateStr);
-            html += `<div class="calendar-day"><div class="calendar-day-header">${d}</div>${events.slice(0, 3).map(e => `<div class="calendar-event">${e.type === 'Revenu' ? '💰' : '💸'} ${formatMoney(e.montant)}</div>`).join('')}</div>`;
-        }
-        html += '</div>';
-        const container = document.getElementById('calendarView');
-        if (container) container.innerHTML = html;
-    }
+    saveAllData(); 
+    closeObjectiveModal(); 
+    renderObjectifs(); 
+    showNotification('Objectif enregistré', 'success');
+}     
 function editObjective(id) {
     const o = objectifs.find(x => x.id === id);
     if (!o) {
@@ -2950,6 +2947,33 @@ function editObjective(id) {
         `;
     }
 }
+    function deleteObjective(id) {
+        if (confirm('Supprimer ?')) { objectifs = objectifs.filter(o => o.id !== id); saveAllData(); renderObjectifs(); showNotification('Supprimé', 'success'); }
+    }
+
+    // =============================================================
+    // 7.17 CALENDRIER
+    // =============================================================
+    function renderCalendar() {
+        const filtered = getFilteredTransactions();
+        const month = currentMonth.split('-')[0];
+        const monthsList = ['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'];
+        const monthIndex = monthsList.indexOf(month);
+        const firstDay = new Date(currentYear, monthIndex, 1).getDay();
+        const daysInMonth = new Date(currentYear, monthIndex + 1, 0).getDate();
+        let html = '<div class="calendar-grid">';
+        ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'].forEach(d => html += `<div class="calendar-day-header">${d}</div>`);
+        for (let i = 0; i < (firstDay + 6) % 7; i++) html += '<div></div>';
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dateStr = `${currentYear}-${String(monthIndex + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            const events = filtered.filter(t => t.date === dateStr);
+            html += `<div class="calendar-day"><div class="calendar-day-header">${d}</div>${events.slice(0, 3).map(e => `<div class="calendar-event">${e.type === 'Revenu' ? '💰' : '💸'} ${formatMoney(e.montant)}</div>`).join('')}</div>`;
+        }
+        html += '</div>';
+        const container = document.getElementById('calendarView');
+        if (container) container.innerHTML = html;
+    }
+
         // =============================================================
 // AJOUTER UNE TRANSACTION D'ÉPARGNE LIÉE À UN OBJECTIF
 // =============================================================
@@ -3265,13 +3289,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('loginEmail')?.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
-            loginWithEmail();
+            loginWithEmail(event);
         }
     });
     document.getElementById('loginPassword')?.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
-            loginWithEmail();
+            loginWithEmail(event);
         }
     });
     
