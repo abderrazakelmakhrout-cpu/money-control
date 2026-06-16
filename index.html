@@ -837,34 +837,81 @@
     // =============================================================
     // 7.7 AUTHENTIFICATION
     // =============================================================
-    async function loginWithEmail() {
-        const email = document.getElementById('loginEmail').value.trim();
-        const password = document.getElementById('loginPassword').value;
-        if (!email) { showNotification('❌ Veuillez entrer votre email', 'danger'); return; }
-        if (!password) { showNotification('❌ Veuillez entrer votre mot de passe', 'danger'); return; }
-        
-        const btn = event.target;
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connexion...';
-        btn.disabled = true;
-        
-        try {
-            await auth.signInWithEmailAndPassword(email, password);
-            showNotification('✅ Connexion réussie !', 'success');
-        } catch (error) {
-            let msg = '❌ Erreur de connexion';
-            switch(error.code) {
-                case 'auth/invalid-email': msg = '❌ Email invalide'; break;
-                case 'auth/user-not-found': msg = '❌ Compte non trouvé'; break;
-                case 'auth/wrong-password': msg = '❌ Mot de passe incorrect'; break;
-                case 'auth/too-many-requests': msg = '🔒 Trop de tentatives'; break;
-            }
-            showNotification(msg, 'danger');
-        } finally {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        }
+async function loginWithEmail() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errorDiv = document.getElementById('loginErrorMessage');
+    
+    // ===== 1. VALIDATION DES CHAMPS =====
+    if (!email) {
+        errorDiv.textContent = '❌ Veuillez entrer votre email';
+        errorDiv.style.display = 'block';
+        document.getElementById('loginEmail').style.borderColor = 'var(--danger)';
+        return;
     }
+    if (!email.includes('@') || !email.includes('.')) {
+        errorDiv.textContent = '❌ Email invalide (ex: nom@domaine.com)';
+        errorDiv.style.display = 'block';
+        document.getElementById('loginEmail').style.borderColor = 'var(--danger)';
+        return;
+    }
+    if (!password) {
+        errorDiv.textContent = '❌ Veuillez entrer votre mot de passe';
+        errorDiv.style.display = 'block';
+        document.getElementById('loginPassword').style.borderColor = 'var(--danger)';
+        return;
+    }
+    if (password.length < 6) {
+        errorDiv.textContent = '❌ Le mot de passe doit contenir au moins 6 caractères';
+        errorDiv.style.display = 'block';
+        document.getElementById('loginPassword').style.borderColor = 'var(--danger)';
+        return;
+    }
+    
+    // ===== 2. EFFACER LES ERREURS =====
+    errorDiv.style.display = 'none';
+    document.getElementById('loginEmail').style.borderColor = '';
+    document.getElementById('loginPassword').style.borderColor = '';
+    
+    // ===== 3. CONNEXION =====
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connexion...';
+    btn.disabled = true;
+    
+    try {
+        await auth.signInWithEmailAndPassword(email, password);
+        showNotification('✅ Connexion réussie !', 'success');
+    } catch (error) {
+        // ===== 4. MESSAGES D'ERREUR FIREBASE =====
+        let msg = '';
+        switch(error.code) {
+            case 'auth/user-not-found':
+                msg = '❌ Aucun compte trouvé avec cet email';
+                break;
+            case 'auth/wrong-password':
+                msg = '❌ Mot de passe incorrect. Vérifiez votre saisie.';
+                break;
+            case 'auth/invalid-email':
+                msg = '❌ Email invalide';
+                break;
+            case 'auth/user-disabled':
+                msg = '❌ Ce compte a été désactivé';
+                break;
+            case 'auth/too-many-requests':
+                msg = '🔒 Trop de tentatives. Réessayez plus tard.';
+                break;
+            default:
+                msg = '❌ ' + error.message;
+        }
+        errorDiv.textContent = msg;
+        errorDiv.style.display = 'block';
+        showNotification(msg, 'danger');
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
 
     async function registerWithEmail() {
     const firstName = document.getElementById('registerFirstName').value.trim();
@@ -924,17 +971,55 @@
     }
 }
 
-    async function resetPassword() {
-        const email = document.getElementById('resetEmail').value.trim();
-        if (!email) { showNotification('❌ Email requis', 'danger'); return; }
-        try {
-            await auth.sendPasswordResetEmail(email);
-            showNotification('✅ Email envoyé !', 'success');
-            setTimeout(showLoginForm, 2000);
-        } catch (error) {
-            showNotification(error.code === 'auth/user-not-found' ? '❌ Compte non trouvé' : '❌ Erreur', 'danger');
-        }
+async function resetPassword() {
+    const email = document.getElementById('resetEmail').value.trim();
+    const errorDiv = document.getElementById('loginErrorMessage');
+    
+    if (!email) {
+        errorDiv.textContent = '❌ Veuillez entrer votre email';
+        errorDiv.style.display = 'block';
+        document.getElementById('resetEmail').style.borderColor = 'var(--danger)';
+        return;
     }
+    if (!email.includes('@') || !email.includes('.')) {
+        errorDiv.textContent = '❌ Email invalide (ex: nom@domaine.com)';
+        errorDiv.style.display = 'block';
+        document.getElementById('resetEmail').style.borderColor = 'var(--danger)';
+        return;
+    }
+    
+    errorDiv.style.display = 'none';
+    document.getElementById('resetEmail').style.borderColor = '';
+    
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...';
+    btn.disabled = true;
+    
+    try {
+        await auth.sendPasswordResetEmail(email);
+        showNotification('✅ Email envoyé ! Vérifiez votre boîte mail.', 'success');
+        setTimeout(showLoginForm, 2000);
+    } catch (error) {
+        let msg = '';
+        switch(error.code) {
+            case 'auth/user-not-found':
+                msg = '❌ Aucun compte trouvé avec cet email';
+                break;
+            case 'auth/invalid-email':
+                msg = '❌ Email invalide';
+                break;
+            default:
+                msg = '❌ ' + error.message;
+        }
+        errorDiv.textContent = msg;
+        errorDiv.style.display = 'block';
+        showNotification(msg, 'danger');
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
 
     async function logout() {
         await auth.signOut();
@@ -2140,34 +2225,100 @@ function editBudget(categorie, budgetActuel) {
         }
     });
 
-    // =============================================================
-    // 7.23 INITIALISATION
-    // =============================================================
-    document.addEventListener('DOMContentLoaded', () => {
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                document.getElementById('loginContainer').style.display = 'none';
-                document.getElementById('appContainer').style.display = 'block';
-                await loadUserData(user.uid);
-                await displayWelcomeMessage();
-                initFilters();
-                await initAdminSection();
-                await addActivationButtonIfNeeded();
-                showGuideIfNeeded();
-                renderDashboard();
-                renderTransactions();
-                renderBudgets();
-                renderObjectifs();
-                renderCalendar();
-                const isActivated = await isAccountActivated();
-                if (!isActivated) showNotification('ℹ️ Activez votre compte pour ajouter des transactions', 'info');
-            } else {
-                document.getElementById('loginContainer').style.display = 'flex';
-                document.getElementById('appContainer').style.display = 'none';
+   // =============================================================
+// 7.23 INITIALISATION
+// =============================================================
+document.addEventListener('DOMContentLoaded', () => {
+    // ===== NETTOYER LES ERREURS AU CHARGEMENT =====
+    const errorDiv = document.getElementById('loginErrorMessage');
+    if (errorDiv) {
+        errorDiv.style.display = 'none';
+        errorDiv.textContent = '';
+    }
+    
+    // ===== VALIDATION EN TEMPS RÉEL =====
+    const emailInput = document.getElementById('loginEmail');
+    if (emailInput) {
+        emailInput.addEventListener('input', function() {
+            const errorDiv = document.getElementById('loginErrorMessage');
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
+                errorDiv.textContent = '';
             }
+            this.style.borderColor = '';
         });
+    }
+    
+    const passInput = document.getElementById('loginPassword');
+    if (passInput) {
+        passInput.addEventListener('input', function() {
+            const errorDiv = document.getElementById('loginErrorMessage');
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
+                errorDiv.textContent = '';
+            }
+            this.style.borderColor = '';
+        });
+    }
+    
+    // ===== TOUCHE ENTRÉE POUR SE CONNECTER =====
+    document.getElementById('loginEmail')?.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            loginWithEmail();
+        }
     });
-
+    document.getElementById('loginPassword')?.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            loginWithEmail();
+        }
+    });
+    
+    // ===== AUTHENTIFICATION FIREBASE =====
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            // ✅ Utilisateur connecté
+            console.log('✅ Utilisateur connecté:', user.email);
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            
+            await loadUserData(user.uid);
+            await displayWelcomeMessage();
+            initFilters();
+            await initAdminSection();
+            await addActivationButtonIfNeeded();
+            showGuideIfNeeded();
+            renderDashboard();
+            renderTransactions();
+            renderBudgets();
+            renderObjectifs();
+            renderCalendar();
+            
+            const isActivated = await isAccountActivated();
+            if (!isActivated) {
+                showNotification('ℹ️ Activez votre compte pour ajouter des transactions', 'info');
+            }
+        } else {
+            // ❌ Utilisateur NON connecté
+            console.log('❌ Utilisateur NON connecté');
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('appContainer').style.display = 'none';
+            
+            // Réinitialiser les champs
+            const emailField = document.getElementById('loginEmail');
+            const passField = document.getElementById('loginPassword');
+            if (emailField) emailField.value = '';
+            if (passField) passField.value = '';
+            
+            const errorDiv2 = document.getElementById('loginErrorMessage');
+            if (errorDiv2) {
+                errorDiv2.style.display = 'none';
+                errorDiv2.textContent = '';
+            }
+        }
+    });
+});
     // =============================================================
     // 7.24 EXPOSITION GLOBALE
     // =============================================================
