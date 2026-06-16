@@ -584,19 +584,58 @@
                     <div class="cards-grid" id="advancedKPIs"></div>
                 </section>
 
-                <!-- SECTION 8: Paramètres -->
-                <section id="parametres" class="section">
-                    <div class="page-header"><div class="page-title"><h2>Paramètres</h2><p>Personnalisation</p></div></div>
-                    <div class="table-card">
-                        <div class="table-header"><div class="table-title">Configuration</div></div>
-                        <div class="form-grid">
-                            <div class="form-group"><label class="form-label">Devise</label><select id="settingsCurrency" class="form-select"><option>MAD</option><option>EUR</option><option>USD</option></select></div>
-                            <div class="form-group"><label class="form-label">Alerte Budget (%)</label><input type="number" id="settingsBudgetAlert" class="form-input" value="80"></div>
-                            <div class="form-group"><label class="form-label">Alerte Objectif (%)</label><input type="number" id="settingsObjAlert" class="form-input" value="90"></div>
-                        </div>
-                        <button class="btn btn-danger" onclick="resetData()"><i class="fas fa-undo"></i> Réinitialiser</button>
-                    </div>
-                </section>
+           <!-- SECTION 8: Paramètres -->
+<section id="parametres" class="section">
+    <div class="page-header">
+        <div class="page-title"><h2>Paramètres</h2><p>Personnalisation et transactions récurrentes</p></div>
+    </div>
+    
+    <!-- ===== Configuration générale ===== -->
+    <div class="table-card">
+        <div class="table-header"><div class="table-title">⚙️ Configuration</div></div>
+        <div class="form-grid">
+            <div class="form-group"><label class="form-label">Devise</label><select id="settingsCurrency" class="form-select"><option>MAD</option><option>EUR</option><option>USD</option></select></div>
+            <div class="form-group"><label class="form-label">Alerte Budget (%)</label><input type="number" id="settingsBudgetAlert" class="form-input" value="80"></div>
+            <div class="form-group"><label class="form-label">Alerte Objectif (%)</label><input type="number" id="settingsObjAlert" class="form-input" value="90"></div>
+        </div>
+        <button class="btn btn-danger" onclick="resetData()"><i class="fas fa-undo"></i> Réinitialiser</button>
+    </div>
+    
+    <!-- ===== Transactions récurrentes ===== -->
+    <div class="table-card">
+        <div class="table-header">
+            <div class="table-title">🔄 Transactions récurrentes mensuelles</div>
+            <button class="btn btn-primary" onclick="openRecurrenteModal()"><i class="fas fa-plus"></i> Ajouter</button>
+        </div>
+        <div style="overflow-x:auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Type</th>
+                        <th>Catégorie</th>
+                        <th>Montant</th>
+                        <th>Jour</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="recurrentesTable"></tbody>
+            </table>
+        </div>
+        <div style="margin-top:15px;display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-success" onclick="executerTransactionsRecurrentes()">
+                <i class="fas fa-play"></i> Exécuter maintenant
+            </button>
+            <button class="btn btn-secondary" onclick="executerTransactionsRecurrentesMois()">
+                <i class="fas fa-calendar-alt"></i> Exécuter pour le mois en cours
+            </button>
+            <span style="font-size:12px;color:var(--text-muted);display:flex;align-items:center;">
+                <i class="fas fa-info-circle"></i> Les transactions sont ajoutées automatiquement le jour indiqué
+            </span>
+        </div>
+    </div>
+</section>
 
                 <!-- SECTION 9: Admin -->
                 <section id="admin" class="section">
@@ -666,6 +705,44 @@
                 <button class="btn btn-primary" style="width:100%" onclick="saveObjective()"><i class="fas fa-save"></i> Enregistrer</button>
             </div>
         </div>
+
+        <!-- Modal Transaction Récurrente -->
+<div class="modal-overlay" id="recurrenteModal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title">Transaction récurrente mensuelle</div>
+            <button class="modal-close" onclick="closeRecurrenteModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div style="margin-bottom:15px;padding:12px;background:rgba(6,182,212,0.15);border-radius:12px;font-size:13px;">
+            <i class="fas fa-info-circle" style="color:var(--info);"></i>
+            Cette transaction sera ajoutée automatiquement chaque mois à la date indiquée.
+        </div>
+        <div class="form-grid">
+            <div class="form-group"><label class="form-label">Description</label><input type="text" id="recDescription" class="form-input" placeholder="Ex: Salaire, Loyer..."></div>
+            <div class="form-group"><label class="form-label">Type</label>
+                <select id="recType" class="form-select" onchange="updateRecCategorie()">
+                    <option value="Revenu">Revenu</option>
+                    <option value="Dépense">Dépense</option>
+                    <option value="Épargne">Épargne</option>
+                </select>
+            </div>
+            <div class="form-group"><label class="form-label">Catégorie</label><select id="recCategorie" class="form-select"></select></div>
+            <div class="form-group"><label class="form-label">Sous-catégorie</label><input type="text" id="recSousCategorie" class="form-input" placeholder="Mensuel, Annuel..."></div>
+            <div class="form-group"><label class="form-label">Montant (MAD)</label><input type="number" id="recMontant" class="form-input" placeholder="0.00"></div>
+            <div class="form-group"><label class="form-label">Jour du mois (1-31)</label>
+                <select id="recJour" class="form-select">
+                    ${Array.from({length:31}, (_,i) => `<option value="${i+1}">${i+1}</option>`).join('')}
+                </select>
+            </div>
+            <div class="form-group"><label class="form-label">Date de début</label><input type="date" id="recDateDebut" class="form-input"></div>
+            <div class="form-group"><label class="form-label">Date de fin (optionnel)</label><input type="date" id="recDateFin" class="form-input"></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:10px;">
+            <button class="btn btn-primary" style="flex:1;" onclick="saveRecurrente()"><i class="fas fa-save"></i> Enregistrer</button>
+            <button class="btn btn-secondary" onclick="closeRecurrenteModal()"><i class="fas fa-times"></i> Annuler</button>
+        </div>
+    </div>
+</div>
 
         <!-- Modal Guide -->
         <div class="modal-overlay" id="welcomeGuideModal">
@@ -798,6 +875,46 @@
         epargne: ["Voyage", "Voiture", "Urgence", "Investissement", "Projet"]
     };
 
+        // ===== NOUVEAU : Transactions récurrentes par défaut =====
+const DEFAULT_TRANSACTIONS_RECURRENTES = [
+    {
+        id: 1,
+        description: "Salaire mensuel",
+        type: "Revenu",
+        categorie: "Salaire",
+        sous_categorie: "Mensuel",
+        montant: 8500,
+        jour: 1,
+        actif: true,
+        dateDebut: "2026-01-01",
+        dateFin: null
+    },
+    {
+        id: 2,
+        description: "Loyer",
+        type: "Dépense",
+        categorie: "Logement",
+        sous_categorie: "Loyer",
+        montant: 3500,
+        jour: 5,
+        actif: true,
+        dateDebut: "2026-01-01",
+        dateFin: null
+    },
+    {
+        id: 3,
+        description: "Épargne mensuelle",
+        type: "Épargne",
+        categorie: "Épargne",
+        sous_categorie: "Mensuel",
+        montant: 1000,
+        jour: 20,
+        actif: true,
+        dateDebut: "2026-01-01",
+        dateFin: null
+    }
+];
+
     // =============================================================
     // 7.5 VARIABLES GLOBALES
     // =============================================================
@@ -809,7 +926,10 @@
     let currentMonth = "mai-2026";
     let editTransactionId = null;
     let editObjectiveId = null;
+        let editRecurrenteId = null; // NOUVEAU
     let charts = {};
+        let transactionsRecurrentes = [];
+let dernierRappelRecurrent = null;
 
     let alertConfig = {
         emailEnabled: true,
@@ -1071,6 +1191,8 @@ async function resetPassword() {
             objectifs = JSON.parse(localStorage.getItem(`objectifs_${uid}`) || '[]');
             budgets = JSON.parse(localStorage.getItem(`budgets_${uid}`) || '[]');
             categories = JSON.parse(localStorage.getItem(`categories_${uid}`) || '{}');
+            // ===== Charger les récurrentes =====
+        loadRecurrentes();
         } else {
             const doc = await db.collection('users').doc(uid).get();
             if (doc.exists && doc.data().transactions) {
@@ -1079,12 +1201,14 @@ async function resetPassword() {
                 budgets = doc.data().budgets || DEFAULT_BUDGETS;
                 categories = doc.data().categories || DEFAULT_CATEGORIES;
                 saveAllData();
+                 loadRecurrentes();
             } else {
                 transactions = [...DEFAULT_TRANSACTIONS];
                 objectifs = [...DEFAULT_OBJECTIFS];
                 budgets = [...DEFAULT_BUDGETS];
                 categories = {...DEFAULT_CATEGORIES};
                 saveAllData();
+                  saveRecurrentes();
             }
         }
     }
@@ -2249,6 +2373,366 @@ function modifierNomCategorie(ancienNom, nouveauNom) {
     
     showNotification(`✅ Catégorie renommée en "${nouveauNom}"`, 'success');
 }
+      // =============================================================
+// 7.15.5 TRANSACTIONS RÉCURRENTES
+// =============================================================
+
+/** Charger les transactions récurrentes */
+function loadRecurrentes() {
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+    
+    const stored = localStorage.getItem(`recurrentes_${uid}`);
+    if (stored) {
+        transactionsRecurrentes = JSON.parse(stored);
+    } else {
+        transactionsRecurrentes = [...DEFAULT_TRANSACTIONS_RECURRENTES];
+        saveRecurrentes();
+    }
+    
+    // Vérifier la date du dernier rappel
+    dernierRappelRecurrent = localStorage.getItem(`dernierRappel_${uid}`);
+    if (!dernierRappelRecurrent) {
+        dernierRappelRecurrent = new Date().toISOString().split('T')[0];
+        localStorage.setItem(`dernierRappel_${uid}`, dernierRappelRecurrent);
+    }
+}
+
+/** Sauvegarder les transactions récurrentes */
+function saveRecurrentes() {
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
+    localStorage.setItem(`recurrentes_${uid}`, JSON.stringify(transactionsRecurrentes));
+}
+
+/** Afficher les transactions récurrentes dans le tableau */
+function renderRecurrentes() {
+    const tbody = document.getElementById('recurrentesTable');
+    if (!tbody) return;
+    
+    if (transactionsRecurrentes.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:30px;">
+            <i class="fas fa-clock" style="font-size:24px;display:block;margin-bottom:10px;"></i>
+            Aucune transaction récurrente. Ajoutez-en une !
+        </td></tr>`;
+        return;
+    }
+    
+    tbody.innerHTML = transactionsRecurrentes.map(r => `
+        <tr>
+            <td><strong>${r.description}</strong></td>
+            <td><span class="badge badge-${r.type === 'Revenu' ? 'rev' : r.type === 'Dépense' ? 'dep' : 'ep'}">${r.type}</span></td>
+            <td>${r.categorie}</td>
+            <td style="color:${r.type === 'Revenu' ? 'var(--success)' : r.type === 'Dépense' ? 'var(--danger)' : 'var(--info)'}">
+                ${r.type === 'Dépense' ? '-' : '+'}${formatMoney(r.montant)}
+            </td>
+            <td>Jour ${r.jour}</td>
+            <td>
+                <span class="badge ${r.actif ? 'badge-rev' : 'badge-dep'}" 
+                      style="cursor:pointer;" 
+                      onclick="toggleRecurrente(${r.id})">
+                    ${r.actif ? '✅ Actif' : '⏸️ Inactif'}
+                </span>
+            </td>
+            <td>
+                <button class="btn btn-secondary btn-sm" onclick="editRecurrente(${r.id})"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-danger btn-sm" onclick="deleteRecurrente(${r.id})"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+/** Ouvrir le modal de transaction récurrente */
+function openRecurrenteModal() {
+    if (!isAccountActivatedSync()) {
+        showNotification('🔒 Activation requise pour gérer les transactions récurrentes', 'warning');
+        openWelcomeGuide();
+        return;
+    }
+    
+    document.getElementById('recurrenteModal').classList.add('active');
+    editRecurrenteId = null;
+    
+    // Réinitialiser les champs
+    document.getElementById('recDescription').value = '';
+    document.getElementById('recType').value = 'Dépense';
+    document.getElementById('recSousCategorie').value = '';
+    document.getElementById('recMontant').value = '';
+    document.getElementById('recJour').value = '1';
+    document.getElementById('recDateDebut').value = new Date().toISOString().split('T')[0];
+    document.getElementById('recDateFin').value = '';
+    
+    updateRecCategorie();
+}
+
+/** Fermer le modal de transaction récurrente */
+function closeRecurrenteModal() {
+    document.getElementById('recurrenteModal').classList.remove('active');
+}
+
+/** Mettre à jour les catégories dans le modal récurrent */
+function updateRecCategorie() {
+    const type = document.getElementById('recType').value;
+    const catSelect = document.getElementById('recCategorie');
+    if (!catSelect) return;
+    
+    let cats = [];
+    if (type === 'Revenu') {
+        cats = categories.revenus || ['Salaire', 'Freelance', 'Investissement'];
+    } else if (type === 'Dépense') {
+        const budgetCats = budgets.map(b => b.categorie);
+        const depenseCats = categories.depenses || [];
+        cats = [...new Set([...budgetCats, ...depenseCats])];
+        if (cats.length === 0) cats = ['Alimentation', 'Logement', 'Transport', 'Loisirs'];
+    } else {
+        cats = categories.epargne || ['Voyage', 'Voiture', 'Urgence'];
+    }
+    
+    catSelect.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
+}
+
+/** Sauvegarder une transaction récurrente */
+function saveRecurrente() {
+    const description = document.getElementById('recDescription').value.trim();
+    const type = document.getElementById('recType').value;
+    const categorie = document.getElementById('recCategorie').value;
+    const sousCategorie = document.getElementById('recSousCategorie').value.trim();
+    const montant = parseFloat(document.getElementById('recMontant').value);
+    const jour = parseInt(document.getElementById('recJour').value);
+    const dateDebut = document.getElementById('recDateDebut').value;
+    const dateFin = document.getElementById('recDateFin').value || null;
+    
+    if (!description) {
+        showNotification('❌ Description requise', 'danger');
+        document.getElementById('recDescription').style.borderColor = 'var(--danger)';
+        return;
+    }
+    if (!montant || montant <= 0) {
+        showNotification('❌ Montant valide requis', 'danger');
+        document.getElementById('recMontant').style.borderColor = 'var(--danger)';
+        return;
+    }
+    if (!dateDebut) {
+        showNotification('❌ Date de début requise', 'danger');
+        document.getElementById('recDateDebut').style.borderColor = 'var(--danger)';
+        return;
+    }
+    
+    // Réinitialiser les bordures
+    document.getElementById('recDescription').style.borderColor = '';
+    document.getElementById('recMontant').style.borderColor = '';
+    document.getElementById('recDateDebut').style.borderColor = '';
+    
+    const recurrente = {
+        id: editRecurrenteId || Date.now(),
+        description: description,
+        type: type,
+        categorie: categorie,
+        sous_categorie: sousCategorie || 'Mensuel',
+        montant: montant,
+        jour: jour,
+        actif: true,
+        dateDebut: dateDebut,
+        dateFin: dateFin
+    };
+    
+    if (editRecurrenteId) {
+        const idx = transactionsRecurrentes.findIndex(r => r.id === editRecurrenteId);
+        if (idx !== -1) transactionsRecurrentes[idx] = recurrente;
+    } else {
+        transactionsRecurrentes.push(recurrente);
+    }
+    
+    saveRecurrentes();
+    renderRecurrentes();
+    closeRecurrenteModal();
+    showNotification(`✅ Transaction récurrente "${description}" enregistrée`, 'success');
+}
+
+/** Éditer une transaction récurrente */
+function editRecurrente(id) {
+    const r = transactionsRecurrentes.find(x => x.id === id);
+    if (!r) return;
+    
+    openRecurrenteModal();
+    editRecurrenteId = id;
+    
+    document.getElementById('recDescription').value = r.description;
+    document.getElementById('recType').value = r.type;
+    updateRecCategorie();
+    document.getElementById('recCategorie').value = r.categorie;
+    document.getElementById('recSousCategorie').value = r.sous_categorie || '';
+    document.getElementById('recMontant').value = r.montant;
+    document.getElementById('recJour').value = r.jour;
+    document.getElementById('recDateDebut').value = r.dateDebut;
+    document.getElementById('recDateFin').value = r.dateFin || '';
+}
+
+/** Supprimer une transaction récurrente */
+function deleteRecurrente(id) {
+    if (!confirm('Supprimer cette transaction récurrente ?')) return;
+    transactionsRecurrentes = transactionsRecurrentes.filter(r => r.id !== id);
+    saveRecurrentes();
+    renderRecurrentes();
+    showNotification('🗑️ Transaction récurrente supprimée', 'warning');
+}
+
+/** Activer/Désactiver une transaction récurrente */
+function toggleRecurrente(id) {
+    const r = transactionsRecurrentes.find(x => x.id === id);
+    if (r) {
+        r.actif = !r.actif;
+        saveRecurrentes();
+        renderRecurrentes();
+        showNotification(`Transaction ${r.actif ? 'activée' : 'désactivée'}`, 'success');
+    }
+}
+
+/** Exécuter toutes les transactions récurrentes pour le mois en cours */
+function executerTransactionsRecurrentes() {
+    if (!auth.currentUser) {
+        showNotification('❌ Connectez-vous', 'danger');
+        return;
+    }
+    
+    const aujourdhui = new Date();
+    const moisActuel = aujourdhui.getMonth();
+    const anneeActuelle = aujourdhui.getFullYear();
+    const moisNom = ['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'][moisActuel];
+    const moisKey = `${moisNom}-${anneeActuelle}`;
+    
+    let compteur = 0;
+    const transactionsAjoutees = [];
+    
+    transactionsRecurrentes.forEach(r => {
+        if (!r.actif) return;
+        
+        // Vérifier si la date de début est passée
+        if (r.dateDebut && new Date(r.dateDebut) > aujourdhui) return;
+        
+        // Vérifier si la date de fin est dépassée
+        if (r.dateFin && new Date(r.dateFin) < aujourdhui) return;
+        
+        // Créer la date de la transaction
+        const dateTransaction = new Date(anneeActuelle, moisActuel, r.jour);
+        if (dateTransaction > aujourdhui) return;
+        
+        // Vérifier si la transaction existe déjà ce mois
+        const existe = transactions.some(t => 
+            t.mois === moisKey &&
+            t.description === r.description &&
+            t.type === r.type &&
+            t.categorie === r.categorie &&
+            t.montant === r.montant
+        );
+        
+        if (!existe) {
+            transactions.push({
+                id: Date.now() + compteur,
+                date: dateTransaction.toISOString().split('T')[0],
+                mois: moisKey,
+                annee: anneeActuelle,
+                type: r.type,
+                description: r.description,
+                categorie: r.categorie,
+                sous_categorie: r.sous_categorie || 'Mensuel',
+                montant: r.montant
+            });
+            compteur++;
+            transactionsAjoutees.push(r.description);
+        }
+    });
+    
+    if (compteur > 0) {
+        saveAllData();
+        applyGlobalFilters();
+        showNotification(`✅ ${compteur} transaction(s) récurrente(s) ajoutées : ${transactionsAjoutees.join(', ')}`, 'success');
+    } else {
+        showNotification('ℹ️ Aucune nouvelle transaction à ajouter', 'info');
+    }
+}
+
+/** Exécuter les transactions récurrentes pour un mois spécifique */
+function executerTransactionsRecurrentesMois() {
+    const mois = prompt('Entrez le mois (1-12) :', new Date().getMonth() + 1);
+    if (!mois) return;
+    
+    const moisNum = parseInt(mois);
+    if (moisNum < 1 || moisNum > 12) {
+        showNotification('❌ Mois invalide (1-12)', 'danger');
+        return;
+    }
+    
+    const annee = prompt('Entrez l\'année (ex: 2026) :', new Date().getFullYear());
+    if (!annee) return;
+    
+    const anneeNum = parseInt(annee);
+    if (anneeNum < 2020 || anneeNum > 2030) {
+        showNotification('❌ Année invalide', 'danger');
+        return;
+    }
+    
+    // Exécuter pour le mois demandé
+    const moisNom = ['janv','févr','mars','avr','mai','juin','juil','août','sept','oct','nov','déc'][moisNum - 1];
+    const moisKey = `${moisNom}-${anneeNum}`;
+    
+    let compteur = 0;
+    
+    transactionsRecurrentes.forEach(r => {
+        if (!r.actif) return;
+        if (r.dateDebut && new Date(r.dateDebut) > new Date(anneeNum, moisNum - 1, r.jour)) return;
+        if (r.dateFin && new Date(r.dateFin) < new Date(anneeNum, moisNum - 1, r.jour)) return;
+        
+        const existe = transactions.some(t => 
+            t.mois === moisKey &&
+            t.description === r.description &&
+            t.type === r.type &&
+            t.categorie === r.categorie &&
+            t.montant === r.montant
+        );
+        
+        if (!existe) {
+            transactions.push({
+                id: Date.now() + compteur,
+                date: `${anneeNum}-${String(moisNum).padStart(2, '0')}-${String(r.jour).padStart(2, '0')}`,
+                mois: moisKey,
+                annee: anneeNum,
+                type: r.type,
+                description: r.description,
+                categorie: r.categorie,
+                sous_categorie: r.sous_categorie || 'Mensuel',
+                montant: r.montant
+            });
+            compteur++;
+        }
+    });
+    
+    if (compteur > 0) {
+        saveAllData();
+        applyGlobalFilters();
+        showNotification(`✅ ${compteur} transaction(s) ajoutées pour ${moisKey}`, 'success');
+    } else {
+        showNotification(`ℹ️ Aucune transaction à ajouter pour ${moisKey}`, 'info');
+    }
+}
+
+/** Vérifier automatiquement les transactions récurrentes au chargement */
+function verifierTransactionsRecurrentes() {
+    if (!auth.currentUser) return;
+    
+    const uid = auth.currentUser.uid;
+    const aujourdhui = new Date().toISOString().split('T')[0];
+    const dernierCheck = localStorage.getItem(`dernierCheck_${uid}`);
+    
+    // Vérifier une fois par jour
+    if (dernierCheck === aujourdhui) return;
+    
+    // Exécuter les transactions récurrentes
+    executerTransactionsRecurrentes();
+    
+    // Mettre à jour le dernier check
+    localStorage.setItem(`dernierCheck_${uid}`, aujourdhui);
+}  
     // =============================================================
     // 7.16 OBJECTIFS
     // =============================================================
@@ -2805,6 +3289,9 @@ document.addEventListener('DOMContentLoaded', () => {
             await initAdminSection();
             await addActivationButtonIfNeeded();
             showGuideIfNeeded();
+              // ===== NOUVEAU : Charger les récurrentes =====
+            loadRecurrentes();
+            verifierTransactionsRecurrentes();
             renderDashboard();
             renderTransactions();
             renderBudgets();
@@ -2881,6 +3368,17 @@ window.validerNouvelleCategorie = validerNouvelleCategorie;
 window.supprimerCategorieBudget = supprimerCategorieBudget;
 window.modifierNomCategorie = modifierNomCategorie;
 window.validerEditBudget = validerEditBudget;
+        // Transactions récurrentes
+window.openRecurrenteModal = openRecurrenteModal;
+window.closeRecurrenteModal = closeRecurrenteModal;
+window.saveRecurrente = saveRecurrente;
+window.editRecurrente = editRecurrente;
+window.deleteRecurrente = deleteRecurrente;
+window.toggleRecurrente = toggleRecurrente;
+window.executerTransactionsRecurrentes = executerTransactionsRecurrentes;
+window.executerTransactionsRecurrentesMois = executerTransactionsRecurrentesMois;
+window.updateRecCategorie = updateRecCategorie;
+window.renderRecurrentes = renderRecurrentes;
     </script>
 </body>
 </html>
