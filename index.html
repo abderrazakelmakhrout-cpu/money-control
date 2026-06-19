@@ -843,6 +843,7 @@
         }
     </style>
 <base target="_blank">
+<base target="_blank">
 </head>
 
 <!-- ============================================================ -->
@@ -1744,6 +1745,19 @@
     }
 
     // =============================================================
+    // 6.9b VERIFICATION ADMIN
+    // =============================================================
+    async function checkAdminStatus() {
+        const user = auth.currentUser;
+        if (!user) return;
+        const isAdmin = ADMIN_EMAILS.includes(user.email.toLowerCase());
+        const adminMenuItem = document.getElementById('adminMenuItem');
+        if (adminMenuItem) {
+            adminMenuItem.style.display = isAdmin ? 'flex' : 'none';
+        }
+    }
+
+    // =============================================================
     // 6.10 FILTRES
     // =============================================================
     function getFilteredTransactions() {
@@ -2523,6 +2537,7 @@
                 document.getElementById('appContainer').style.display = 'block';
                 await loadUserData(user.uid);
                 await displayWelcomeMessage();
+                await checkAdminStatus();
                 initFilters();
                 await addActivationButtonIfNeeded();
                 // Show guide on first visit
