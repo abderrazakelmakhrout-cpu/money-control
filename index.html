@@ -842,10 +842,10 @@
             .no-print { display: none !important; }
         }
         /* ========================================================= */
-/* 4.19 AMÉLIORATIONS MOBILE                                  */
+/* 4.19 AMÃ‰LIORATIONS MOBILE                                  */
 /* ========================================================= */
 
-/* Amélioration du touch pour mobile */
+/* AmÃ©lioration du touch pour mobile */
 @media (max-width: 768px) {
     /* Sidebar en overlay pleine largeur */
     .sidebar {
@@ -886,7 +886,7 @@
         box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     }
 
-    /* Thème toggle en bas à droite */
+    /* ThÃ¨me toggle en bas Ã  droite */
     .theme-toggle {
         bottom: 16px !important;
         right: 16px !important;
@@ -904,7 +904,7 @@
         font-size: 16px !important;
     }
 
-    /* Logout en haut à droite */
+    /* Logout en haut Ã  droite */
     .logout-btn {
         position: fixed !important;
         top: 12px !important;
@@ -1032,7 +1032,7 @@
         font-size: 17px !important;
     }
 
-    /* Calendrier adapté */
+    /* Calendrier adaptÃ© */
     .calendar-grid {
         gap: 4px !important;
     }
@@ -1172,7 +1172,7 @@
     }
 }
 
-/* Pour les très petits écrans */
+/* Pour les trÃ¨s petits Ã©crans */
 @media (max-width: 400px) {
     .cards-grid {
         grid-template-columns: 1fr !important;
@@ -1232,14 +1232,14 @@
     z-index: -1;
 }
 
-/* Amélioration du scroll sur mobile */
+/* AmÃ©lioration du scroll sur mobile */
 * {
     -webkit-tap-highlight-color: transparent;
 }
 
 /* Inputs plus grands pour le touch */
 .form-input, .form-select, .filter-select, .search-box {
-    font-size: 16px !important; /* Évite le zoom automatique sur iOS */
+    font-size: 16px !important; /* Ã‰vite le zoom automatique sur iOS */
 }
 
 @media (max-width: 768px) {
@@ -1264,14 +1264,13 @@
         min-width: 34px !important;
     }
 
-    /* Meilleure visibilité des badges */
+    /* Meilleure visibilitÃ© des badges */
     .badge {
         padding: 3px 8px !important;
         font-size: 10px !important;
     }
 }
     </style>
-<base target="_blank">
 <base target="_blank">
 </head>
 
@@ -1283,7 +1282,7 @@
     <!-- ============================================================ -->
     <!-- 5.1 ECRAN DE CONNEXION                                        -->
     <!-- ============================================================ -->
-    <div id="loginContainer" style="display: flex; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999;">
+    <div id="loginContainer" style="display: flex; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999; overflow-y: auto; -webkit-overflow-scrolling: touch;">
         <div style="margin: auto; width: 100%; max-width: 450px; padding: 20px;">
             <div style="background: var(--bg-card); border-radius: 28px; padding: 40px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
                 <!-- Logo -->
@@ -1304,7 +1303,7 @@
                     </div>
                     <div class="form-group" style="margin-bottom: 20px;">
                         <label class="form-label">MOT DE PASSE</label>
-                        <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" autocomplete="current-password">
+                        <input type="password" id="loginPassword" class="form-input" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" autocomplete="current-password">
                         <small id="loginPasswordError" class="error-msg">Mot de passe requis</small>
                     </div>
                     <button class="btn btn-primary" style="width: 100%; margin-bottom: 12px;" onclick="loginWithEmail(event)">
@@ -1334,11 +1333,11 @@
                     </div>
                     <div class="form-group" style="margin-bottom: 20px;">
                         <label class="form-label">MOT DE PASSE</label>
-                        <input type="password" id="registerPassword" class="form-input" placeholder="••••••••">
+                        <input type="password" id="registerPassword" class="form-input" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢">
                     </div>
                     <div class="form-group" style="margin-bottom: 20px;">
                         <label class="form-label">CONFIRMER</label>
-                        <input type="password" id="registerConfirmPassword" class="form-input" placeholder="••••••••">
+                        <input type="password" id="registerConfirmPassword" class="form-input" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢">
                     </div>
                     <button class="btn btn-primary" style="width: 100%; margin-bottom: 12px;" onclick="registerWithEmail(event)">
                         <i class="fas fa-user-plus"></i> Creer un compte
@@ -1861,7 +1860,7 @@
     <p><strong>3 mois :</strong> 99 MAD</p>
     <p><strong>6 mois :</strong> 149 MAD</p>
     <p><strong>12 mois :</strong> 199 MAD</p>
-    via l’un des moyens disponibles (virement bancaire, cash ou paiement express).
+    via lâ€™un des moyens disponibles (virement bancaire, cash ou paiement express).
 </li>
                             <li>Prenez une capture d'ecran de votre virement</li>
                             <li>Envoyez la capture par WhatsApp a <strong> Numero : +212606325731 </strong></li>
@@ -1885,7 +1884,7 @@
         <!-- Confirm Dialog -->
         <div class="confirm-overlay" id="confirmDialog">
             <div class="confirm-box">
-                <div id="confirmIcon" style="font-size: 40px; margin-bottom: 15px;">⚠️</div>
+                <div id="confirmIcon" style="font-size: 40px; margin-bottom: 15px;">âš ï¸</div>
                 <h3 id="confirmTitle" style="margin-bottom: 10px; color: var(--text);">Confirmer ?</h3>
                 <p id="confirmMessage" style="color: var(--text-muted); margin-bottom: 20px; font-size: 14px;"></p>
                 <div style="display: flex; gap: 12px; justify-content: center;">
@@ -2000,6 +1999,14 @@ let touchStartY = 0;
     const formatDate = (d) => new Date(d).toLocaleDateString('fr-FR');
     const generateId = () => Date.now() + Math.floor(Math.random() * 1000);
     const escapeHtml = (str) => { if(!str) return ''; const div = document.createElement('div'); div.textContent = str; return div.innerHTML; };
+    // Escape a value for safe embedding inside onclick="fn('VALUE')" (JS string literal, then HTML attribute)
+    const escapeJsAttr = (str) => String(str ?? '')
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'")
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
 
     function showNotification(msg, type) {
         const panel = document.getElementById('notifPanel');
@@ -2017,7 +2024,7 @@ let touchStartY = 0;
 function closeSidebarOnBackdrop(e) {
     const sidebar = document.getElementById('sidebar');
     if (sidebar.classList.contains('open')) {
-        // Vérifier si le clic est en dehors du sidebar
+        // VÃ©rifier si le clic est en dehors du sidebar
         if (!sidebar.contains(e.target) && !e.target.closest('.menu-toggle')) {
             sidebar.classList.remove('open');
         }
@@ -2033,7 +2040,7 @@ document.addEventListener('touchend', function(e) {
     const touchEndY = e.changedTouches[0].screenY;
     const diffX = touchEndX - touchStartX;
     const diffY = touchEndY - touchStartY;
-    
+
     // Swipe horizontal seulement
     if (Math.abs(diffX) > Math.abs(diffY)) {
         const sidebar = document.getElementById('sidebar');
@@ -2047,47 +2054,15 @@ document.addEventListener('touchend', function(e) {
         }
     }
 });
-
-document.addEventListener('touchstart', function(e) {
-    touchStartX = e.changedTouches[0].screenX;
-    touchStartY = e.changedTouches[0].screenY;
-});
-
-document.addEventListener('touchend', function(e) {
-    const touchEndX = e.changedTouches[0].screenX;
-    const touchEndY = e.changedTouches[0].screenY;
-    const diffX = touchEndX - touchStartX;
-    const diffY = touchEndY - touchStartY;
-    
-    // Swipe horizontal seulement
-    if (Math.abs(diffX) > Math.abs(diffY)) {
-        const sidebar = document.getElementById('sidebar');
-        // Swipe vers la droite pour ouvrir (depuis le bord gauche)
-        if (diffX > 50 && touchStartX < 50 && !sidebar.classList.contains('open')) {
-            sidebar.classList.add('open');
-        }
-        // Swipe vers la gauche pour fermer
-        else if (diffX < -50 && sidebar.classList.contains('open')) {
-            sidebar.classList.remove('open');
-        }
-    }
-});
-// Ajoutez cet event listener
 document.addEventListener('click', closeSidebarOnBackdrop);
-
-// Amélioration du toggle pour mobile
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    sidebar.classList.toggle('open');
-}
     // =============================================================
     // 6.7 CONFIRM DIALOG
     // =============================================================
     function showConfirm(title, message, callback, variant) {
         document.getElementById('confirmTitle').textContent = title;
         document.getElementById('confirmMessage').textContent = message;
-        const icons = { danger: '🔴', warning: '⚠️', success: '✅' };
-        document.getElementById('confirmIcon').textContent = icons[variant] || '⚠️';
+        const icons = { danger: 'ðŸ”´', warning: 'âš ï¸', success: 'âœ…' };
+        document.getElementById('confirmIcon').textContent = icons[variant] || 'âš ï¸';
         confirmCallback = callback;
         const btn = document.getElementById('confirmBtn');
         btn.onclick = () => { closeConfirmDialog(); if(confirmCallback) confirmCallback(); };
@@ -2106,7 +2081,8 @@ function toggleSidebar() {
         localStorage.setItem(`budgets_${uid}`, JSON.stringify(budgets));
         localStorage.setItem(`categories_${uid}`, JSON.stringify(categories));
         localStorage.setItem(`recurrentes_${uid}`, JSON.stringify(recurrentes));
-        db.collection('users').doc(uid).set({ transactions, objectifs, budgets, categories, recurrentes, lastSync: new Date().toISOString() }, { merge: true });
+        db.collection('users').doc(uid).set({ transactions, objectifs, budgets, categories, recurrentes, lastSync: new Date().toISOString() }, { merge: true })
+            .catch(error => { console.error('Erreur de synchronisation cloud:', error); showNotification('Synchronisation cloud impossible (donnees sauvegardees localement)', 'warning'); });
     }
 
     async function loadUserData(uid) {
@@ -2246,9 +2222,9 @@ function toggleSidebar() {
             const doc = await db.collection('users').doc(user.uid).get();
             const data = doc.exists ? doc.data() : {};
             const name = data.firstName && data.lastName ? `${data.firstName} ${data.lastName}` : user.email.split('@')[0];
-            document.getElementById('welcomeUserText').innerHTML = `Bonjour ${name} ! 👋`;
+            document.getElementById('welcomeUserText').innerHTML = `Bonjour ${name} ! ðŸ‘‹`;
         } catch (e) {
-            document.getElementById('welcomeUserText').innerHTML = `Bonjour ${user.email.split('@')[0]} ! 👋`;
+            document.getElementById('welcomeUserText').innerHTML = `Bonjour ${user.email.split('@')[0]} ! ðŸ‘‹`;
         }
     }
 
@@ -2262,6 +2238,12 @@ function toggleSidebar() {
         const adminMenuItem = document.getElementById('adminMenuItem');
         if (adminMenuItem) {
             adminMenuItem.style.display = isAdmin ? 'flex' : 'none';
+        }
+        if (isAdmin) {
+            try {
+                const snap = await db.collection('activation_requests').where('status', '==', 'pending').get();
+                document.getElementById('pendingCount').textContent = snap.size;
+            } catch (e) { /* badge reste a 0 si la requete echoue */ }
         }
     }
 
@@ -2367,10 +2349,10 @@ function toggleSidebar() {
         [...transactions].sort((a,b) => new Date(a.date)-new Date(b.date)).forEach(t => { if(t.type==='Revenu') totalSoldeCumule+=t.montant; else totalSoldeCumule-=t.montant; });
 
         document.getElementById('kpiGrid').innerHTML = `
-            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-wallet"></i></div><div class="kpi-label">SOLDE TOTAL</div><div class="kpi-value">${formatMoney(totalSoldeCumule)}</div><div class="kpi-sub ${prevData.solde.variation>=0?'positive':'negative'}">${prevData.solde.variation>=0?'↑':'↓'} ${Math.abs(prevData.solde.variation)}% vs mois precedent</div></div>
-            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-arrow-up"></i></div><div class="kpi-label">REVENUS DU MOIS</div><div class="kpi-value">${formatMoney(revenus)}</div><div class="kpi-sub ${prevData.revenus.variation>=0?'positive':'negative'}">${prevData.revenus.variation>=0?'↑':'↓'} ${Math.abs(prevData.revenus.variation)}% vs mois precedent</div></div>
-            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-arrow-down"></i></div><div class="kpi-label">DEPENSES DU MOIS</div><div class="kpi-value">${formatMoney(depenses)}</div><div class="kpi-sub ${prevData.depenses.variation<=0?'positive':'negative'}">${prevData.depenses.variation<=0?'↓':'↑'} ${Math.abs(prevData.depenses.variation)}% vs mois precedent</div></div>
-            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-piggy-bank"></i></div><div class="kpi-label">EPARGNE DU MOIS</div><div class="kpi-value">${formatMoney(epargne)}</div><div class="kpi-sub ${prevData.epargne.variation>=0?'positive':'negative'}">${prevData.epargne.variation>=0?'↑':'↓'} ${Math.abs(prevData.epargne.variation)}% vs mois precedent</div></div>
+            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-wallet"></i></div><div class="kpi-label">SOLDE TOTAL</div><div class="kpi-value">${formatMoney(totalSoldeCumule)}</div><div class="kpi-sub ${prevData.solde.variation>=0?'positive':'negative'}">${prevData.solde.variation>=0?'â†‘':'â†“'} ${Math.abs(prevData.solde.variation)}% vs mois precedent</div></div>
+            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-arrow-up"></i></div><div class="kpi-label">REVENUS DU MOIS</div><div class="kpi-value">${formatMoney(revenus)}</div><div class="kpi-sub ${prevData.revenus.variation>=0?'positive':'negative'}">${prevData.revenus.variation>=0?'â†‘':'â†“'} ${Math.abs(prevData.revenus.variation)}% vs mois precedent</div></div>
+            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-arrow-down"></i></div><div class="kpi-label">DEPENSES DU MOIS</div><div class="kpi-value">${formatMoney(depenses)}</div><div class="kpi-sub ${prevData.depenses.variation<=0?'positive':'negative'}">${prevData.depenses.variation<=0?'â†“':'â†‘'} ${Math.abs(prevData.depenses.variation)}% vs mois precedent</div></div>
+            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-piggy-bank"></i></div><div class="kpi-label">EPARGNE DU MOIS</div><div class="kpi-value">${formatMoney(epargne)}</div><div class="kpi-sub ${prevData.epargne.variation>=0?'positive':'negative'}">${prevData.epargne.variation>=0?'â†‘':'â†“'} ${Math.abs(prevData.epargne.variation)}% vs mois precedent</div></div>
             <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-simple"></i></div><div class="kpi-label">BUDGET CONSOMME</div><div class="kpi-value">${pctBudget}%</div><div class="kpi-sub">${formatMoney(budgetConsomme)} / ${formatMoney(totalBudget)}</div></div>
             <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-percentage"></i></div><div class="kpi-label">TAUX D'EPARGNE</div><div class="kpi-value">${revenus>0?((epargne/revenus)*100).toFixed(1):0}%</div><div class="kpi-sub">${revenus>0?((depenses/revenus)*100).toFixed(1):0}% de depenses</div></div>
         `;
@@ -2398,7 +2380,7 @@ function toggleSidebar() {
         const alerts = [];
         if (pctBudget > 100) alerts.push({type:'danger', msg:`Depassement budget : ${pctBudget}%`});
         else if (pctBudget > 80) alerts.push({type:'warning', msg:`Budget a ${pctBudget}%`});
-        objectifs.forEach(o => { const pct = (o.actuel/o.cible)*100; if (pct>85 && pct<100) alerts.push({type:'warning', msg:`"${o.nom}" a ${pct.toFixed(1)}%`}); });
+        objectifs.forEach(o => { const pct = (o.actuel/o.cible)*100; if (pct>85 && pct<100) alerts.push({type:'warning', msg:`"${escapeHtml(o.nom)}" a ${pct.toFixed(1)}%`}); });
         document.getElementById('alertsContainer').innerHTML = alerts.map(a => `<div class="alert-bar alert-${a.type}"><i class="fas fa-bell"></i> ${a.msg}</div>`).join('');
     }
 
@@ -2410,7 +2392,7 @@ function toggleSidebar() {
         const tbody = document.getElementById('transactionsTable');
         if (!tbody) return;
         tbody.innerHTML = filtered.map(t => `
-            <tr><td>${formatDate(t.date)}</td><td><span class="badge badge-${t.type==='Revenu'?'rev':t.type==='Depense'?'dep':'ep'}">${t.type}</span></td><td>${escapeHtml(t.description)}</td><td>${t.categorie}</td><td>${t.sous_categorie||'-'}</td><td style="color:${t.type==='Revenu'?'var(--success)':'var(--danger)'}">${t.type==='Depense'?'-':'+'}${formatMoney(t.montant)}</td><td>
+            <tr><td>${formatDate(t.date)}</td><td><span class="badge badge-${t.type==='Revenu'?'rev':t.type==='Depense'?'dep':'ep'}">${t.type}</span></td><td>${escapeHtml(t.description)}</td><td>${escapeHtml(t.categorie)}</td><td>${escapeHtml(t.sous_categorie||'-')}</td><td style="color:${t.type==='Revenu'?'var(--success)':'var(--danger)'}">${t.type==='Depense'?'-':'+'}${formatMoney(t.montant)}</td><td>
             <button class="btn btn-secondary btn-sm" onclick="editTransaction(${t.id})"><i class="fas fa-edit"></i></button>
             <button class="btn btn-danger btn-sm" onclick="deleteTransaction(${t.id})"><i class="fas fa-trash"></i></button></td></tr>
         `).join('');
@@ -2506,12 +2488,12 @@ function toggleSidebar() {
         document.getElementById('budgetCards').innerHTML = budgets.map(b => {
             const realise = filtered.filter(t => t.categorie === b.categorie).reduce((s,t) => s+t.montant, 0);
             const pct = (realise/b.budget*100).toFixed(1);
-            return `<div class="kpi-card" data-categorie="${b.categorie}" data-budget="${b.budget}">
+            return `<div class="kpi-card" data-categorie="${escapeHtml(b.categorie)}" data-budget="${b.budget}">
                 <div class="kpi-label" style="display:flex; justify-content:space-between; align-items:center;">
-                    <span>${b.categorie}</span>
+                    <span>${escapeHtml(b.categorie)}</span>
                     <div style="display:flex; gap:4px;">
-                        <button class="btn btn-secondary btn-sm" onclick="editBudget('${b.categorie}', ${b.budget})" style="padding:2px 8px; font-size:10px;"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-danger btn-sm" onclick="supprimerCategorieBudget('${b.categorie}')" style="padding:2px 8px; font-size:10px;"><i class="fas fa-trash"></i></button>
+                        <button class="btn btn-secondary btn-sm" onclick="editBudget('${escapeJsAttr(b.categorie)}', ${b.budget})" style="padding:2px 8px; font-size:10px;"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-danger btn-sm" onclick="supprimerCategorieBudget('${escapeJsAttr(b.categorie)}')" style="padding:2px 8px; font-size:10px;"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
                 <div class="kpi-value" style="font-size:18px">${formatMoney(realise)} / ${formatMoney(b.budget)}</div>
@@ -2526,7 +2508,7 @@ function toggleSidebar() {
             let status = '<span style="color:var(--success)">OK</span>';
             if (pct > 100) status = '<span style="color:var(--danger)">Depassement</span>';
             else if (pct > 80) status = '<span style="color:var(--warning)">Attention</span>';
-            return `<tr><td><strong>${b.categorie}</strong></td><td>${formatMoney(b.budget)}</td><td>${formatMoney(realise)}</td><td>${formatMoney(b.budget-realise)}</td><td>${pct}%</td><td>${status}</td></tr>`;
+            return `<tr><td><strong>${escapeHtml(b.categorie)}</strong></td><td>${formatMoney(b.budget)}</td><td>${formatMoney(realise)}</td><td>${formatMoney(b.budget-realise)}</td><td>${pct}%</td><td>${status}</td></tr>`;
         }).join('');
     }
 
@@ -2576,11 +2558,14 @@ function toggleSidebar() {
     // =============================================================
     function renderObjectifs() {
         const epargneTxs = transactions.filter(t => t.type === 'Epargne');
+        let changed = false;
         const objectifsMisAJour = objectifs.map(obj => {
             const total = epargneTxs.filter(t => t.sous_categorie === obj.nom || t.description.toLowerCase().includes(obj.nom.toLowerCase())).reduce((sum,t) => sum+t.montant, 0);
+            if (total !== obj.actuel) changed = true;
             return {...obj, actuel: total};
         });
-        objectifs = objectifsMisAJour; saveAllData();
+        objectifs = objectifsMisAJour;
+        if (changed) saveAllData();
 
         document.getElementById('objectifsGrid').innerHTML = objectifs.map(o => {
             const pct = (o.actuel/o.cible*100).toFixed(1);
@@ -2589,9 +2574,9 @@ function toggleSidebar() {
             return `<div class="obj-card ${o.priorite==='Haute'?'high':o.priorite==='Moyenne'?'medium':'low'}">
                 <div class="obj-header">
                     <div>
-                        <div class="obj-name">${o.nom} ${o.actuel>=o.cible?'<span style="color:var(--success);font-size:14px;"> 🎉</span>':''}</div>
-                        <div class="obj-desc">${o.description||"Objectif d'epargne"}</div>
-                        <div class="obj-desc">📅 ${o.date_cible} · ${statut}</div>
+                        <div class="obj-name">${escapeHtml(o.nom)} ${o.actuel>=o.cible?'<span style="color:var(--success);font-size:14px;"> ðŸŽ‰</span>':''}</div>
+                        <div class="obj-desc">${escapeHtml(o.description)||"Objectif d'epargne"}</div>
+                        <div class="obj-desc">ðŸ“… ${o.date_cible} Â· ${statut}</div>
                     </div>
                     <div class="obj-amt"><div class="obj-current">${formatMoney(o.actuel)}</div><div class="obj-target">/${formatMoney(o.cible)}</div></div>
                 </div>
@@ -2712,7 +2697,7 @@ function toggleSidebar() {
         for (let d = 1; d <= daysInMonth; d++) {
             const events = eventsByDay[d] || [];
             const isToday = new Date().getDate() === d && new Date().getMonth() === monthIndex && new Date().getFullYear() === currentYear;
-            html += `<div class="calendar-day" style="${isToday ? 'border:2px solid var(--primary);' : ''}"><div class="calendar-day-header">${d}</div>${events.slice(0,3).map(e => `<div class="calendar-event">${e.type==='Revenu'?'💰':'💸'} ${formatMoney(e.montant)}</div>`).join('')}${events.length>3 ? `<div style="font-size:10px; color:var(--text-muted);">+${events.length-3} de plus</div>` : ''}</div>`;
+            html += `<div class="calendar-day" style="${isToday ? 'border:2px solid var(--primary);' : ''}"><div class="calendar-day-header">${d}</div>${events.slice(0,3).map(e => `<div class="calendar-event">${e.type==='Revenu'?'ðŸ’°':'ðŸ’¸'} ${formatMoney(e.montant)}</div>`).join('')}${events.length>3 ? `<div style="font-size:10px; color:var(--text-muted);">+${events.length-3} de plus</div>` : ''}</div>`;
         }
         html += '</div>';
         document.getElementById('calendarView').innerHTML = html;
@@ -2745,14 +2730,14 @@ function toggleSidebar() {
 
         document.getElementById('reportContent').innerHTML = `
             <div class="rapport-stats">
-                <div class="rapport-card"><div class="rapport-value" style="color:var(--success)">+${formatMoney(revenus)}</div><div class="rapport-label">Revenus</div><div class="rapport-sub">${prevData.revenus.variation>=0?'↑':'↓'} ${Math.abs(prevData.revenus.variation)}%</div></div>
-                <div class="rapport-card"><div class="rapport-value" style="color:var(--danger)">-${formatMoney(depenses)}</div><div class="rapport-label">Depenses</div><div class="rapport-sub">${prevData.depenses.variation<=0?'↓':'↑'} ${Math.abs(prevData.depenses.variation)}%</div></div>
+                <div class="rapport-card"><div class="rapport-value" style="color:var(--success)">+${formatMoney(revenus)}</div><div class="rapport-label">Revenus</div><div class="rapport-sub">${prevData.revenus.variation>=0?'â†‘':'â†“'} ${Math.abs(prevData.revenus.variation)}%</div></div>
+                <div class="rapport-card"><div class="rapport-value" style="color:var(--danger)">-${formatMoney(depenses)}</div><div class="rapport-label">Depenses</div><div class="rapport-sub">${prevData.depenses.variation<=0?'â†“':'â†‘'} ${Math.abs(prevData.depenses.variation)}%</div></div>
                 <div class="rapport-card"><div class="rapport-value" style="color:var(--info)">${formatMoney(epargne)}</div><div class="rapport-label">Epargne</div><div class="rapport-sub">Taux: ${tauxEpargne}%</div></div>
-                <div class="rapport-card"><div class="rapport-value" style="color:${balance>=0?'var(--success)':'var(--danger)'}">${balance>=0?'+':''}${formatMoney(balance)}</div><div class="rapport-label">Balance</div><div class="rapport-sub">${prevData.solde.variation>=0?'↑':'↓'} ${Math.abs(prevData.solde.variation)}%</div></div>
+                <div class="rapport-card"><div class="rapport-value" style="color:${balance>=0?'var(--success)':'var(--danger)'}">${balance>=0?'+':''}${formatMoney(balance)}</div><div class="rapport-label">Balance</div><div class="rapport-sub">${prevData.solde.variation>=0?'â†‘':'â†“'} ${Math.abs(prevData.solde.variation)}%</div></div>
             </div>
             <div class="charts-grid">
-                <div class="chart-card"><div class="chart-header"><div class="chart-title">Top 5 Depenses</div></div>${top5Dep.map(([cat,mnt],i) => `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;background:rgba(239,68,68,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--danger)">${i+1}</span><span style="font-weight:600">${cat}</span></div><div style="font-weight:700;color:var(--danger)">-${formatMoney(mnt)}</div></div>`).join('')}</div>
-                <div class="chart-card"><div class="chart-header"><div class="chart-title">Top 5 Revenus</div></div>${top5Rev.map(([cat,mnt],i) => `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;background:rgba(16,185,129,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--success)">${i+1}</span><span style="font-weight:600">${cat}</span></div><div style="font-weight:700;color:var(--success)">+${formatMoney(mnt)}</div></div>`).join('')}</div>
+                <div class="chart-card"><div class="chart-header"><div class="chart-title">Top 5 Depenses</div></div>${top5Dep.map(([cat,mnt],i) => `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;background:rgba(239,68,68,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--danger)">${i+1}</span><span style="font-weight:600">${escapeHtml(cat)}</span></div><div style="font-weight:700;color:var(--danger)">-${formatMoney(mnt)}</div></div>`).join('')}</div>
+                <div class="chart-card"><div class="chart-header"><div class="chart-title">Top 5 Revenus</div></div>${top5Rev.map(([cat,mnt],i) => `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;background:rgba(16,185,129,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--success)">${i+1}</span><span style="font-weight:600">${escapeHtml(cat)}</span></div><div style="font-weight:700;color:var(--success)">+${formatMoney(mnt)}</div></div>`).join('')}</div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px; margin-bottom:20px;">
                 <div class="chart-card"><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
@@ -2801,8 +2786,8 @@ function toggleSidebar() {
 
         document.getElementById('analyseTop').innerHTML = `
             <div style="padding:15px;">
-                ${topRevenu?`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Plus grand revenu</span><span style="font-size:13px;font-weight:600;color:var(--success)">${topRevenu[0]} (${formatMoney(topRevenu[1])})</span></div>`:''}
-                ${topDepense?`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Plus grande depense</span><span style="font-size:13px;font-weight:600;color:var(--danger)">${topDepense[0]} (${formatMoney(topDepense[1])})</span></div>`:''}
+                ${topRevenu?`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Plus grand revenu</span><span style="font-size:13px;font-weight:600;color:var(--success)">${escapeHtml(topRevenu[0])} (${formatMoney(topRevenu[1])})</span></div>`:''}
+                ${topDepense?`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Plus grande depense</span><span style="font-size:13px;font-weight:600;color:var(--danger)">${escapeHtml(topDepense[0])} (${formatMoney(topDepense[1])})</span></div>`:''}
                 <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Taux d'epargne</span><span style="font-size:13px;font-weight:600;color:${parseFloat(tauxEpargne)>=20?'var(--success)':'var(--amber)'}">${tauxEpargne}%</span></div>
                 <div style="display:flex;justify-content:space-between;padding:10px 0;"><span style="font-size:13px;color:var(--text-muted)">Recommandation</span><span style="font-size:13px;font-weight:600;color:var(--text)">${parseFloat(tauxEpargne)>=20?'Excellent!':parseFloat(tauxEpargne)>=10?'Bien':'A ameliorer'}</span></div>
             </div>`;
@@ -2821,9 +2806,9 @@ function toggleSidebar() {
         }
         tbody.innerHTML = recurrentes.map(r => `
             <tr>
-                <td><strong>${r.description}</strong></td>
+                <td><strong>${escapeHtml(r.description)}</strong></td>
                 <td><span class="badge badge-${r.type==='Revenu'?'rev':r.type==='Depense'?'dep':'ep'}">${r.type}</span></td>
-                <td>${r.categorie}</td>
+                <td>${escapeHtml(r.categorie)}</td>
                 <td style="color:${r.type==='Revenu'?'var(--success)':r.type==='Depense'?'var(--danger)':'var(--info)'}">${r.type==='Depense'?'-':'+'}${formatMoney(r.montant)}</td>
                 <td>Jour ${r.jour}</td>
                 <td><span class="badge ${r.actif?'badge-rev':'badge-dep'}" style="cursor:pointer;" onclick="toggleRecurrente(${r.id})">${r.actif?'Actif':'Inactif'}</span></td>
@@ -2936,33 +2921,90 @@ function toggleSidebar() {
     // =============================================================
     // 6.21 ADMIN
     // =============================================================
-    function renderAdmin() {
-        // Donnees mock pour demo
-        const pendingUsers = [
-            { id: '1', userName: 'Ahmed Ben', email: 'ahmed@example.com', requestDate: '2026-06-15' },
-            { id: '2', userName: 'Sara Alaoui', email: 'sara@example.com', requestDate: '2026-06-16' },
-        ];
-        const activatedUsers = [
-            { id: 'a1', fullName: 'Karim Fassi', email: 'karim@example.com', activationDate: '2026-06-10' },
-            { id: 'a2', fullName: 'Laila Moussaoui', email: 'laila@example.com', activationDate: '2026-06-12' },
-        ];
+    function formatFirestoreDate(value) {
+        if (!value) return '-';
+        const d = value && typeof value.toDate === 'function' ? value.toDate() : new Date(value);
+        return isNaN(d) ? '-' : d.toLocaleDateString('fr-FR');
+    }
 
-        document.getElementById('pendingRequestsList').innerHTML = pendingUsers.length === 0
-            ? '<p style="text-align:center;color:var(--text-muted);padding:30px;">Aucune demande en attente</p>'
-            : pendingUsers.map(req => `<div style="background:var(--bg);border-radius:16px;padding:20px;margin-bottom:12px;border-left:4px solid var(--warning);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;"><div><div style="font-weight:700;font-size:16px;">${escapeHtml(req.userName)}</div><div style="font-size:12px;color:var(--text-muted);">${escapeHtml(req.email)}</div></div><div style="display:flex;gap:10px;"><button class="btn btn-success btn-sm" onclick="showNotification('Utilisateur active','success')"><i class="fas fa-check-circle"></i> Activer</button><button class="btn btn-danger btn-sm" onclick="showNotification('Demande rejetee','warning')"><i class="fas fa-times-circle"></i> Rejeter</button></div></div>`).join('');
+    async function renderAdmin() {
+        const listEl = document.getElementById('pendingRequestsList');
+        const actEl = document.getElementById('activatedUsersList');
+        const loadingHtml = '<p style="text-align:center;color:var(--text-muted);padding:30px;"><i class="fas fa-spinner fa-spin"></i> Chargement...</p>';
+        listEl.innerHTML = loadingHtml;
+        actEl.innerHTML = loadingHtml;
 
-        document.getElementById('activatedUsersList').innerHTML = activatedUsers.length === 0
-            ? '<p style="text-align:center;color:var(--text-muted);padding:30px;">Aucun utilisateur active</p>'
-            : `<table class="data-table"><thead><tr><th>Nom</th><th>Email</th><th>Date</th><th>Actions</th></tr></thead><tbody>${activatedUsers.map(u => `<tr><td><strong>${escapeHtml(u.fullName)}</strong></td><td>${escapeHtml(u.email)}</td><td>${u.activationDate}</td><td><button class="btn btn-danger btn-sm" onclick="showNotification('Utilisateur desactive','warning')"><i class="fas fa-ban"></i> Desactiver</button></td></tr>`).join('')}</tbody></table>`;
+        try {
+            const pendingSnap = await db.collection('activation_requests').where('status', '==', 'pending').get();
+            const pendingUsers = pendingSnap.docs.map(doc => {
+                const d = doc.data();
+                return { id: doc.id, userId: d.userId, userName: d.userName || d.email, email: d.email, requestDate: d.requestDate };
+            }).sort((a,b) => (b.requestDate?.toMillis?.() || 0) - (a.requestDate?.toMillis?.() || 0));
+
+            listEl.innerHTML = pendingUsers.length === 0
+                ? '<p style="text-align:center;color:var(--text-muted);padding:30px;">Aucune demande en attente</p>'
+                : pendingUsers.map(req => `<div style="background:var(--bg);border-radius:16px;padding:20px;margin-bottom:12px;border-left:4px solid var(--warning);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;"><div><div style="font-weight:700;font-size:16px;">${escapeHtml(req.userName)}</div><div style="font-size:12px;color:var(--text-muted);">${escapeHtml(req.email)}</div><div style="font-size:11px;color:var(--text-muted);margin-top:4px;">${formatFirestoreDate(req.requestDate)}</div></div><div style="display:flex;gap:10px;"><button class="btn btn-success btn-sm" onclick="activateRequest('${escapeJsAttr(req.id)}','${escapeJsAttr(req.userId)}')"><i class="fas fa-check-circle"></i> Activer</button><button class="btn btn-danger btn-sm" onclick="rejectRequest('${escapeJsAttr(req.id)}')"><i class="fas fa-times-circle"></i> Rejeter</button></div></div>`).join('');
+
+            const activeSnap = await db.collection('users').where('isActivated', '==', true).get();
+            const activatedUsers = activeSnap.docs.map(doc => {
+                const d = doc.data();
+                return { id: doc.id, fullName: d.fullName || d.email, email: d.email, activationDate: d.activationDate };
+            });
+
+            actEl.innerHTML = activatedUsers.length === 0
+                ? '<p style="text-align:center;color:var(--text-muted);padding:30px;">Aucun utilisateur active</p>'
+                : `<table class="data-table"><thead><tr><th>Nom</th><th>Email</th><th>Date</th><th>Actions</th></tr></thead><tbody>${activatedUsers.map(u => `<tr><td><strong>${escapeHtml(u.fullName)}</strong></td><td>${escapeHtml(u.email)}</td><td>${formatFirestoreDate(u.activationDate)}</td><td><button class="btn btn-danger btn-sm" onclick="deactivateUser('${escapeJsAttr(u.id)}')"><i class="fas fa-ban"></i> Desactiver</button></td></tr>`).join('')}</tbody></table>`;
+
+            document.getElementById('pendingCount').textContent = pendingUsers.length;
+        } catch (error) {
+            console.error('Erreur chargement admin:', error);
+            listEl.innerHTML = '<p style="text-align:center;color:var(--danger);padding:30px;">Erreur de chargement des donnees</p>';
+            actEl.innerHTML = '';
+        }
     }
 
     function refreshActivationRequests() { renderAdmin(); showNotification('Listes rafraichies', 'success'); }
 
-    function manualActivateUser() {
+    async function activateRequest(requestId, userId) {
+        if (!userId) { showNotification('Utilisateur introuvable pour cette demande', 'danger'); return; }
+        try {
+            await db.collection('users').doc(userId).set({ isActivated: true, activationDate: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+            await db.collection('activation_requests').doc(requestId).update({ status: 'approved' });
+            showNotification('Utilisateur active', 'success');
+            renderAdmin();
+        } catch (error) { console.error(error); showNotification("Erreur lors de l'activation", 'danger'); }
+    }
+
+    async function rejectRequest(requestId) {
+        try {
+            await db.collection('activation_requests').doc(requestId).update({ status: 'rejected' });
+            showNotification('Demande rejetee', 'warning');
+            renderAdmin();
+        } catch (error) { console.error(error); showNotification('Erreur lors du rejet', 'danger'); }
+    }
+
+    async function deactivateUser(userId) {
+        try {
+            await db.collection('users').doc(userId).set({ isActivated: false }, { merge: true });
+            showNotification('Utilisateur desactive', 'warning');
+            renderAdmin();
+        } catch (error) { console.error(error); showNotification('Erreur lors de la desactivation', 'danger'); }
+    }
+
+    async function manualActivateUser() {
         const email = document.getElementById('adminUserEmail').value.trim();
         if (!email) { showNotification('Email requis', 'danger'); return; }
-        showNotification(`${email} active !`, 'success');
-        document.getElementById('adminUserEmail').value = '';
+        try {
+            const snap = await db.collection('users').where('email', '==', email).limit(1).get();
+            if (snap.empty) { showNotification('Aucun utilisateur trouve avec cet email', 'danger'); return; }
+            const userDoc = snap.docs[0];
+            await userDoc.ref.set({ isActivated: true, activationDate: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+            const pendingSnap = await db.collection('activation_requests').where('userId', '==', userDoc.id).where('status', '==', 'pending').get();
+            await Promise.all(pendingSnap.docs.map(doc => doc.ref.update({ status: 'approved' })));
+            showNotification(`${email} active !`, 'success');
+            document.getElementById('adminUserEmail').value = '';
+            renderAdmin();
+        } catch (error) { console.error(error); showNotification("Erreur lors de l'activation", 'danger'); }
     }
 
     // =============================================================
@@ -3006,7 +3048,7 @@ function toggleSidebar() {
     function copierRIB() { navigator.clipboard.writeText(RIB).then(() => showNotification('RIB copie !', 'success')).catch(() => showNotification('Erreur', 'danger')); }
 
     function resetData() {
-        showConfirm('Reinitialiser toutes les donnees ?', '⚠️ Toutes vos transactions, budgets et objectifs seront remis aux valeurs par defaut.', () => {
+        showConfirm('Reinitialiser toutes les donnees ?', 'âš ï¸ Toutes vos transactions, budgets et objectifs seront remis aux valeurs par defaut.', () => {
             transactions = [...DEFAULT_TRANSACTIONS]; objectifs = [...DEFAULT_OBJECTIFS]; budgets = [...DEFAULT_BUDGETS]; categories = {...DEFAULT_CATEGORIES, depenses: [...DEFAULT_CATEGORIES.depenses]}; recurrentes = [...DEFAULT_TRANSACTIONS_RECURRENTES]; saveAllData(); applyGlobalFilters(); showNotification('Donnees reinitialisees', 'success');
         }, 'danger');
     }
