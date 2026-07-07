@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Money Control Pro - Gestion Financiere Personnelle</title>
+    <title>Money Control Pro - Gestion FinanciÃ¨re Personnelle</title>
 
     <!-- ============================================================ -->
     <!-- 1. LIBRAIRIES EXTERNES (CDN)                                  -->
@@ -1291,15 +1291,15 @@
                         <i class="fas fa-chart-line" style="font-size: 36px; color: white;"></i>
                     </div>
                     <h1 style="font-size: 28px; font-weight: 800; color: var(--text);">Money Control Pro</h1>
-                    <p style="color: var(--text-muted); font-size: 14px; margin-top: 8px;">Gestion financiere professionnelle</p>
+                    <p style="color: var(--text-muted); font-size: 14px; margin-top: 8px;">Gestion financiÃ¨re professionnelle</p>
                 </div>
 
                 <!-- Formulaire de connexion -->
                 <div id="loginForm">
                     <div class="form-group" style="margin-bottom: 20px;">
-                        <label class="form-label">EMAIL</label>
+                        <label class="form-label">ADRESSE E-MAIL</label>
                         <input type="email" id="loginEmail" class="form-input" placeholder="exemple@email.com" autocomplete="email">
-                        <small id="loginEmailError" class="error-msg">Email invalide</small>
+                        <small id="loginEmailError" class="error-msg">Adresse e-mail invalide</small>
                     </div>
                     <div class="form-group" style="margin-bottom: 20px;">
                         <label class="form-label">MOT DE PASSE</label>
@@ -1311,16 +1311,16 @@
                     </button>
                     <div id="loginErrorMessage" style="color: var(--danger); font-size: 12px; text-align: center; margin-top: 10px; display: none;"></div>
                     <div style="text-align: center; margin-top: 20px;">
-                        <a href="#" onclick="showRegisterForm(); return false;" style="color: var(--primary);">Creer un compte</a>
+                        <a href="#" onclick="showRegisterForm(); return false;" style="color: var(--primary);">CrÃ©er un compte</a>
                         <span style="margin: 0 10px; color: var(--text-muted);">|</span>
-                        <a href="#" onclick="showResetForm(); return false;" style="color: var(--text-muted);">Mot de passe oublie ?</a>
+                        <a href="#" onclick="showResetForm(); return false;" style="color: var(--text-muted);">Mot de passe oubliÃ© ?</a>
                     </div>
                 </div>
 
                 <!-- Formulaire d'inscription -->
                 <div id="registerForm" style="display: none;">
                     <div class="form-group" style="margin-bottom: 20px;">
-                        <label class="form-label">PRENOM</label>
+                        <label class="form-label">PRÃ‰NOM</label>
                         <input type="text" id="registerFirstName" class="form-input" placeholder="Jean">
                     </div>
                     <div class="form-group" style="margin-bottom: 20px;">
@@ -1328,36 +1328,39 @@
                         <input type="text" id="registerLastName" class="form-input" placeholder="Dupont">
                     </div>
                     <div class="form-group" style="margin-bottom: 20px;">
-                        <label class="form-label">EMAIL</label>
+                        <label class="form-label">ADRESSE E-MAIL</label>
                         <input type="email" id="registerEmail" class="form-input" placeholder="exemple@email.com">
                     </div>
                     <div class="form-group" style="margin-bottom: 20px;">
                         <label class="form-label">MOT DE PASSE</label>
-                        <input type="password" id="registerPassword" class="form-input" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢">
+                        <input type="password" id="registerPassword" class="form-input" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" oninput="updatePasswordStrength()">
+                        <div id="passwordStrengthBar" style="height:4px;border-radius:4px;background:var(--border);margin-top:8px;overflow:hidden;"><div id="passwordStrengthFill" style="height:100%;width:0%;border-radius:4px;transition:all 0.2s;"></div></div>
+                        <small id="passwordStrengthHint" style="font-size:11px;color:var(--text-muted);display:block;margin-top:6px;">Au moins 6 caractÃ¨res. Ajoutez majuscules, chiffres et caractÃ¨res spÃ©ciaux pour un mot de passe plus robuste.</small>
                     </div>
                     <div class="form-group" style="margin-bottom: 20px;">
-                        <label class="form-label">CONFIRMER</label>
-                        <input type="password" id="registerConfirmPassword" class="form-input" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢">
+                        <label class="form-label">CONFIRMER LE MOT DE PASSE</label>
+                        <input type="password" id="registerConfirmPassword" class="form-input" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" oninput="checkPasswordMatch()">
+                        <small id="registerConfirmError" class="error-msg">Les mots de passe ne correspondent pas</small>
                     </div>
                     <button class="btn btn-primary" style="width: 100%; margin-bottom: 12px;" onclick="registerWithEmail(event)">
-                        <i class="fas fa-user-plus"></i> Creer un compte
+                        <i class="fas fa-user-plus"></i> CrÃ©er un compte
                     </button>
                     <div style="text-align: center;">
-                        <a href="#" onclick="showLoginForm(); return false;" style="color: var(--text-muted);">Deja un compte ? Se connecter</a>
+                        <a href="#" onclick="showLoginForm(); return false;" style="color: var(--text-muted);">DÃ©jÃ  un compte ? Se connecter</a>
                     </div>
                 </div>
 
                 <!-- Formulaire de reinitialisation -->
                 <div id="resetForm" style="display: none;">
                     <div class="form-group" style="margin-bottom: 20px;">
-                        <label class="form-label">EMAIL</label>
+                        <label class="form-label">ADRESSE E-MAIL</label>
                         <input type="email" id="resetEmail" class="form-input" placeholder="exemple@email.com">
                     </div>
                     <button class="btn btn-primary" style="width: 100%; margin-bottom: 12px;" onclick="resetPassword(event)">
                         <i class="fas fa-envelope"></i> Envoyer le lien
                     </button>
                     <div style="text-align: center;">
-                        <a href="#" onclick="showLoginForm(); return false;" style="color: var(--text-muted);">Retour a la connexion</a>
+                        <a href="#" onclick="showLoginForm(); return false;" style="color: var(--text-muted);">Retour Ã  la connexion</a>
                     </div>
                 </div>
             </div>
@@ -1385,7 +1388,7 @@
                 <div class="sidebar-header">
                     <div class="logo">
                         <div class="logo-icon"><i class="fas fa-chart-line"></i></div>
-                        <div class="logo-text"><h1>MONEY CONTROL</h1><span>Gestion Financiere Pro</span></div>
+                        <div class="logo-text"><h1>MONEY CONTROL</h1><span>Gestion FinanciÃ¨re Pro</span></div>
                     </div>
                 </div>
                 <div style="display: none; padding: 10px 20px; border-bottom: 1px solid var(--border);" class="sidebar-close-mobile">
@@ -1401,7 +1404,7 @@
                     <div class="nav-item" onclick="showSection('calendrier', this)"><i class="fas fa-calendar-alt"></i><span>Calendrier</span></div>
                     <div class="nav-item" onclick="showSection('rapports', this)"><i class="fas fa-file-alt"></i><span>Rapports</span></div>
                     <div class="nav-item" onclick="showSection('analyse', this)"><i class="fas fa-chart-pie"></i><span>Analyse</span></div>
-                    <div class="nav-item" onclick="showSection('parametres', this)"><i class="fas fa-cog"></i><span>Parametres</span></div>
+                    <div class="nav-item" onclick="showSection('parametres', this)"><i class="fas fa-cog"></i><span>ParamÃ¨tres</span></div>
                     <div class="nav-item" onclick="showSection('admin', this)" id="adminMenuItem" style="display: none;"><i class="fas fa-shield-alt"></i><span>Administration</span><span class="nav-badge" id="pendingCount">0</span></div>
                 </nav>
             </aside>
@@ -1416,7 +1419,7 @@
                         <div style="width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px;"><i class="fas fa-user-circle"></i></div>
                         <div>
                             <h3 style="font-size: 20px; margin-bottom: 5px;" id="welcomeUserText">Bonjour,</h3>
-                            <p style="opacity: 0.9; font-size: 14px;">Bienvenue sur votre espace de gestion financiere</p>
+                            <p style="opacity: 0.9; font-size: 14px;">Bienvenue sur votre espace de gestion financiÃ¨re</p>
                         </div>
                         <div id="activationBtnContainer" style="margin-left: auto;"></div>
                     </div>
@@ -1427,12 +1430,12 @@
                     <div class="filter-group">
                         <select id="globalYear" class="filter-select" onchange="applyGlobalFilters()"></select>
                         <select id="globalMonth" class="filter-select" onchange="applyGlobalFilters()"></select>
-                        <select id="globalCategory" class="filter-select" onchange="applyGlobalFilters()"><option value="all">Toutes categories</option></select>
+                        <select id="globalCategory" class="filter-select" onchange="applyGlobalFilters()"><option value="all">Toutes catÃ©gories</option></select>
                         <select id="globalType" class="filter-select" onchange="applyGlobalFilters()">
                             <option value="all">Tous types</option>
                             <option value="Revenu">Revenus</option>
-                            <option value="Depense">Depenses</option>
-                            <option value="Epargne">Epargne</option>
+                            <option value="Depense">DÃ©penses</option>
+                            <option value="Epargne">Ã‰pargne</option>
                         </select>
                     </div>
                     <input type="text" id="globalSearch" class="search-box" placeholder="Rechercher une transaction..." oninput="applyGlobalFilters()">
@@ -1448,29 +1451,29 @@
                             <p>Vue d'ensemble de vos finances personnelles</p>
                         </div>
                         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                            <button class="btn btn-primary" onclick="openTransactionModal()"><i class="fas fa-plus"></i> Transaction</button>
-                            <button class="btn btn-success" onclick="ajouterEpargnePourObjectif()"><i class="fas fa-piggy-bank"></i> Epargne Objectif</button>
+                            <button class="btn btn-primary" onclick="if (requireActivation()) openTransactionModal()"><i class="fas fa-plus"></i> Transaction</button>
+                            <button class="btn btn-success" onclick="ajouterEpargnePourObjectif()"><i class="fas fa-piggy-bank"></i> Ã‰pargne Objectif</button>
                         </div>
                     </div>
                     <div id="alertsContainer"></div>
                     <div class="cards-grid" id="kpiGrid"></div>
                     <div class="charts-grid">
                         <div class="chart-card">
-                            <div class="chart-header"><div class="chart-title">Repartition des Depenses</div></div>
+                            <div class="chart-header"><div class="chart-title">RÃ©partition des DÃ©penses</div></div>
                             <div class="chart-container"><canvas id="expenseChart"></canvas></div>
                         </div>
                         <div class="chart-card">
-                            <div class="chart-header"><div class="chart-title">Repartition des Revenus</div></div>
+                            <div class="chart-header"><div class="chart-title">RÃ©partition des Revenus</div></div>
                             <div class="chart-container"><canvas id="incomeChart"></canvas></div>
                         </div>
                     </div>
                     <div class="charts-grid">
                         <div class="chart-card">
-                            <div class="chart-header"><div class="chart-title">Evolution Mensuelle</div></div>
+                            <div class="chart-header"><div class="chart-title">Ã‰volution Mensuelle</div></div>
                             <div class="chart-container"><canvas id="evolutionChart"></canvas></div>
                         </div>
                         <div class="chart-card">
-                            <div class="chart-header"><div class="chart-title">Budget vs Realise</div></div>
+                            <div class="chart-header"><div class="chart-title">Budget vs RÃ©alisÃ©</div></div>
                             <div class="chart-container"><canvas id="budgetVsRealChart"></canvas></div>
                         </div>
                     </div>
@@ -1481,8 +1484,8 @@
                 <!-- ============================================================ -->
                 <section id="transactions" class="section">
                     <div class="page-header">
-                        <div class="page-title"><h2>Transactions</h2><p>Gerez vos revenus, depenses et epargne</p></div>
-                        <button class="btn btn-primary" onclick="openTransactionModal()"><i class="fas fa-plus"></i> Ajouter</button>
+                        <div class="page-title"><h2>Transactions</h2><p>GÃ©rez vos revenus, dÃ©penses et Ã©pargne</p></div>
+                        <button class="btn btn-primary" onclick="if (requireActivation()) openTransactionModal()"><i class="fas fa-plus"></i> Ajouter</button>
                     </div>
                     <div class="table-card">
                         <div class="table-header">
@@ -1496,7 +1499,7 @@
                         <div style="overflow-x: auto;">
                             <table class="data-table">
                                 <thead>
-                                    <tr><th>Date</th><th>Type</th><th>Description</th><th>Categorie</th><th>Sous-categorie</th><th>Montant</th><th>Actions</th></tr>
+                                    <tr><th>Date</th><th>Type</th><th>Description</th><th>CatÃ©gorie</th><th>Sous-catÃ©gorie</th><th>Montant</th><th>Actions</th></tr>
                                 </thead>
                                 <tbody id="transactionsTable"></tbody>
                             </table>
@@ -1509,14 +1512,14 @@
                 <!-- ============================================================ -->
                 <section id="budgets" class="section">
                     <div class="page-header">
-                        <div class="page-title"><h2>Budgets Mensuels</h2><p>Controlez vos depenses par categorie</p></div>
-                        <button class="btn btn-primary" onclick="ajouterCategorieBudget()"><i class="fas fa-plus"></i> Nouvelle categorie</button>
+                        <div class="page-title"><h2>Budgets Mensuels</h2><p>ContrÃ´lez vos dÃ©penses par catÃ©gorie</p></div>
+                        <button class="btn btn-primary" onclick="ajouterCategorieBudget()"><i class="fas fa-plus"></i> Nouvelle catÃ©gorie</button>
                     </div>
                     <div class="cards-grid" id="budgetCards"></div>
                     <div class="table-card">
                         <table class="data-table">
                             <thead>
-                                <tr><th>Categorie</th><th>Budget prevu</th><th>Realise</th><th>Restant</th><th>Consommation</th><th>Statut</th></tr>
+                                <tr><th>CatÃ©gorie</th><th>Budget prÃ©vu</th><th>RÃ©alisÃ©</th><th>Restant</th><th>Consommation</th><th>Statut</th></tr>
                             </thead>
                             <tbody id="budgetTable"></tbody>
                         </table>
@@ -1528,10 +1531,10 @@
                 <!-- ============================================================ -->
                 <section id="objectifs" class="section">
                     <div class="page-header">
-                        <div class="page-title"><h2>Objectifs d'Epargne</h2><p>Suivez la progression de vos projets</p></div>
+                        <div class="page-title"><h2>Objectifs d'Ã‰pargne</h2><p>Suivez la progression de vos projets</p></div>
                         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                            <button class="btn btn-primary" onclick="openObjectiveModal()"><i class="fas fa-plus"></i> Nouvel objectif</button>
-                            <button class="btn btn-success" onclick="ajouterEpargnePourObjectif()"><i class="fas fa-piggy-bank"></i> Epargne + Objectif</button>
+                            <button class="btn btn-primary" onclick="if (requireActivation()) openObjectiveModal()"><i class="fas fa-plus"></i> Nouvel objectif</button>
+                            <button class="btn btn-success" onclick="ajouterEpargnePourObjectif()"><i class="fas fa-piggy-bank"></i> Ã‰pargne + Objectif</button>
                         </div>
                     </div>
                     <div class="objectifs-grid" id="objectifsGrid"></div>
@@ -1552,7 +1555,7 @@
                 <!-- ============================================================ -->
                 <section id="rapports" class="section">
                     <div class="page-header">
-                        <div class="page-title"><h2>Rapports Financiers</h2><p>Analyses detaillees</p></div>
+                        <div class="page-title"><h2>Rapports Financiers</h2><p>Analyses dÃ©taillÃ©es</p></div>
                         <div><button class="btn btn-secondary" onclick="window.print()"><i class="fas fa-print"></i> Imprimer</button></div>
                     </div>
                     <div id="reportContent"></div>
@@ -1563,16 +1566,16 @@
                 <!-- ============================================================ -->
                 <section id="analyse" class="section">
                     <div class="page-header">
-                        <div class="page-title"><h2>Analyse Financiere</h2><p>Indicateurs avances</p></div>
+                        <div class="page-title"><h2>Analyse FinanciÃ¨re</h2><p>Indicateurs avancÃ©s</p></div>
                     </div>
                     <div class="cards-grid" id="advancedKPIs"></div>
                     <div class="charts-grid" style="margin-top: 20px;">
                         <div class="chart-card">
-                            <div class="chart-header"><div class="chart-title">Resume Financier</div></div>
+                            <div class="chart-header"><div class="chart-title">RÃ©sumÃ© Financier</div></div>
                             <div id="analyseResume"></div>
                         </div>
                         <div class="chart-card">
-                            <div class="chart-header"><div class="chart-title">Top Categories</div></div>
+                            <div class="chart-header"><div class="chart-title">Top CatÃ©gories</div></div>
                             <div id="analyseTop"></div>
                         </div>
                     </div>
@@ -1583,7 +1586,7 @@
                 <!-- ============================================================ -->
                 <section id="parametres" class="section">
                     <div class="page-header">
-                        <div class="page-title"><h2>Parametres</h2><p>Personnalisation et transactions recurrentes</p></div>
+                        <div class="page-title"><h2>ParamÃ¨tres</h2><p>Personnalisation et transactions rÃ©currentes</p></div>
                     </div>
                     <!-- Configuration generale -->
                     <div class="table-card">
@@ -1604,26 +1607,26 @@
                         </div>
                         <div style="display:flex; gap:10px; flex-wrap:wrap;">
                             <button class="btn btn-primary" onclick="sauvegarderParametres()"><i class="fas fa-save"></i> Sauvegarder</button>
-                            <button class="btn btn-danger" onclick="resetData()"><i class="fas fa-undo"></i> Reinitialiser</button>
+                            <button class="btn btn-danger" onclick="resetData()"><i class="fas fa-undo"></i> RÃ©initialiser</button>
                         </div>
                     </div>
                     <!-- Transactions recurrentes -->
                     <div class="table-card">
                         <div class="table-header">
-                            <div class="table-title">Transactions recurrentes mensuelles</div>
-                            <button class="btn btn-primary btn-sm" onclick="openRecurrenteModal()"><i class="fas fa-plus"></i> Ajouter</button>
+                            <div class="table-title">Transactions rÃ©currentes mensuelles</div>
+                            <button class="btn btn-primary btn-sm" onclick="if (requireActivation()) openRecurrenteModal()"><i class="fas fa-plus"></i> Ajouter</button>
                         </div>
                         <div style="overflow-x:auto;">
                             <table class="data-table">
                                 <thead>
-                                    <tr><th>Description</th><th>Type</th><th>Categorie</th><th>Montant</th><th>Jour</th><th>Statut</th><th>Actions</th></tr>
+                                    <tr><th>Description</th><th>Type</th><th>CatÃ©gorie</th><th>Montant</th><th>Jour</th><th>Statut</th><th>Actions</th></tr>
                                 </thead>
                                 <tbody id="recurrentesTable"></tbody>
                             </table>
                         </div>
                         <div style="margin-top:15px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-                            <button class="btn btn-success" onclick="executerTransactionsRecurrentes()"><i class="fas fa-play"></i> Executer maintenant</button>
-                            <span style="font-size:12px; color:var(--text-muted);"><i class="fas fa-info-circle"></i> Les transactions sont ajoutees automatiquement le jour indique</span>
+                            <button class="btn btn-success" onclick="executerTransactionsRecurrentes()"><i class="fas fa-play"></i> ExÃ©cuter maintenant</button>
+                            <span style="font-size:12px; color:var(--text-muted);"><i class="fas fa-info-circle"></i> Les transactions sont ajoutÃ©es automatiquement le jour indiquÃ©</span>
                         </div>
                     </div>
                 </section>
@@ -1639,20 +1642,20 @@
                     <div class="table-card">
                         <div class="table-header">
                             <div class="table-title">Demandes d'activation en attente</div>
-                            <button class="btn btn-secondary btn-sm" onclick="refreshActivationRequests()"><i class="fas fa-sync-alt"></i> Rafraichir</button>
+                            <button class="btn btn-secondary btn-sm" onclick="refreshActivationRequests()"><i class="fas fa-sync-alt"></i> RafraÃ®chir</button>
                         </div>
                         <div id="pendingRequestsList" style="padding: 10px 0;"></div>
                     </div>
                     <!-- Utilisateurs actives -->
                     <div class="table-card">
-                        <div class="table-header"><div class="table-title">Utilisateurs actives</div></div>
+                        <div class="table-header"><div class="table-title">Utilisateurs activÃ©s</div></div>
                         <div id="activatedUsersList" style="padding: 10px 0;"></div>
                     </div>
                     <!-- Activation manuelle -->
                     <div class="table-card">
                         <div class="table-header"><div class="table-title">Activation manuelle</div></div>
                         <div class="form-group" style="margin-bottom: 15px;">
-                            <label class="form-label">Email de l'utilisateur</label>
+                            <label class="form-label">Adresse e-mail de l'utilisateur</label>
                             <div style="display: flex; gap: 10px;">
                                 <input type="email" id="adminUserEmail" class="form-input" placeholder="utilisateur@email.com" style="flex: 1;">
                                 <button class="btn btn-primary" onclick="manualActivateUser()"><i class="fas fa-check-circle"></i> Activer</button>
@@ -1683,8 +1686,8 @@
                         <label class="form-label">Type</label>
                         <select id="txType" class="form-select" onchange="updateCategorySelect()">
                             <option value="Revenu">Revenu</option>
-                            <option value="Depense">Depense</option>
-                            <option value="Epargne">Epargne</option>
+                            <option value="Depense">DÃ©pense</option>
+                            <option value="Epargne">Ã‰pargne</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -1693,12 +1696,12 @@
                         <small id="txDescError" class="error-msg">Description requise</small>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Categorie</label>
+                        <label class="form-label">CatÃ©gorie</label>
                         <select id="txCategory" class="form-select"></select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Sous-categorie</label>
-                        <input type="text" id="txSubCategory" class="form-input" placeholder="Sous-categorie">
+                        <label class="form-label">Sous-catÃ©gorie</label>
+                        <input type="text" id="txSubCategory" class="form-input" placeholder="Sous-catÃ©gorie">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Montant (MAD) <span style="color:var(--danger)">*</span></label>
@@ -1718,7 +1721,7 @@
                     <button class="modal-close" onclick="closeObjectiveModal()"><i class="fas fa-times"></i></button>
                 </div>
                 <div id="objInfoMessage" style="display:none; margin-bottom:15px; padding:12px; background:rgba(16,185,129,0.15); border:1px solid var(--success); border-radius:12px; font-size:13px; color:var(--text);">
-                    Le montant actuel sera automatiquement calcule a partir de vos transactions d'epargne.
+                    Le montant actuel sera automatiquement calculÃ© Ã  partir de vos transactions d'Ã©pargne.
                 </div>
                 <div class="form-grid">
                     <div class="form-group">
@@ -1745,7 +1748,7 @@
                         <small id="objDateError" class="error-msg">Date requise</small>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Priorite</label>
+                        <label class="form-label">PrioritÃ©</label>
                         <select id="objPriority" class="form-select">
                             <option value="Haute">Haute</option>
                             <option value="Moyenne" selected>Moyenne</option>
@@ -1761,11 +1764,11 @@
         <div class="modal-overlay" id="recurrenteModal">
             <div class="modal">
                 <div class="modal-header">
-                    <div class="modal-title" id="recModalTitle">Transaction recurrente mensuelle</div>
+                    <div class="modal-title" id="recModalTitle">Transaction rÃ©currente mensuelle</div>
                     <button class="modal-close" onclick="closeRecurrenteModal()"><i class="fas fa-times"></i></button>
                 </div>
                 <div style="margin-bottom:15px; padding:12px; background:rgba(6,182,212,0.15); border-radius:12px; font-size:13px;">
-                    <i class="fas fa-info-circle" style="color:var(--info);"></i> Cette transaction sera ajoutee automatiquement chaque mois a la date indiquee.
+                    <i class="fas fa-info-circle" style="color:var(--info);"></i> Cette transaction sera ajoutÃ©e automatiquement chaque mois Ã  la date indiquÃ©e.
                 </div>
                 <div class="form-grid">
                     <div class="form-group">
@@ -1777,16 +1780,16 @@
                         <label class="form-label">Type</label>
                         <select id="recType" class="form-select" onchange="updateRecCategorie()">
                             <option value="Revenu">Revenu</option>
-                            <option value="Depense">Depense</option>
-                            <option value="Epargne">Epargne</option>
+                            <option value="Depense">DÃ©pense</option>
+                            <option value="Epargne">Ã‰pargne</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Categorie</label>
+                        <label class="form-label">CatÃ©gorie</label>
                         <select id="recCategorie" class="form-select"></select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Sous-categorie</label>
+                        <label class="form-label">Sous-catÃ©gorie</label>
                         <input type="text" id="recSousCategorie" class="form-input" placeholder="Mensuel, Annuel...">
                     </div>
                     <div class="form-group">
@@ -1799,9 +1802,9 @@
                         <select id="recJour" class="form-select"></select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Date de debut <span style="color:var(--danger)">*</span></label>
+                        <label class="form-label">Date de dÃ©but <span style="color:var(--danger)">*</span></label>
                         <input type="date" id="recDateDebut" class="form-input">
-                        <small id="recDateDebutError" class="error-msg">Date de debut requise</small>
+                        <small id="recDateDebutError" class="error-msg">Date de dÃ©but requise</small>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Date de fin (optionnel)</label>
@@ -1824,35 +1827,35 @@
                 </div>
                 <div style="padding: 10px 0;">
                     <div style="display: flex; gap: 10px; border-bottom: 2px solid var(--border); margin-bottom: 20px;">
-                        <button class="guide-tab active" onclick="showGuideTab('presentation')" id="tab-presentation"><i class="fas fa-info-circle"></i> Presentation</button>
+                        <button class="guide-tab active" onclick="showGuideTab('presentation')" id="tab-presentation"><i class="fas fa-info-circle"></i> PrÃ©sentation</button>
                         <button class="guide-tab" onclick="showGuideTab('guide')" id="tab-guide"><i class="fas fa-graduation-cap"></i> Guide</button>
                         <button class="guide-tab" onclick="showGuideTab('activation')" id="tab-activation"><i class="fas fa-key"></i> Activation</button>
                     </div>
                     <div id="guide-presentation" class="guide-content">
                         <h3 style="color: var(--primary); margin-bottom: 15px;">Qu'est-ce que Money Control Pro ?</h3>
-                        <p style="margin-bottom: 20px;">Une application complete de gestion financiere personnelle :</p>
+                        <p style="margin-bottom: 20px;">Une application complÃ¨te de gestion financiÃ¨re personnelle :</p>
                         <ul style="margin-bottom: 25px; list-style: none; padding-left: 0;">
-                            <li style="margin-bottom: 10px;">Suivre vos revenus et depenses en temps reel</li>
-                            <li style="margin-bottom: 10px;">Creer des budgets par categorie</li>
-                            <li style="margin-bottom: 10px;">Definir des objectifs d'epargne</li>
+                            <li style="margin-bottom: 10px;">Suivre vos revenus et dÃ©penses en temps rÃ©el</li>
+                            <li style="margin-bottom: 10px;">CrÃ©er des budgets par catÃ©gorie</li>
+                            <li style="margin-bottom: 10px;">DÃ©finir des objectifs d'Ã©pargne</li>
                             <li style="margin-bottom: 10px;">Visualiser des graphiques et analyses</li>
                             <li style="margin-bottom: 10px;">Exporter vos rapports en PDF/CSV/Excel</li>
                         </ul>
                     </div>
                     <div id="guide-guide" class="guide-content" style="display: none;">
                         <h3 style="color: var(--primary); margin-bottom: 15px;">Comment utiliser l'application ?</h3>
-                        <div style="margin-bottom: 25px;"><h4><i class="fas fa-tachometer-alt"></i> 1. Tableau de Bord</h4><p>Visualisez vos indicateurs cles et graphiques d'evolution.</p></div>
-                        <div style="margin-bottom: 25px;"><h4><i class="fas fa-exchange-alt"></i> 2. Transactions</h4><p>Ajoutez vos revenus, depenses et epargnes avec categories personnalisees.</p></div>
-                        <div style="margin-bottom: 25px;"><h4><i class="fas fa-chart-simple"></i> 3. Budgets</h4><p>Definissez des budgets mensuels par categorie avec alertes de depassement.</p></div>
-                        <div style="margin-bottom: 25px;"><h4><i class="fas fa-bullseye"></i> 4. Objectifs</h4><p>Creez des objectifs (voyage, voiture, etc.) et suivez votre progression.</p></div>
+                        <div style="margin-bottom: 25px;"><h4><i class="fas fa-tachometer-alt"></i> 1. Tableau de Bord</h4><p>Visualisez vos indicateurs clÃ©s et graphiques d'Ã©volution.</p></div>
+                        <div style="margin-bottom: 25px;"><h4><i class="fas fa-exchange-alt"></i> 2. Transactions</h4><p>Ajoutez vos revenus, dÃ©penses et Ã©pargnes avec catÃ©gories personnalisÃ©es.</p></div>
+                        <div style="margin-bottom: 25px;"><h4><i class="fas fa-chart-simple"></i> 3. Budgets</h4><p>DÃ©finissez des budgets mensuels par catÃ©gorie avec alertes de dÃ©passement.</p></div>
+                        <div style="margin-bottom: 25px;"><h4><i class="fas fa-bullseye"></i> 4. Objectifs</h4><p>CrÃ©ez des objectifs (voyage, voiture, etc.) et suivez votre progression.</p></div>
                     </div>
                     <div id="guide-activation" class="guide-content" style="display: none;">
                         <h3 style="color: var(--primary); margin-bottom: 15px;">Activer votre compte</h3>
                         <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid var(--warning); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
                             <h4 style="color: var(--warning); margin-bottom: 10px;">IMPORTANT</h4>
-                            <p>Pour acceder a toutes les fonctionnalites, vous devez activer votre compte.</p>
+                            <p>Pour accÃ©der Ã  toutes les fonctionnalitÃ©s, vous devez activer votre compte.</p>
                         </div>
-                        <h4>Procedure d'activation :</h4>
+                        <h4>ProcÃ©dure d'activation :</h4>
                         <ol style="margin: 15px 0 15px 20px; line-height: 1.8;">
                             <li>
     Effectuez le paiement selon la formule choisie :
@@ -1860,11 +1863,11 @@
     <p><strong>3 mois :</strong> 99 MAD</p>
     <p><strong>6 mois :</strong> 149 MAD</p>
     <p><strong>12 mois :</strong> 199 MAD</p>
-    via lâ€™un des moyens disponibles (virement bancaire, cash ou paiement express).
+    via l'un des moyens disponibles (virement bancaire, cash ou paiement express).
 </li>
-                            <li>Prenez une capture d'ecran de votre virement</li>
-                            <li>Envoyez la capture par WhatsApp a <strong> Numero : +212606325731 </strong></li>
-                            <li>Vous recevrez un email de confirmation sous 24h</li>
+                            <li>Prenez une capture d'Ã©cran de votre virement</li>
+                            <li>Envoyez la capture par WhatsApp au <strong>numÃ©ro : +212 6 06 32 57 31</strong></li>
+                            <li>Vous recevrez un e-mail de confirmation sous 24h</li>
                         </ol>
                         <div style="background: var(--bg); border-radius: 16px; padding: 20px; margin: 20px 0; text-align: center; border: 2px solid var(--primary);">
                             <i class="fas fa-university" style="font-size: 40px; color: var(--primary); margin-bottom: 10px;"></i>
@@ -1989,6 +1992,7 @@
     let editRecurrenteId = null;
     let charts = {};
     let confirmCallback = null;
+    let isUserActivated = false;
         let touchStartX = 0;
 let touchStartY = 0;
 
@@ -2082,7 +2086,7 @@ document.addEventListener('click', closeSidebarOnBackdrop);
         localStorage.setItem(`categories_${uid}`, JSON.stringify(categories));
         localStorage.setItem(`recurrentes_${uid}`, JSON.stringify(recurrentes));
         db.collection('users').doc(uid).set({ transactions, objectifs, budgets, categories, recurrentes, lastSync: new Date().toISOString() }, { merge: true })
-            .catch(error => { console.error('Erreur de synchronisation cloud:', error); showNotification('Synchronisation cloud impossible (donnees sauvegardees localement)', 'warning'); });
+            .catch(error => { console.error('Erreur de synchronisation cloud:', error); showNotification('Synchronisation cloud impossible (donnÃ©es sauvegardÃ©es localement)', 'warning'); });
     }
 
     async function loadUserData(uid) {
@@ -2123,34 +2127,69 @@ document.addEventListener('click', closeSidebarOnBackdrop);
         document.querySelectorAll('.form-input').forEach(el => el.classList.remove('error'));
         document.querySelectorAll('.error-msg').forEach(el => el.classList.remove('show'));
 
-        if (!email) { errors.push('Email requis'); document.getElementById('loginEmail').classList.add('error'); document.getElementById('loginEmailError').classList.add('show'); }
-        else if (!email.includes('@') || !email.includes('.')) { errors.push('Email invalide'); document.getElementById('loginEmail').classList.add('error'); document.getElementById('loginEmailError').classList.add('show'); }
+        if (!email) { errors.push('Adresse e-mail requise'); document.getElementById('loginEmail').classList.add('error'); document.getElementById('loginEmailError').classList.add('show'); }
+        else if (!email.includes('@') || !email.includes('.')) { errors.push('Adresse e-mail invalide'); document.getElementById('loginEmail').classList.add('error'); document.getElementById('loginEmailError').classList.add('show'); }
         if (!password) { errors.push('Mot de passe requis'); document.getElementById('loginPassword').classList.add('error'); document.getElementById('loginPasswordError').classList.add('show'); }
-        else if (password.length < 6) { errors.push('Minimum 6 caracteres'); document.getElementById('loginPassword').classList.add('error'); }
+        else if (password.length < 6) { errors.push('6 caractÃ¨res minimum'); document.getElementById('loginPassword').classList.add('error'); }
 
         if (errors.length > 0) { errorDiv.textContent = errors.join(' | '); errorDiv.style.display = 'block'; return; }
         errorDiv.style.display = 'none';
 
         const btn = event.target;
+        if (btn.disabled) return;
         const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connexion...';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connexion en cours...';
         btn.disabled = true;
 
         try {
             await auth.signInWithEmailAndPassword(email, password);
-            showNotification('Connexion reussie !', 'success');
+            showNotification('Connexion rÃ©ussie !', 'success');
         } catch (error) {
             const msgs = {
-                'auth/user-not-found': 'Aucun compte trouve avec cet email',
+                'auth/user-not-found': 'Aucun compte trouvÃ© avec cette adresse e-mail',
                 'auth/wrong-password': 'Mot de passe incorrect',
-                'auth/invalid-email': 'Email invalide',
-                'auth/user-disabled': 'Ce compte a ete desactive',
-                'auth/too-many-requests': 'Trop de tentatives. Reessayez plus tard.'
+                'auth/invalid-email': 'Adresse e-mail invalide',
+                'auth/user-disabled': 'Ce compte a Ã©tÃ© dÃ©sactivÃ©',
+                'auth/too-many-requests': 'Trop de tentatives. RÃ©essayez plus tard.'
             };
             errorDiv.textContent = msgs[error.code] || error.message;
             errorDiv.style.display = 'block';
             showNotification(msgs[error.code] || 'Erreur de connexion', 'danger');
         } finally { btn.innerHTML = originalText; btn.disabled = false; }
+    }
+
+    // Indicateur de force du mot de passe (informatif uniquement, ne bloque pas la creation)
+    function evaluatePasswordStrength(password) {
+        if (!password) return { pct: 0, color: 'var(--border)', label: '' };
+        if (password.length < 6) return { pct: 20, color: 'var(--danger)', label: 'Trop court (6 caractÃ¨res minimum)' };
+        let score = 0;
+        if (password.length >= 8) score++;
+        if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
+        if (/\d/.test(password)) score++;
+        if (/[^A-Za-z0-9]/.test(password)) score++;
+        if (score <= 1) return { pct: 40, color: 'var(--danger)', label: 'Faible â€” ajoutez majuscules, chiffres ou caractÃ¨res spÃ©ciaux' };
+        if (score === 2) return { pct: 70, color: 'var(--warning)', label: 'Moyen â€” un mot de passe plus long et variÃ© est plus sÃ»r' };
+        return { pct: 100, color: 'var(--success)', label: 'Robuste' };
+    }
+
+    function updatePasswordStrength() {
+        const password = document.getElementById('registerPassword').value;
+        const { pct, color, label } = evaluatePasswordStrength(password);
+        const fill = document.getElementById('passwordStrengthFill');
+        const hint = document.getElementById('passwordStrengthHint');
+        if (fill) { fill.style.width = pct + '%'; fill.style.background = color; }
+        if (hint) { hint.textContent = label || 'Au moins 6 caractÃ¨res. Ajoutez majuscules, chiffres et caractÃ¨res spÃ©ciaux pour un mot de passe plus robuste.'; hint.style.color = password ? color : 'var(--text-muted)'; }
+        checkPasswordMatch();
+    }
+
+    function checkPasswordMatch() {
+        const password = document.getElementById('registerPassword').value;
+        const confirmField = document.getElementById('registerConfirmPassword');
+        const confirmError = document.getElementById('registerConfirmError');
+        if (!confirmField.value) { confirmField.classList.remove('error'); confirmError.classList.remove('show'); return; }
+        const mismatch = password !== confirmField.value;
+        confirmField.classList.toggle('error', mismatch);
+        confirmError.classList.toggle('show', mismatch);
     }
 
     async function registerWithEmail(event) {
@@ -2160,14 +2199,15 @@ document.addEventListener('click', closeSidebarOnBackdrop);
         const password = document.getElementById('registerPassword').value;
         const confirm = document.getElementById('registerConfirmPassword').value;
 
-        if (!firstName || !lastName) { showNotification('Prenom et nom requis', 'danger'); return; }
-        if (!email) { showNotification('Email requis', 'danger'); return; }
-        if (password !== confirm) { showNotification('Mots de passe differents', 'danger'); return; }
-        if (password.length < 6) { showNotification('6 caracteres minimum', 'danger'); return; }
+        if (!firstName || !lastName) { showNotification('PrÃ©nom et nom requis', 'danger'); return; }
+        if (!email || !email.includes('@') || !email.includes('.')) { showNotification('Adresse e-mail invalide', 'danger'); return; }
+        if (password !== confirm) { showNotification('Les mots de passe ne correspondent pas', 'danger'); return; }
+        if (password.length < 6) { showNotification('Le mot de passe doit contenir au moins 6 caractÃ¨res', 'danger'); return; }
 
         const btn = event.target;
+        if (btn.disabled) return;
         const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creation...';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> CrÃ©ation en cours...';
         btn.disabled = true;
 
         try {
@@ -2182,28 +2222,29 @@ document.addEventListener('click', closeSidebarOnBackdrop);
                 userId: result.user.uid, email, userName: fullName, status: 'pending', screenshotProvided: false,
                 requestDate: firebase.firestore.FieldValue.serverTimestamp()
             });
-            showNotification('Compte cree ! Validation sous 24h.', 'success');
+            showNotification('Compte crÃ©Ã© ! Validation sous 24h.', 'success');
             setTimeout(() => location.reload(), 2000);
         } catch (error) {
-            const msgs = { 'auth/email-already-in-use': 'Email deja utilise', 'auth/weak-password': 'Mot de passe trop faible' };
-            showNotification(msgs[error.code] || 'Erreur inscription', 'danger');
+            const msgs = { 'auth/email-already-in-use': 'Cette adresse e-mail est dÃ©jÃ  utilisÃ©e', 'auth/weak-password': 'Mot de passe trop faible', 'auth/invalid-email': 'Adresse e-mail invalide' };
+            showNotification(msgs[error.code] || "Erreur lors de l'inscription", 'danger');
         } finally { btn.innerHTML = originalText; btn.disabled = false; }
     }
 
     async function resetPassword(event) {
         const email = document.getElementById('resetEmail').value.trim();
         const errorDiv = document.getElementById('loginErrorMessage');
-        if (!email || !email.includes('@')) { errorDiv.textContent = 'Email invalide'; errorDiv.style.display = 'block'; return; }
+        if (!email || !email.includes('@')) { errorDiv.textContent = 'Adresse e-mail invalide'; errorDiv.style.display = 'block'; return; }
         errorDiv.style.display = 'none';
         const btn = event.target;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...';
+        if (btn.disabled) return;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
         btn.disabled = true;
         try {
             await auth.sendPasswordResetEmail(email);
-            showNotification('Email envoye ! Verifiez votre boite mail.', 'success');
+            showNotification('E-mail envoyÃ© ! VÃ©rifiez votre boÃ®te de rÃ©ception.', 'success');
             setTimeout(showLoginForm, 2000);
         } catch (error) {
-            const msgs = { 'auth/user-not-found': 'Aucun compte trouve', 'auth/invalid-email': 'Email invalide' };
+            const msgs = { 'auth/user-not-found': 'Aucun compte trouvÃ© avec cette adresse e-mail', 'auth/invalid-email': 'Adresse e-mail invalide' };
             errorDiv.textContent = msgs[error.code] || error.message;
             errorDiv.style.display = 'block';
         } finally { btn.innerHTML = '<i class="fas fa-envelope"></i> Envoyer le lien'; btn.disabled = false; }
@@ -2275,7 +2316,7 @@ document.addEventListener('click', closeSidebarOnBackdrop);
         const budgetCats = budgets.map(b => b.categorie);
         const allCats = [...new Set([...budgetCats, ...(categories.revenus||[]), ...(categories.depenses||[]), ...(categories.epargne||[])])].sort();
         const catSelect = document.getElementById('globalCategory');
-        if (catSelect) { catSelect.innerHTML = '<option value="all">Toutes categories</option>' + allCats.map(c => `<option value="${c}">${c}</option>`).join(''); }
+        if (catSelect) { catSelect.innerHTML = '<option value="all">Toutes catÃ©gories</option>' + allCats.map(c => `<option value="${c}">${escapeHtml(c)}</option>`).join(''); }
     }
 
     function applyGlobalFilters() {
@@ -2313,7 +2354,7 @@ document.addEventListener('click', closeSidebarOnBackdrop);
     function toggleTheme() {
         const body = document.body;
         body.setAttribute('data-theme', body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-        showNotification('Theme change', 'success');
+        showNotification('ThÃ¨me changÃ©', 'success');
     }
     function showSection(sectionId, el) {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -2349,12 +2390,12 @@ document.addEventListener('click', closeSidebarOnBackdrop);
         [...transactions].sort((a,b) => new Date(a.date)-new Date(b.date)).forEach(t => { if(t.type==='Revenu') totalSoldeCumule+=t.montant; else totalSoldeCumule-=t.montant; });
 
         document.getElementById('kpiGrid').innerHTML = `
-            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-wallet"></i></div><div class="kpi-label">SOLDE TOTAL</div><div class="kpi-value">${formatMoney(totalSoldeCumule)}</div><div class="kpi-sub ${prevData.solde.variation>=0?'positive':'negative'}">${prevData.solde.variation>=0?'â†‘':'â†“'} ${Math.abs(prevData.solde.variation)}% vs mois precedent</div></div>
-            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-arrow-up"></i></div><div class="kpi-label">REVENUS DU MOIS</div><div class="kpi-value">${formatMoney(revenus)}</div><div class="kpi-sub ${prevData.revenus.variation>=0?'positive':'negative'}">${prevData.revenus.variation>=0?'â†‘':'â†“'} ${Math.abs(prevData.revenus.variation)}% vs mois precedent</div></div>
-            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-arrow-down"></i></div><div class="kpi-label">DEPENSES DU MOIS</div><div class="kpi-value">${formatMoney(depenses)}</div><div class="kpi-sub ${prevData.depenses.variation<=0?'positive':'negative'}">${prevData.depenses.variation<=0?'â†“':'â†‘'} ${Math.abs(prevData.depenses.variation)}% vs mois precedent</div></div>
-            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-piggy-bank"></i></div><div class="kpi-label">EPARGNE DU MOIS</div><div class="kpi-value">${formatMoney(epargne)}</div><div class="kpi-sub ${prevData.epargne.variation>=0?'positive':'negative'}">${prevData.epargne.variation>=0?'â†‘':'â†“'} ${Math.abs(prevData.epargne.variation)}% vs mois precedent</div></div>
-            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-simple"></i></div><div class="kpi-label">BUDGET CONSOMME</div><div class="kpi-value">${pctBudget}%</div><div class="kpi-sub">${formatMoney(budgetConsomme)} / ${formatMoney(totalBudget)}</div></div>
-            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-percentage"></i></div><div class="kpi-label">TAUX D'EPARGNE</div><div class="kpi-value">${revenus>0?((epargne/revenus)*100).toFixed(1):0}%</div><div class="kpi-sub">${revenus>0?((depenses/revenus)*100).toFixed(1):0}% de depenses</div></div>
+            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-wallet"></i></div><div class="kpi-label">SOLDE TOTAL</div><div class="kpi-value">${formatMoney(totalSoldeCumule)}</div><div class="kpi-sub ${prevData.solde.variation>=0?'positive':'negative'}">${prevData.solde.variation>=0?'â†‘':'â†“'} ${Math.abs(prevData.solde.variation)}% vs mois prÃ©cÃ©dent</div></div>
+            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-arrow-up"></i></div><div class="kpi-label">REVENUS DU MOIS</div><div class="kpi-value">${formatMoney(revenus)}</div><div class="kpi-sub ${prevData.revenus.variation>=0?'positive':'negative'}">${prevData.revenus.variation>=0?'â†‘':'â†“'} ${Math.abs(prevData.revenus.variation)}% vs mois prÃ©cÃ©dent</div></div>
+            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-arrow-down"></i></div><div class="kpi-label">DÃ‰PENSES DU MOIS</div><div class="kpi-value">${formatMoney(depenses)}</div><div class="kpi-sub ${prevData.depenses.variation<=0?'positive':'negative'}">${prevData.depenses.variation<=0?'â†“':'â†‘'} ${Math.abs(prevData.depenses.variation)}% vs mois prÃ©cÃ©dent</div></div>
+            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-piggy-bank"></i></div><div class="kpi-label">Ã‰PARGNE DU MOIS</div><div class="kpi-value">${formatMoney(epargne)}</div><div class="kpi-sub ${prevData.epargne.variation>=0?'positive':'negative'}">${prevData.epargne.variation>=0?'â†‘':'â†“'} ${Math.abs(prevData.epargne.variation)}% vs mois prÃ©cÃ©dent</div></div>
+            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-simple"></i></div><div class="kpi-label">BUDGET CONSOMMÃ‰</div><div class="kpi-value">${pctBudget}%</div><div class="kpi-sub">${formatMoney(budgetConsomme)} / ${formatMoney(totalBudget)}</div></div>
+            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-percentage"></i></div><div class="kpi-label">TAUX D'Ã‰PARGNE</div><div class="kpi-value">${revenus>0?((epargne/revenus)*100).toFixed(1):0}%</div><div class="kpi-sub">${revenus>0?((depenses/revenus)*100).toFixed(1):0}% de dÃ©penses</div></div>
         `;
 
         // Charts
@@ -2378,9 +2419,9 @@ document.addEventListener('click', closeSidebarOnBackdrop);
 
         // Alerts
         const alerts = [];
-        if (pctBudget > 100) alerts.push({type:'danger', msg:`Depassement budget : ${pctBudget}%`});
-        else if (pctBudget > 80) alerts.push({type:'warning', msg:`Budget a ${pctBudget}%`});
-        objectifs.forEach(o => { const pct = (o.actuel/o.cible)*100; if (pct>85 && pct<100) alerts.push({type:'warning', msg:`"${escapeHtml(o.nom)}" a ${pct.toFixed(1)}%`}); });
+        if (pctBudget > 100) alerts.push({type:'danger', msg:`DÃ©passement de budget : ${pctBudget}%`});
+        else if (pctBudget > 80) alerts.push({type:'warning', msg:`Budget consommÃ© Ã  ${pctBudget}%`});
+        objectifs.forEach(o => { const pct = (o.actuel/o.cible)*100; if (pct>85 && pct<100) alerts.push({type:'warning', msg:`"${escapeHtml(o.nom)}" Ã  ${pct.toFixed(1)}%`}); });
         document.getElementById('alertsContainer').innerHTML = alerts.map(a => `<div class="alert-bar alert-${a.type}"><i class="fas fa-bell"></i> ${a.msg}</div>`).join('');
     }
 
@@ -2457,7 +2498,7 @@ document.addEventListener('click', closeSidebarOnBackdrop);
         saveAllData();
         closeTransactionModal();
         applyGlobalFilters();
-        showNotification(editTransactionId ? 'Transaction modifiee' : 'Transaction ajoutee', 'success');
+        showNotification(editTransactionId ? 'Transaction modifiÃ©e' : 'Transaction ajoutÃ©e', 'success');
     }
 
     function editTransaction(id) {
@@ -2475,8 +2516,8 @@ document.addEventListener('click', closeSidebarOnBackdrop);
     }
 
     function deleteTransaction(id) {
-        showConfirm('Supprimer la transaction ?', 'Cette action est irreversible.', () => {
-            transactions = transactions.filter(x => x.id !== id); saveAllData(); applyGlobalFilters(); showNotification('Transaction supprimee', 'success');
+        showConfirm('Supprimer la transaction ?', 'Cette action est irrÃ©versible.', () => {
+            transactions = transactions.filter(x => x.id !== id); saveAllData(); applyGlobalFilters(); showNotification('Transaction supprimÃ©e', 'success');
         }, 'danger');
     }
 
@@ -2506,23 +2547,24 @@ document.addEventListener('click', closeSidebarOnBackdrop);
             const realise = filtered.filter(t => t.categorie === b.categorie).reduce((s,t) => s+t.montant, 0);
             const pct = (realise/b.budget*100).toFixed(1);
             let status = '<span style="color:var(--success)">OK</span>';
-            if (pct > 100) status = '<span style="color:var(--danger)">Depassement</span>';
+            if (pct > 100) status = '<span style="color:var(--danger)">DÃ©passement</span>';
             else if (pct > 80) status = '<span style="color:var(--warning)">Attention</span>';
             return `<tr><td><strong>${escapeHtml(b.categorie)}</strong></td><td>${formatMoney(b.budget)}</td><td>${formatMoney(realise)}</td><td>${formatMoney(b.budget-realise)}</td><td>${pct}%</td><td>${status}</td></tr>`;
         }).join('');
     }
 
     function ajouterCategorieBudget() {
-        const nom = prompt('Nom de la nouvelle categorie :');
+        if (!requireActivation()) return;
+        const nom = prompt('Nom de la nouvelle catÃ©gorie :');
         if (!nom) return;
-        if (budgets.some(b => b.categorie.toLowerCase() === nom.toLowerCase())) { showNotification('Categorie existante', 'warning'); return; }
+        if (budgets.some(b => b.categorie.toLowerCase() === nom.toLowerCase())) { showNotification('CatÃ©gorie dÃ©jÃ  existante', 'warning'); return; }
         const budgetVal = parseFloat(prompt('Budget mensuel (MAD) :', '1000'));
         if (!budgetVal || budgetVal <= 0) { showNotification('Budget invalide', 'danger'); return; }
         budgets.push({ categorie: nom, budget: budgetVal });
         if (!categories.depenses) categories.depenses = [];
         categories.depenses.push(nom);
         saveAllData(); renderBudgets(); renderDashboard(); initFilters();
-        showNotification(`Categorie "${nom}" ajoutee !`, 'success');
+        showNotification(`CatÃ©gorie "${escapeHtml(nom)}" ajoutÃ©e !`, 'success');
     }
 
     function editBudget(categorie, budgetActuel) {
@@ -2539,17 +2581,17 @@ document.addEventListener('click', closeSidebarOnBackdrop);
             }
             b.categorie = finalName; b.budget = nouveauBudget;
             saveAllData(); renderBudgets(); renderDashboard(); initFilters(); renderTransactions();
-            showNotification('Budget modifie', 'success');
+            showNotification('Budget modifiÃ©', 'success');
         }
     }
 
     function supprimerCategorieBudget(categorie) {
-        showConfirm('Supprimer la categorie ?', `La categorie "${categorie}" sera supprimee. Les transactions associees resteront.`, () => {
-            transactions.forEach(t => { if (t.categorie === categorie) t.categorie = 'Non categorisee'; });
+        showConfirm('Supprimer la catÃ©gorie ?', `La catÃ©gorie "${categorie}" sera supprimÃ©e. Les transactions associÃ©es resteront.`, () => {
+            transactions.forEach(t => { if (t.categorie === categorie) t.categorie = 'Non catÃ©gorisÃ©e'; });
             budgets = budgets.filter(b => b.categorie !== categorie);
             if (categories.depenses) categories.depenses = categories.depenses.filter(c => c !== categorie);
             saveAllData(); renderBudgets(); renderDashboard(); initFilters(); renderTransactions();
-            showNotification('Categorie supprimee', 'warning');
+            showNotification('CatÃ©gorie supprimÃ©e', 'warning');
         }, 'danger');
     }
 
@@ -2570,7 +2612,7 @@ document.addEventListener('click', closeSidebarOnBackdrop);
         document.getElementById('objectifsGrid').innerHTML = objectifs.map(o => {
             const pct = (o.actuel/o.cible*100).toFixed(1);
             const joursRestants = Math.ceil((new Date(o.date_cible)-new Date())/(1000*60*60*24));
-            const statut = o.actuel >= o.cible ? 'Objectif atteint !' : `${joursRestants>0?joursRestants+' jours restants':'Delai depasse'}`;
+            const statut = o.actuel >= o.cible ? 'Objectif atteint !' : `${joursRestants>0?joursRestants+' jours restants':'DÃ©lai dÃ©passÃ©'}`;
             return `<div class="obj-card ${o.priorite==='Haute'?'high':o.priorite==='Moyenne'?'medium':'low'}">
                 <div class="obj-header">
                     <div>
@@ -2626,7 +2668,7 @@ document.addEventListener('click', closeSidebarOnBackdrop);
         const obj = { id: editObjectiveId || generateId(), nom: document.getElementById('objName').value.trim(), cible: parseFloat(document.getElementById('objTarget').value), actuel: parseFloat(document.getElementById('objCurrent').value)||0, date_cible: document.getElementById('objDate').value, description: document.getElementById('objDesc').value.trim(), priorite: document.getElementById('objPriority').value, categorie: 'Epargne', sous_categorie: document.getElementById('objName').value.trim() };
         if (editObjectiveId) { const idx = objectifs.findIndex(o => o.id === editObjectiveId); if (idx !== -1) objectifs[idx] = obj; }
         else { objectifs.push(obj); }
-        saveAllData(); closeObjectiveModal(); renderObjectifs(); showNotification(editObjectiveId ? 'Objectif modifie' : 'Objectif cree', 'success');
+        saveAllData(); closeObjectiveModal(); renderObjectifs(); showNotification(editObjectiveId ? 'Objectif modifiÃ©' : 'Objectif crÃ©Ã©', 'success');
     }
 
     function editObjective(id) {
@@ -2644,29 +2686,30 @@ document.addEventListener('click', closeSidebarOnBackdrop);
     }
 
     function deleteObjective(id) {
-        showConfirm('Supprimer l\'objectif ?', 'Cette action est irreversible.', () => { objectifs = objectifs.filter(o => o.id !== id); saveAllData(); renderObjectifs(); showNotification('Objectif supprime', 'success'); }, 'danger');
+        showConfirm('Supprimer l\'objectif ?', 'Cette action est irrÃ©versible.', () => { objectifs = objectifs.filter(o => o.id !== id); saveAllData(); renderObjectifs(); showNotification('Objectif supprimÃ©', 'success'); }, 'danger');
     }
 
     function ajouterEpargnePourObjectif() {
-        if (objectifs.length === 0) { showNotification('Creez d\'abord un objectif', 'info'); setTimeout(() => openObjectiveModal(), 500); return; }
+        if (!requireActivation()) return;
+        if (objectifs.length === 0) { showNotification('CrÃ©ez d\'abord un objectif', 'info'); setTimeout(() => openObjectiveModal(), 500); return; }
         const noms = objectifs.map(o => o.nom).join(', ');
         const nom = prompt(`Choisir l'objectif:\n${noms}`, objectifs[0]?.nom || '');
         if (!nom) return;
         if (!objectifs.some(o => o.nom === nom)) {
-            if (!confirm(`L'objectif "${nom}" n'existe pas. Le creer ?`)) return;
+            if (!confirm(`L'objectif "${nom}" n'existe pas. Le crÃ©er ?`)) return;
             const cible = prompt('Montant cible :', '10000');
             if (!cible || isNaN(parseFloat(cible))) return;
             const date = prompt('Date cible (AAAA-MM-JJ) :', new Date().toISOString().split('T')[0]);
             if (!date) return;
-            objectifs.push({ id: generateId(), nom, cible: parseFloat(cible), actuel: 0, date_cible: date, description: 'Cree automatiquement', priorite: 'Moyenne', categorie: 'Epargne', sous_categorie: nom });
-            saveAllData(); showNotification('Objectif cree', 'success');
+            objectifs.push({ id: generateId(), nom, cible: parseFloat(cible), actuel: 0, date_cible: date, description: 'CrÃ©Ã© automatiquement', priorite: 'Moyenne', categorie: 'Epargne', sous_categorie: nom });
+            saveAllData(); showNotification('Objectif crÃ©Ã©', 'success');
         }
         openTransactionModal();
         document.getElementById('txType').value = 'Epargne';
         updateCategorySelect();
         document.getElementById('txSubCategory').value = nom;
-        document.getElementById('txDesc').placeholder = `Epargne pour: ${nom}`;
-        showNotification(`Ajoutez votre epargne pour "${nom}"`, 'info');
+        document.getElementById('txDesc').placeholder = `Ã‰pargne pour : ${nom}`;
+        showNotification(`Ajoutez votre Ã©pargne pour "${escapeHtml(nom)}"`, 'info');
     }
 
     // =============================================================
@@ -2731,23 +2774,23 @@ document.addEventListener('click', closeSidebarOnBackdrop);
         document.getElementById('reportContent').innerHTML = `
             <div class="rapport-stats">
                 <div class="rapport-card"><div class="rapport-value" style="color:var(--success)">+${formatMoney(revenus)}</div><div class="rapport-label">Revenus</div><div class="rapport-sub">${prevData.revenus.variation>=0?'â†‘':'â†“'} ${Math.abs(prevData.revenus.variation)}%</div></div>
-                <div class="rapport-card"><div class="rapport-value" style="color:var(--danger)">-${formatMoney(depenses)}</div><div class="rapport-label">Depenses</div><div class="rapport-sub">${prevData.depenses.variation<=0?'â†“':'â†‘'} ${Math.abs(prevData.depenses.variation)}%</div></div>
-                <div class="rapport-card"><div class="rapport-value" style="color:var(--info)">${formatMoney(epargne)}</div><div class="rapport-label">Epargne</div><div class="rapport-sub">Taux: ${tauxEpargne}%</div></div>
+                <div class="rapport-card"><div class="rapport-value" style="color:var(--danger)">-${formatMoney(depenses)}</div><div class="rapport-label">DÃ©penses</div><div class="rapport-sub">${prevData.depenses.variation<=0?'â†“':'â†‘'} ${Math.abs(prevData.depenses.variation)}%</div></div>
+                <div class="rapport-card"><div class="rapport-value" style="color:var(--info)">${formatMoney(epargne)}</div><div class="rapport-label">Ã‰pargne</div><div class="rapport-sub">Taux : ${tauxEpargne}%</div></div>
                 <div class="rapport-card"><div class="rapport-value" style="color:${balance>=0?'var(--success)':'var(--danger)'}">${balance>=0?'+':''}${formatMoney(balance)}</div><div class="rapport-label">Balance</div><div class="rapport-sub">${prevData.solde.variation>=0?'â†‘':'â†“'} ${Math.abs(prevData.solde.variation)}%</div></div>
             </div>
             <div class="charts-grid">
-                <div class="chart-card"><div class="chart-header"><div class="chart-title">Top 5 Depenses</div></div>${top5Dep.map(([cat,mnt],i) => `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;background:rgba(239,68,68,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--danger)">${i+1}</span><span style="font-weight:600">${escapeHtml(cat)}</span></div><div style="font-weight:700;color:var(--danger)">-${formatMoney(mnt)}</div></div>`).join('')}</div>
+                <div class="chart-card"><div class="chart-header"><div class="chart-title">Top 5 DÃ©penses</div></div>${top5Dep.map(([cat,mnt],i) => `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;background:rgba(239,68,68,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--danger)">${i+1}</span><span style="font-weight:600">${escapeHtml(cat)}</span></div><div style="font-weight:700;color:var(--danger)">-${formatMoney(mnt)}</div></div>`).join('')}</div>
                 <div class="chart-card"><div class="chart-header"><div class="chart-title">Top 5 Revenus</div></div>${top5Rev.map(([cat,mnt],i) => `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;background:rgba(16,185,129,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--success)">${i+1}</span><span style="font-weight:600">${escapeHtml(cat)}</span></div><div style="font-weight:700;color:var(--success)">+${formatMoney(mnt)}</div></div>`).join('')}</div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px; margin-bottom:20px;">
                 <div class="chart-card"><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-                    <div style="background:var(--bg);border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text-muted)">Taux epargne</div><div style="font-size:20px;font-weight:800;color:var(--info)">${tauxEpargne}%</div></div>
-                    <div style="background:var(--bg);border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text-muted)">Taux depenses</div><div style="font-size:20px;font-weight:800;color:var(--warning)">${revenus>0?((depenses/revenus)*100).toFixed(1):0}%</div></div>
+                    <div style="background:var(--bg);border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text-muted)">Taux d'Ã©pargne</div><div style="font-size:20px;font-weight:800;color:var(--info)">${tauxEpargne}%</div></div>
+                    <div style="background:var(--bg);border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text-muted)">Taux de dÃ©penses</div><div style="font-size:20px;font-weight:800;color:var(--warning)">${revenus>0?((depenses/revenus)*100).toFixed(1):0}%</div></div>
                     <div style="background:var(--bg);border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text-muted)">Balance moyenne</div><div style="font-size:18px;font-weight:800;color:${soldeMoyen>=0?'var(--success)':'var(--danger)'}">${formatMoney(soldeMoyen)}</div></div>
-                    <div style="background:var(--bg);border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text-muted)">Meilleur/Pire</div><div style="font-size:13px;font-weight:700"><span style="color:var(--success)">${months[bestIdx]||'-'}</span> / <span style="color:var(--danger)">${months[worstIdx]||'-'}</span></div></div>
+                    <div style="background:var(--bg);border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text-muted)">Meilleur/Pire mois</div><div style="font-size:13px;font-weight:700"><span style="color:var(--success)">${months[bestIdx]||'-'}</span> / <span style="color:var(--danger)">${months[worstIdx]||'-'}</span></div></div>
                 </div></div>
             </div>
-            <div class="table-card"><div class="table-header"><div class="table-title">Bilan mensuel</div></div><table class="data-table"><thead><tr><th>Mois</th><th>Revenus</th><th>Depenses</th><th>Balance</th></tr></thead><tbody>${months.map((m,i) => `<tr><td><strong>${m}</strong></td><td style="color:var(--success)">+${formatMoney(revByMonth[i])}</td><td style="color:var(--danger)">-${formatMoney(depByMonth[i])}</td><td style="color:${balByMonth[i]>=0?'var(--success)':'var(--danger)'}">${balByMonth[i]>=0?'+':''}${formatMoney(balByMonth[i])}</td></tr>`).join('')}</tbody></table></div>
+            <div class="table-card"><div class="table-header"><div class="table-title">Bilan mensuel</div></div><table class="data-table"><thead><tr><th>Mois</th><th>Revenus</th><th>DÃ©penses</th><th>Balance</th></tr></thead><tbody>${months.map((m,i) => `<tr><td><strong>${m}</strong></td><td style="color:var(--success)">+${formatMoney(revByMonth[i])}</td><td style="color:var(--danger)">-${formatMoney(depByMonth[i])}</td><td style="color:${balByMonth[i]>=0?'var(--success)':'var(--danger)'}">${balByMonth[i]>=0?'+':''}${formatMoney(balByMonth[i])}</td></tr>`).join('')}</tbody></table></div>
         `;
     }
 
@@ -2763,9 +2806,9 @@ document.addEventListener('click', closeSidebarOnBackdrop);
         const ratioDep = revenus > 0 ? (depenses/revenus*100).toFixed(1) : 0;
 
         document.getElementById('advancedKPIs').innerHTML = `
-            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-percentage"></i></div><div class="kpi-label">Taux d'epargne</div><div class="kpi-value">${tauxEpargne}%</div><div class="kpi-sub">Objectif: >20%</div></div>
-            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-balance-scale"></i></div><div class="kpi-label">Ratio Depenses/Revenus</div><div class="kpi-value">${ratioDep}%</div><div class="kpi-sub">Ideal: <50%</div></div>
-            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-line"></i></div><div class="kpi-label">Prevision annuelle</div><div class="kpi-value">${formatMoney((revenus-depenses)*12)}</div><div class="kpi-sub">Epargne projetee</div></div>
+            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-percentage"></i></div><div class="kpi-label">Taux d'Ã©pargne</div><div class="kpi-value">${tauxEpargne}%</div><div class="kpi-sub">Objectif : >20%</div></div>
+            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-balance-scale"></i></div><div class="kpi-label">Ratio DÃ©penses/Revenus</div><div class="kpi-value">${ratioDep}%</div><div class="kpi-sub">IdÃ©al : <50%</div></div>
+            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-line"></i></div><div class="kpi-label">PrÃ©vision annuelle</div><div class="kpi-value">${formatMoney((revenus-depenses)*12)}</div><div class="kpi-sub">Ã‰pargne projetÃ©e</div></div>
         `;
 
         const depParCat = {}; filtered.filter(t => t.type === 'Depense').forEach(t => depParCat[t.categorie] = (depParCat[t.categorie]||0)+t.montant);
@@ -2777,19 +2820,19 @@ document.addEventListener('click', closeSidebarOnBackdrop);
         document.getElementById('analyseResume').innerHTML = `
             <div style="padding:15px;">
                 <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Revenus totaux</span><span style="font-size:13px;font-weight:600;color:var(--success)">${formatMoney(revenus)}</span></div>
-                <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Depenses totales</span><span style="font-size:13px;font-weight:600;color:var(--danger)">${formatMoney(depenses)}</span></div>
-                <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Epargne</span><span style="font-size:13px;font-weight:600;color:var(--info)">${formatMoney(epargne)}</span></div>
+                <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">DÃ©penses totales</span><span style="font-size:13px;font-weight:600;color:var(--danger)">${formatMoney(depenses)}</span></div>
+                <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Ã‰pargne</span><span style="font-size:13px;font-weight:600;color:var(--info)">${formatMoney(epargne)}</span></div>
                 <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Balance nette</span><span style="font-size:13px;font-weight:600;color:${revenus-depenses-epargne>=0?'var(--success)':'var(--danger)'}">${formatMoney(revenus-depenses-epargne)}</span></div>
                 <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Nombre de transactions</span><span style="font-size:13px;font-weight:600">${filtered.length}</span></div>
-                <div style="display:flex;justify-content:space-between;padding:10px 0;"><span style="font-size:13px;color:var(--text-muted)">Depense moyenne</span><span style="font-size:13px;font-weight:600">${formatMoney(moyenneDepense)}</span></div>
+                <div style="display:flex;justify-content:space-between;padding:10px 0;"><span style="font-size:13px;color:var(--text-muted)">DÃ©pense moyenne</span><span style="font-size:13px;font-weight:600">${formatMoney(moyenneDepense)}</span></div>
             </div>`;
 
         document.getElementById('analyseTop').innerHTML = `
             <div style="padding:15px;">
                 ${topRevenu?`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Plus grand revenu</span><span style="font-size:13px;font-weight:600;color:var(--success)">${escapeHtml(topRevenu[0])} (${formatMoney(topRevenu[1])})</span></div>`:''}
-                ${topDepense?`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Plus grande depense</span><span style="font-size:13px;font-weight:600;color:var(--danger)">${escapeHtml(topDepense[0])} (${formatMoney(topDepense[1])})</span></div>`:''}
-                <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Taux d'epargne</span><span style="font-size:13px;font-weight:600;color:${parseFloat(tauxEpargne)>=20?'var(--success)':'var(--amber)'}">${tauxEpargne}%</span></div>
-                <div style="display:flex;justify-content:space-between;padding:10px 0;"><span style="font-size:13px;color:var(--text-muted)">Recommandation</span><span style="font-size:13px;font-weight:600;color:var(--text)">${parseFloat(tauxEpargne)>=20?'Excellent!':parseFloat(tauxEpargne)>=10?'Bien':'A ameliorer'}</span></div>
+                ${topDepense?`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Plus grande dÃ©pense</span><span style="font-size:13px;font-weight:600;color:var(--danger)">${escapeHtml(topDepense[0])} (${formatMoney(topDepense[1])})</span></div>`:''}
+                <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Taux d'Ã©pargne</span><span style="font-size:13px;font-weight:600;color:${parseFloat(tauxEpargne)>=20?'var(--success)':'var(--amber)'}">${tauxEpargne}%</span></div>
+                <div style="display:flex;justify-content:space-between;padding:10px 0;"><span style="font-size:13px;color:var(--text-muted)">Recommandation</span><span style="font-size:13px;font-weight:600;color:var(--text)">${parseFloat(tauxEpargne)>=20?'Excellent !':parseFloat(tauxEpargne)>=10?'Bien':'Ã€ amÃ©liorer'}</span></div>
             </div>`;
     }
 
@@ -2801,7 +2844,7 @@ document.addEventListener('click', closeSidebarOnBackdrop);
         const tbody = document.getElementById('recurrentesTable');
         if (!tbody) return;
         if (recurrentes.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:30px;"><i class="fas fa-clock" style="font-size:24px;display:block;margin-bottom:10px;"></i>Aucune transaction recurrente.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:30px;"><i class="fas fa-clock" style="font-size:24px;display:block;margin-bottom:10px;"></i>Aucune transaction rÃ©currente.</td></tr>`;
             return;
         }
         tbody.innerHTML = recurrentes.map(r => `
@@ -2818,7 +2861,7 @@ document.addEventListener('click', closeSidebarOnBackdrop);
     }
 
     function sauvegarderParametres() {
-        showNotification('Parametres sauvegardes', 'success');
+        showNotification('ParamÃ¨tres sauvegardÃ©s', 'success');
     }
 
     // =============================================================
@@ -2826,7 +2869,7 @@ document.addEventListener('click', closeSidebarOnBackdrop);
     // =============================================================
     function openRecurrenteModal() {
         document.getElementById('recurrenteModal').classList.add('active');
-        document.getElementById('recModalTitle').textContent = 'Transaction recurrente mensuelle';
+        document.getElementById('recModalTitle').textContent = 'Transaction rÃ©currente mensuelle';
         editRecurrenteId = null;
         document.getElementById('recDescription').value = '';
         document.getElementById('recSousCategorie').value = '';
@@ -2871,14 +2914,14 @@ document.addEventListener('click', closeSidebarOnBackdrop);
         const r = { id: editRecurrenteId || generateId(), description: document.getElementById('recDescription').value.trim(), type: document.getElementById('recType').value, categorie: document.getElementById('recCategorie').value, sous_categorie: document.getElementById('recSousCategorie').value.trim() || 'Mensuel', montant: parseFloat(document.getElementById('recMontant').value), jour: parseInt(document.getElementById('recJour').value), actif: true, dateDebut: document.getElementById('recDateDebut').value, dateFin: document.getElementById('recDateFin').value || null };
         if (editRecurrenteId) { const idx = recurrentes.findIndex(x => x.id === editRecurrenteId); if (idx !== -1) recurrentes[idx] = r; }
         else { recurrentes.push(r); }
-        saveAllData(); renderParametres(); closeRecurrenteModal(); showNotification(editRecurrenteId ? 'Recurrente modifiee' : 'Recurrente ajoutee', 'success');
+        saveAllData(); renderParametres(); closeRecurrenteModal(); showNotification(editRecurrenteId ? 'RÃ©currente modifiÃ©e' : 'RÃ©currente ajoutÃ©e', 'success');
     }
 
     function editRecurrente(id) {
         const r = recurrentes.find(x => x.id === id);
         if (!r) return;
         openRecurrenteModal(); editRecurrenteId = id;
-        document.getElementById('recModalTitle').textContent = 'Modifier recurrente';
+        document.getElementById('recModalTitle').textContent = 'Modifier la transaction rÃ©currente';
         document.getElementById('recDescription').value = r.description;
         document.getElementById('recType').value = r.type;
         updateRecCategorie();
@@ -2891,12 +2934,12 @@ document.addEventListener('click', closeSidebarOnBackdrop);
     }
 
     function deleteRecurrente(id) {
-        showConfirm('Supprimer ?', 'Cette transaction recurrente sera supprimee.', () => { recurrentes = recurrentes.filter(r => r.id !== id); saveAllData(); renderParametres(); showNotification('Supprimee', 'warning'); }, 'danger');
+        showConfirm('Supprimer ?', 'Cette transaction rÃ©currente sera supprimÃ©e.', () => { recurrentes = recurrentes.filter(r => r.id !== id); saveAllData(); renderParametres(); showNotification('SupprimÃ©e', 'warning'); }, 'danger');
     }
 
     function toggleRecurrente(id) {
         const r = recurrentes.find(x => x.id === id);
-        if (r) { r.actif = !r.actif; saveAllData(); renderParametres(); showNotification(`Transaction ${r.actif ? 'activee' : 'desactivee'}`, 'success'); }
+        if (r) { r.actif = !r.actif; saveAllData(); renderParametres(); showNotification(`Transaction ${r.actif ? 'activÃ©e' : 'dÃ©sactivÃ©e'}`, 'success'); }
     }
 
     function executerTransactionsRecurrentes() {
@@ -2914,8 +2957,8 @@ document.addEventListener('click', closeSidebarOnBackdrop);
             const existe = transactions.some(t => t.mois === moisActuel && t.description === r.description && t.type === r.type && t.categorie === r.categorie && t.montant === r.montant);
             if (!existe) { transactions.push({ id: generateId()+compteur, date: dateTransaction.toISOString().split('T')[0], mois: moisActuel, annee: anneeActuelle, type: r.type, description: r.description, categorie: r.categorie, sous_categorie: r.sous_categorie || 'Mensuel', montant: r.montant }); compteur++; }
         });
-        if (compteur > 0) { saveAllData(); applyGlobalFilters(); showNotification(`${compteur} transaction(s) recurrente(s) ajoutee(s)`, 'success'); }
-        else { showNotification('Aucune nouvelle transaction a ajouter', 'info'); }
+        if (compteur > 0) { saveAllData(); applyGlobalFilters(); showNotification(`${compteur} transaction(s) rÃ©currente(s) ajoutÃ©e(s)`, 'success'); }
+        else { showNotification('Aucune nouvelle transaction Ã  ajouter', 'info'); }
     }
 
     // =============================================================
@@ -2952,25 +2995,25 @@ document.addEventListener('click', closeSidebarOnBackdrop);
             });
 
             actEl.innerHTML = activatedUsers.length === 0
-                ? '<p style="text-align:center;color:var(--text-muted);padding:30px;">Aucun utilisateur active</p>'
-                : `<table class="data-table"><thead><tr><th>Nom</th><th>Email</th><th>Date</th><th>Actions</th></tr></thead><tbody>${activatedUsers.map(u => `<tr><td><strong>${escapeHtml(u.fullName)}</strong></td><td>${escapeHtml(u.email)}</td><td>${formatFirestoreDate(u.activationDate)}</td><td><button class="btn btn-danger btn-sm" onclick="deactivateUser('${escapeJsAttr(u.id)}')"><i class="fas fa-ban"></i> Desactiver</button></td></tr>`).join('')}</tbody></table>`;
+                ? '<p style="text-align:center;color:var(--text-muted);padding:30px;">Aucun utilisateur activÃ©</p>'
+                : `<table class="data-table"><thead><tr><th>Nom</th><th>Email</th><th>Date</th><th>Actions</th></tr></thead><tbody>${activatedUsers.map(u => `<tr><td><strong>${escapeHtml(u.fullName)}</strong></td><td>${escapeHtml(u.email)}</td><td>${formatFirestoreDate(u.activationDate)}</td><td><button class="btn btn-danger btn-sm" onclick="deactivateUser('${escapeJsAttr(u.id)}')"><i class="fas fa-ban"></i> DÃ©sactiver</button></td></tr>`).join('')}</tbody></table>`;
 
             document.getElementById('pendingCount').textContent = pendingUsers.length;
         } catch (error) {
             console.error('Erreur chargement admin:', error);
-            listEl.innerHTML = '<p style="text-align:center;color:var(--danger);padding:30px;">Erreur de chargement des donnees</p>';
+            listEl.innerHTML = '<p style="text-align:center;color:var(--danger);padding:30px;">Erreur de chargement des donnÃ©es</p>';
             actEl.innerHTML = '';
         }
     }
 
-    function refreshActivationRequests() { renderAdmin(); showNotification('Listes rafraichies', 'success'); }
+    function refreshActivationRequests() { renderAdmin(); showNotification('Listes rafraÃ®chies', 'success'); }
 
     async function activateRequest(requestId, userId) {
         if (!userId) { showNotification('Utilisateur introuvable pour cette demande', 'danger'); return; }
         try {
             await db.collection('users').doc(userId).set({ isActivated: true, activationDate: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
             await db.collection('activation_requests').doc(requestId).update({ status: 'approved' });
-            showNotification('Utilisateur active', 'success');
+            showNotification('Utilisateur activÃ©', 'success');
             renderAdmin();
         } catch (error) { console.error(error); showNotification("Erreur lors de l'activation", 'danger'); }
     }
@@ -2978,7 +3021,7 @@ document.addEventListener('click', closeSidebarOnBackdrop);
     async function rejectRequest(requestId) {
         try {
             await db.collection('activation_requests').doc(requestId).update({ status: 'rejected' });
-            showNotification('Demande rejetee', 'warning');
+            showNotification('Demande rejetÃ©e', 'warning');
             renderAdmin();
         } catch (error) { console.error(error); showNotification('Erreur lors du rejet', 'danger'); }
     }
@@ -2986,22 +3029,22 @@ document.addEventListener('click', closeSidebarOnBackdrop);
     async function deactivateUser(userId) {
         try {
             await db.collection('users').doc(userId).set({ isActivated: false }, { merge: true });
-            showNotification('Utilisateur desactive', 'warning');
+            showNotification('Utilisateur dÃ©sactivÃ©', 'warning');
             renderAdmin();
-        } catch (error) { console.error(error); showNotification('Erreur lors de la desactivation', 'danger'); }
+        } catch (error) { console.error(error); showNotification('Erreur lors de la dÃ©sactivation', 'danger'); }
     }
 
     async function manualActivateUser() {
         const email = document.getElementById('adminUserEmail').value.trim();
-        if (!email) { showNotification('Email requis', 'danger'); return; }
+        if (!email) { showNotification('Adresse e-mail requise', 'danger'); return; }
         try {
             const snap = await db.collection('users').where('email', '==', email).limit(1).get();
-            if (snap.empty) { showNotification('Aucun utilisateur trouve avec cet email', 'danger'); return; }
+            if (snap.empty) { showNotification('Aucun utilisateur trouvÃ© avec cette adresse e-mail', 'danger'); return; }
             const userDoc = snap.docs[0];
             await userDoc.ref.set({ isActivated: true, activationDate: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
             const pendingSnap = await db.collection('activation_requests').where('userId', '==', userDoc.id).where('status', '==', 'pending').get();
             await Promise.all(pendingSnap.docs.map(doc => doc.ref.update({ status: 'approved' })));
-            showNotification(`${email} active !`, 'success');
+            showNotification(`${escapeHtml(email)} activÃ© !`, 'success');
             document.getElementById('adminUserEmail').value = '';
             renderAdmin();
         } catch (error) { console.error(error); showNotification("Erreur lors de l'activation", 'danger'); }
@@ -3010,33 +3053,42 @@ document.addEventListener('click', closeSidebarOnBackdrop);
     // =============================================================
     // 6.22 EXPORTS
     // =============================================================
+    // Echappe une valeur pour un champ CSV et neutralise l'injection de formule (=, +, -, @ en tete de cellule Excel/Sheets)
+    function csvField(value) {
+        let str = String(value ?? '');
+        if (/^[=+\-@\t\r]/.test(str)) str = `'${str}`;
+        return `"${str.replace(/"/g, '""')}"`;
+    }
+
     function exportToCSV() {
         let csv = "Date,Type,Description,Categorie,Sous-categorie,Montant\n";
-        getFilteredTransactions().forEach(t => csv += `${t.date},${t.type},"${t.description}",${t.categorie},${t.sous_categorie},${t.montant}\n`);
-        const blob = new Blob([csv], { type: 'text/csv' });
+        getFilteredTransactions().forEach(t => {
+            csv += [t.date, t.type, t.description, t.categorie, t.sous_categorie, t.montant].map(csvField).join(',') + '\n';
+        });
+        const blob = new Blob(['ï»¿' + csv], { type: 'text/csv;charset=utf-8;' });
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `transactions_${currentMonth}.csv`; a.click();
-        showNotification('Export CSV reussi', 'success');
+        showNotification('Export CSV rÃ©ussi', 'success');
     }
 
     function exportToPDF() {
         const { jsPDF } = window.jspdf;
-        if (!jsPDF) { showNotification('jsPDF non charge', 'warning'); return; }
+        if (!jsPDF) { showNotification('jsPDF non chargÃ©', 'warning'); return; }
         const doc = new jsPDF();
         doc.setFontSize(16); doc.text('Rapport Money Control Pro', 20, 20);
-        doc.setFontSize(12); doc.text(`Periode: ${currentMonth} ${currentYear}`, 20, 30);
+        doc.setFontSize(12); doc.text(`PÃ©riode : ${currentMonth} ${currentYear}`, 20, 30);
         let y = 50;
         getFilteredTransactions().slice(0, 30).forEach(t => { if (y > 270) { doc.addPage(); y = 20; } doc.text(`${t.date} - ${t.description}: ${t.montant} MAD`, 20, y); y += 8; });
         doc.save(`Rapport_${currentMonth}.pdf`);
-        showNotification('Export PDF reussi', 'success');
+        showNotification('Export PDF rÃ©ussi', 'success');
     }
 
     function exportToExcel() {
         const XLSX = window.XLSX;
-        if (!XLSX) { showNotification('XLSX non charge', 'warning'); return; }
+        if (!XLSX) { showNotification('XLSX non chargÃ©', 'warning'); return; }
         const ws = XLSX.utils.json_to_sheet(getFilteredTransactions());
         const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Transactions');
         XLSX.writeFile(wb, `rapport_${currentMonth}.xlsx`);
-        showNotification('Export Excel reussi', 'success');
+        showNotification('Export Excel rÃ©ussi', 'success');
     }
 
     // =============================================================
@@ -3045,11 +3097,11 @@ document.addEventListener('click', closeSidebarOnBackdrop);
     function openWelcomeGuide() { document.getElementById('welcomeGuideModal').classList.add('active'); }
     function closeWelcomeGuide() { document.getElementById('welcomeGuideModal').classList.remove('active'); localStorage.setItem('guide_seen', 'true'); }
     function showGuideTab(tabName) { document.querySelectorAll('.guide-content').forEach(c => c.style.display = 'none'); document.querySelectorAll('.guide-tab').forEach(t => t.classList.remove('active')); document.getElementById(`guide-${tabName}`).style.display = 'block'; document.getElementById(`tab-${tabName}`).classList.add('active'); }
-    function copierRIB() { navigator.clipboard.writeText(RIB).then(() => showNotification('RIB copie !', 'success')).catch(() => showNotification('Erreur', 'danger')); }
+    function copierRIB() { navigator.clipboard.writeText(RIB).then(() => showNotification('RIB copiÃ© !', 'success')).catch(() => showNotification('Erreur', 'danger')); }
 
     function resetData() {
-        showConfirm('Reinitialiser toutes les donnees ?', 'âš ï¸ Toutes vos transactions, budgets et objectifs seront remis aux valeurs par defaut.', () => {
-            transactions = [...DEFAULT_TRANSACTIONS]; objectifs = [...DEFAULT_OBJECTIFS]; budgets = [...DEFAULT_BUDGETS]; categories = {...DEFAULT_CATEGORIES, depenses: [...DEFAULT_CATEGORIES.depenses]}; recurrentes = [...DEFAULT_TRANSACTIONS_RECURRENTES]; saveAllData(); applyGlobalFilters(); showNotification('Donnees reinitialisees', 'success');
+        showConfirm('RÃ©initialiser toutes les donnÃ©es ?', 'âš ï¸ Toutes vos transactions, budgets et objectifs seront remis aux valeurs par dÃ©faut.', () => {
+            transactions = [...DEFAULT_TRANSACTIONS]; objectifs = [...DEFAULT_OBJECTIFS]; budgets = [...DEFAULT_BUDGETS]; categories = {...DEFAULT_CATEGORIES, depenses: [...DEFAULT_CATEGORIES.depenses]}; recurrentes = [...DEFAULT_TRANSACTIONS_RECURRENTES]; saveAllData(); applyGlobalFilters(); showNotification('DonnÃ©es rÃ©initialisÃ©es', 'success');
         }, 'danger');
     }
 
@@ -3064,12 +3116,23 @@ document.addEventListener('click', closeSidebarOnBackdrop);
     async function addActivationButtonIfNeeded() {
         if (!auth.currentUser) return;
         const isActivated = await isAccountActivated();
+        const isAdmin = ADMIN_EMAILS.includes(auth.currentUser.email.toLowerCase());
+        isUserActivated = isActivated || isAdmin;
         if (!isActivated) {
             const container = document.getElementById('activationBtnContainer');
             if (container && !document.getElementById('activationRequestBtn')) {
                 container.innerHTML = `<button id="activationRequestBtn" class="btn btn-warning" onclick="openWelcomeGuide()" style="background: var(--warning); color: white; border: none;"><i class="fas fa-key"></i> Demander l'activation</button>`;
             }
         }
+    }
+
+    // Bloque les actions de creation tant que le compte n'est pas active et affiche le guide d'activation
+    function requireActivation() {
+        if (isUserActivated) return true;
+        showNotification("Votre compte n'est pas encore activÃ©. Activez-le pour ajouter des donnÃ©es.", 'warning');
+        openWelcomeGuide();
+        showGuideTab('activation');
+        return false;
     }
 
     // =============================================================
