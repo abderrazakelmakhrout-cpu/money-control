@@ -2265,7 +2265,6 @@
         <!-- ============================================================ -->
         <div class="celebrate-overlay" id="celebrateModal">
             <div class="celebrate-card" id="celebrateCard">
-                <!-- Confettis générés par JS -->
                 <span class="celebrate-icon">🎉</span>
                 <div class="celebrate-title">Félicitations !</div>
                 <p class="celebrate-sub">Votre compte a été créé avec succès.</p>
@@ -2732,7 +2731,6 @@
 
         function generateConfetti() {
             const container = document.getElementById('celebrateCard');
-            // Supprimer les anciens confettis
             container.querySelectorAll('.celebrate-confetti').forEach(el => el.remove());
 
             const colors = ['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#ef4444', '#8b5cf6', '#f472b6'];
@@ -2747,19 +2745,19 @@
                 const rotate = Math.random() * 360;
                 const shape = Math.random() > 0.5 ? '50%' : '2px';
                 el.style.cssText = `
-                        left: ${left}%;
-                        top: -10px;
-                        width: ${size}px;
-                        height: ${size * (0.5 + Math.random())}px;
-                        background: ${color};
-                        border-radius: ${shape};
-                        animation-delay: ${delay}s;
-                        animation-duration: ${duration}s;
-                        transform: rotate(${rotate}deg);
-                        position: absolute;
-                        pointer-events: none;
-                        z-index: 10;
-                    `;
+                            left: ${left}%;
+                            top: -10px;
+                            width: ${size}px;
+                            height: ${size * (0.5 + Math.random())}px;
+                            background: ${color};
+                            border-radius: ${shape};
+                            animation-delay: ${delay}s;
+                            animation-duration: ${duration}s;
+                            transform: rotate(${rotate}deg);
+                            position: absolute;
+                            pointer-events: none;
+                            z-index: 10;
+                        `;
                 container.appendChild(el);
             }
         }
@@ -2768,7 +2766,6 @@
             if (celebrateTimer) { clearTimeout(celebrateTimer);
                 celebrateTimer = null; }
             document.getElementById('celebrateModal').classList.remove('active');
-            // Recharger l'application pour passer à l'état connecté
             location.reload();
         }
 
@@ -2832,17 +2829,21 @@
         }
 
         // =============================================================
-        // 6.9b VERIFICATION ADMIN
+        // VÉRIFICATION ADMIN
         // =============================================================
+        function isAdmin() {
+            return auth.currentUser && ADMIN_EMAILS.includes(auth.currentUser.email.toLowerCase());
+        }
+
         async function checkAdminStatus() {
             const user = auth.currentUser;
             if (!user) return;
-            const isAdmin = ADMIN_EMAILS.includes(user.email.toLowerCase());
+            const admin = isAdmin();
             const adminMenuItem = document.getElementById('adminMenuItem');
             if (adminMenuItem) {
-                adminMenuItem.style.display = isAdmin ? 'flex' : 'none';
+                adminMenuItem.style.display = admin ? 'flex' : 'none';
             }
-            if (isAdmin) {
+            if (admin) {
                 try {
                     const snap = await db.collection('activation_requests').where('status', '==', 'pending').get();
                     document.getElementById('pendingCount').textContent = snap.size;
@@ -2977,13 +2978,13 @@
                 else totalSoldeCumule -= t.montant; });
 
             document.getElementById('kpiGrid').innerHTML = `
-                    <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-wallet"></i></div><div class="kpi-label">SOLDE TOTAL</div><div class="kpi-value">${formatMoney(totalSoldeCumule)}</div><div class="kpi-sub ${prevData.solde.variation>=0?'positive':'negative'}">${prevData.solde.variation>=0?'↑':'↓'} ${Math.abs(prevData.solde.variation)}% vs mois précédent</div></div>
-                    <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-arrow-up"></i></div><div class="kpi-label">REVENUS DU MOIS</div><div class="kpi-value">${formatMoney(revenus)}</div><div class="kpi-sub ${prevData.revenus.variation>=0?'positive':'negative'}">${prevData.revenus.variation>=0?'↑':'↓'} ${Math.abs(prevData.revenus.variation)}% vs mois précédent</div></div>
-                    <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-arrow-down"></i></div><div class="kpi-label">DÉPENSES DU MOIS</div><div class="kpi-value">${formatMoney(depenses)}</div><div class="kpi-sub ${prevData.depenses.variation<=0?'positive':'negative'}">${prevData.depenses.variation<=0?'↓':'↑'} ${Math.abs(prevData.depenses.variation)}% vs mois précédent</div></div>
-                    <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-piggy-bank"></i></div><div class="kpi-label">ÉPARGNE DU MOIS</div><div class="kpi-value">${formatMoney(epargne)}</div><div class="kpi-sub ${prevData.epargne.variation>=0?'positive':'negative'}">${prevData.epargne.variation>=0?'↑':'↓'} ${Math.abs(prevData.epargne.variation)}% vs mois précédent</div></div>
-                    <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-simple"></i></div><div class="kpi-label">BUDGET CONSOMMÉ</div><div class="kpi-value">${pctBudget}%</div><div class="kpi-sub">${formatMoney(budgetConsomme)} / ${formatMoney(totalBudget)}</div></div>
-                    <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-percentage"></i></div><div class="kpi-label">TAUX D'ÉPARGNE</div><div class="kpi-value">${revenus>0?((epargne/revenus)*100).toFixed(1):0}%</div><div class="kpi-sub">${revenus>0?((depenses/revenus)*100).toFixed(1):0}% de dépenses</div></div>
-                `;
+                        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-wallet"></i></div><div class="kpi-label">SOLDE TOTAL</div><div class="kpi-value">${formatMoney(totalSoldeCumule)}</div><div class="kpi-sub ${prevData.solde.variation>=0?'positive':'negative'}">${prevData.solde.variation>=0?'↑':'↓'} ${Math.abs(prevData.solde.variation)}% vs mois précédent</div></div>
+                        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-arrow-up"></i></div><div class="kpi-label">REVENUS DU MOIS</div><div class="kpi-value">${formatMoney(revenus)}</div><div class="kpi-sub ${prevData.revenus.variation>=0?'positive':'negative'}">${prevData.revenus.variation>=0?'↑':'↓'} ${Math.abs(prevData.revenus.variation)}% vs mois précédent</div></div>
+                        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-arrow-down"></i></div><div class="kpi-label">DÉPENSES DU MOIS</div><div class="kpi-value">${formatMoney(depenses)}</div><div class="kpi-sub ${prevData.depenses.variation<=0?'positive':'negative'}">${prevData.depenses.variation<=0?'↓':'↑'} ${Math.abs(prevData.depenses.variation)}% vs mois précédent</div></div>
+                        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-piggy-bank"></i></div><div class="kpi-label">ÉPARGNE DU MOIS</div><div class="kpi-value">${formatMoney(epargne)}</div><div class="kpi-sub ${prevData.epargne.variation>=0?'positive':'negative'}">${prevData.epargne.variation>=0?'↑':'↓'} ${Math.abs(prevData.epargne.variation)}% vs mois précédent</div></div>
+                        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-simple"></i></div><div class="kpi-label">BUDGET CONSOMMÉ</div><div class="kpi-value">${pctBudget}%</div><div class="kpi-sub">${formatMoney(budgetConsomme)} / ${formatMoney(totalBudget)}</div></div>
+                        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-percentage"></i></div><div class="kpi-label">TAUX D'ÉPARGNE</div><div class="kpi-value">${revenus>0?((epargne/revenus)*100).toFixed(1):0}%</div><div class="kpi-sub">${revenus>0?((depenses/revenus)*100).toFixed(1):0}% de dépenses</div></div>
+                    `;
 
             // Charts
             const depParCat = {};
@@ -3045,10 +3046,10 @@
             const tbody = document.getElementById('transactionsTable');
             if (!tbody) return;
             tbody.innerHTML = filtered.map(t => `
-                        <tr><td>${formatDate(t.date)}</td><td><span class="badge badge-${t.type==='Revenu'?'rev':t.type==='Depense'?'dep':'ep'}">${t.type}</span></td><td>${escapeHtml(t.description)}</td><td>${escapeHtml(t.categorie)}</td><td>${escapeHtml(t.sous_categorie||'-')}</td><td style="color:${t.type==='Revenu'?'var(--success)':'var(--danger)'}">${t.type==='Depense'?'-':'+'}${formatMoney(t.montant)}</td><td>
-                        <button class="btn btn-secondary btn-sm" onclick="editTransaction(${t.id})"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteTransaction(${t.id})"><i class="fas fa-trash"></i></button></td></tr>
-                    `).join('');
+                            <tr><td>${formatDate(t.date)}</td><td><span class="badge badge-${t.type==='Revenu'?'rev':t.type==='Depense'?'dep':'ep'}">${t.type}</span></td><td>${escapeHtml(t.description)}</td><td>${escapeHtml(t.categorie)}</td><td>${escapeHtml(t.sous_categorie||'-')}</td><td style="color:${t.type==='Revenu'?'var(--success)':'var(--danger)'}">${t.type==='Depense'?'-':'+'}${formatMoney(t.montant)}</td><td>
+                            <button class="btn btn-secondary btn-sm" onclick="editTransaction(${t.id})"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteTransaction(${t.id})"><i class="fas fa-trash"></i></button></td></tr>
+                        `).join('');
             document.getElementById('txCount').textContent = transactions.length;
         }
 
@@ -3156,17 +3157,17 @@
                 0);
                 const pct = (realise / b.budget * 100).toFixed(1);
                 return `<div class="kpi-card" data-categorie="${escapeHtml(b.categorie)}" data-budget="${b.budget}">
-                            <div class="kpi-label" style="display:flex; justify-content:space-between; align-items:center;">
-                                <span>${escapeHtml(b.categorie)}</span>
-                                <div style="display:flex; gap:4px;">
-                                    <button class="btn btn-secondary btn-sm" onclick="editBudget('${escapeJsAttr(b.categorie)}', ${b.budget})" style="padding:2px 8px; font-size:10px;"><i class="fas fa-edit"></i></button>
-                                    <button class="btn btn-danger btn-sm" onclick="supprimerCategorieBudget('${escapeJsAttr(b.categorie)}')" style="padding:2px 8px; font-size:10px;"><i class="fas fa-trash"></i></button>
+                                <div class="kpi-label" style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span>${escapeHtml(b.categorie)}</span>
+                                    <div style="display:flex; gap:4px;">
+                                        <button class="btn btn-secondary btn-sm" onclick="editBudget('${escapeJsAttr(b.categorie)}', ${b.budget})" style="padding:2px 8px; font-size:10px;"><i class="fas fa-edit"></i></button>
+                                        <button class="btn btn-danger btn-sm" onclick="supprimerCategorieBudget('${escapeJsAttr(b.categorie)}')" style="padding:2px 8px; font-size:10px;"><i class="fas fa-trash"></i></button>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="kpi-value" style="font-size:18px">${formatMoney(realise)} / ${formatMoney(b.budget)}</div>
-                            <div class="progress-bg"><div class="progress-fill ${pct>100?'progress-danger':pct>80?'progress-warning':'progress-success'}" style="width:${Math.min(pct,100)}%"></div></div>
-                            <div>${pct}%</div>
-                        </div>`;
+                                <div class="kpi-value" style="font-size:18px">${formatMoney(realise)} / ${formatMoney(b.budget)}</div>
+                                <div class="progress-bg"><div class="progress-fill ${pct>100?'progress-danger':pct>80?'progress-warning':'progress-success'}" style="width:${Math.min(pct,100)}%"></div></div>
+                                <div>${pct}%</div>
+                            </div>`;
             }).join('');
 
             document.getElementById('budgetTable').innerHTML = budgets.map(b => {
@@ -3258,21 +3259,21 @@
                 const statut = o.actuel >= o.cible ? 'Objectif atteint !' :
                     `${joursRestants>0?joursRestants+' jours restants':'Délai dépassé'}`;
                 return `<div class="obj-card ${o.priorite==='Haute'?'high':o.priorite==='Moyenne'?'medium':'low'}">
-                            <div class="obj-header">
-                                <div>
-                                    <div class="obj-name">${escapeHtml(o.nom)} ${o.actuel>=o.cible?'<span style="color:var(--success);font-size:14px;"> 🎉</span>':''}</div>
-                                    <div class="obj-desc">${escapeHtml(o.description)||"Objectif d'epargne"}</div>
-                                    <div class="obj-desc">📅 ${o.date_cible} · ${statut}</div>
+                                <div class="obj-header">
+                                    <div>
+                                        <div class="obj-name">${escapeHtml(o.nom)} ${o.actuel>=o.cible?'<span style="color:var(--success);font-size:14px;"> 🎉</span>':''}</div>
+                                        <div class="obj-desc">${escapeHtml(o.description)||"Objectif d'epargne"}</div>
+                                        <div class="obj-desc">📅 ${o.date_cible} · ${statut}</div>
+                                    </div>
+                                    <div class="obj-amt"><div class="obj-current">${formatMoney(o.actuel)}</div><div class="obj-target">/${formatMoney(o.cible)}</div></div>
                                 </div>
-                                <div class="obj-amt"><div class="obj-current">${formatMoney(o.actuel)}</div><div class="obj-target">/${formatMoney(o.cible)}</div></div>
-                            </div>
-                            <div class="obj-pct">${pct}%</div>
-                            <div class="progress-bg"><div class="progress-fill ${pct>=100?'progress-success':pct>80?'progress-warning':'progress-success'}" style="width:${Math.min(pct,100)}%"></div></div>
-                            <div class="obj-actions">
-                                <button class="btn btn-secondary btn-sm" onclick="editObjective(${o.id})"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteObjective(${o.id})"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </div>`;
+                                <div class="obj-pct">${pct}%</div>
+                                <div class="progress-bg"><div class="progress-fill ${pct>=100?'progress-success':pct>80?'progress-warning':'progress-success'}" style="width:${Math.min(pct,100)}%"></div></div>
+                                <div class="obj-actions">
+                                    <button class="btn btn-secondary btn-sm" onclick="editObjective(${o.id})"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteObjective(${o.id})"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>`;
             }).join('');
             document.getElementById('objCount').textContent = objectifs.length;
         }
@@ -3453,26 +3454,26 @@
                 minI, 0) : 0;
 
             document.getElementById('reportContent').innerHTML = `
-                        <div class="rapport-stats">
-                            <div class="rapport-card"><div class="rapport-value" style="color:var(--success)">+${formatMoney(revenus)}</div><div class="rapport-label">Revenus</div><div class="rapport-sub">${prevData.revenus.variation>=0?'↑':'↓'} ${Math.abs(prevData.revenus.variation)}%</div></div>
-                            <div class="rapport-card"><div class="rapport-value" style="color:var(--danger)">-${formatMoney(depenses)}</div><div class="rapport-label">Dépenses</div><div class="rapport-sub">${prevData.depenses.variation<=0?'↓':'↑'} ${Math.abs(prevData.depenses.variation)}%</div></div>
-                            <div class="rapport-card"><div class="rapport-value" style="color:var(--info)">${formatMoney(epargne)}</div><div class="rapport-label">Épargne</div><div class="rapport-sub">Taux : ${tauxEpargne}%</div></div>
-                            <div class="rapport-card"><div class="rapport-value" style="color:${balance>=0?'var(--success)':'var(--danger)'}">${balance>=0?'+':''}${formatMoney(balance)}</div><div class="rapport-label">Balance</div><div class="rapport-sub">${prevData.solde.variation>=0?'↑':'↓'} ${Math.abs(prevData.solde.variation)}%</div></div>
-                        </div>
-                        <div class="charts-grid">
-                            <div class="chart-card"><div class="chart-header"><div class="chart-title">Top 5 Dépenses</div></div>${top5Dep.map(([cat,mnt],i) => `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;background:rgba(239,68,68,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--danger)">${i+1}</span><span style="font-weight:600">${escapeHtml(cat)}</span></div><div style="font-weight:700;color:var(--danger)">-${formatMoney(mnt)}</div></div>`).join('')}</div>
-                            <div class="chart-card"><div class="chart-header"><div class="chart-title">Top 5 Revenus</div></div>${top5Rev.map(([cat,mnt],i) => `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;background:rgba(16,185,129,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--success)">${i+1}</span><span style="font-weight:600">${escapeHtml(cat)}</span></div><div style="font-weight:700;color:var(--success)">+${formatMoney(mnt)}</div></div>`).join('')}</div>
-                        </div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px; margin-bottom:20px;">
-                            <div class="chart-card"><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-                                <div style="background:var(--bg);border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text-muted)">Taux d'épargne</div><div style="font-size:20px;font-weight:800;color:var(--info)">${tauxEpargne}%</div></div>
-                                <div style="background:var(--bg);border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text-muted)">Taux de dépenses</div><div style="font-size:20px;font-weight:800;color:var(--warning)">${revenus>0?((depenses/revenus)*100).toFixed(1):0}%</div></div>
-                                <div style="background:var(--bg);border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text-muted)">Balance moyenne</div><div style="font-size:18px;font-weight:800;color:${soldeMoyen>=0?'var(--success)':'var(--danger)'}">${formatMoney(soldeMoyen)}</div></div>
-                                <div style="background:var(--bg);border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text-muted)">Meilleur/Pire mois</div><div style="font-size:13px;font-weight:700"><span style="color:var(--success)">${months[bestIdx]||'-'}</span> / <span style="color:var(--danger)">${months[worstIdx]||'-'}</span></div></div>
-                            </div></div>
-                        </div>
-                        <div class="table-card"><div class="table-header"><div class="table-title">Bilan mensuel</div></div><table class="data-table"><thead><tr><th>Mois</th><th>Revenus</th><th>Dépenses</th><th>Balance</th></tr></thead><tbody>${months.map((m,i) => `<tr><td><strong>${m}</strong></td><td style="color:var(--success)">+${formatMoney(revByMonth[i])}</td><td style="color:var(--danger)">-${formatMoney(depByMonth[i])}</td><td style="color:${balByMonth[i]>=0?'var(--success)':'var(--danger)'}">${balByMonth[i]>=0?'+':''}${formatMoney(balByMonth[i])}</td></tr>`).join('')}</tbody></table></div>
-                    `;
+                            <div class="rapport-stats">
+                                <div class="rapport-card"><div class="rapport-value" style="color:var(--success)">+${formatMoney(revenus)}</div><div class="rapport-label">Revenus</div><div class="rapport-sub">${prevData.revenus.variation>=0?'↑':'↓'} ${Math.abs(prevData.revenus.variation)}%</div></div>
+                                <div class="rapport-card"><div class="rapport-value" style="color:var(--danger)">-${formatMoney(depenses)}</div><div class="rapport-label">Dépenses</div><div class="rapport-sub">${prevData.depenses.variation<=0?'↓':'↑'} ${Math.abs(prevData.depenses.variation)}%</div></div>
+                                <div class="rapport-card"><div class="rapport-value" style="color:var(--info)">${formatMoney(epargne)}</div><div class="rapport-label">Épargne</div><div class="rapport-sub">Taux : ${tauxEpargne}%</div></div>
+                                <div class="rapport-card"><div class="rapport-value" style="color:${balance>=0?'var(--success)':'var(--danger)'}">${balance>=0?'+':''}${formatMoney(balance)}</div><div class="rapport-label">Balance</div><div class="rapport-sub">${prevData.solde.variation>=0?'↑':'↓'} ${Math.abs(prevData.solde.variation)}%</div></div>
+                            </div>
+                            <div class="charts-grid">
+                                <div class="chart-card"><div class="chart-header"><div class="chart-title">Top 5 Dépenses</div></div>${top5Dep.map(([cat,mnt],i) => `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;background:rgba(239,68,68,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--danger)">${i+1}</span><span style="font-weight:600">${escapeHtml(cat)}</span></div><div style="font-weight:700;color:var(--danger)">-${formatMoney(mnt)}</div></div>`).join('')}</div>
+                                <div class="chart-card"><div class="chart-header"><div class="chart-title">Top 5 Revenus</div></div>${top5Rev.map(([cat,mnt],i) => `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><div style="display:flex;align-items:center;gap:10px"><span style="width:24px;height:24px;background:rgba(16,185,129,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--success)">${i+1}</span><span style="font-weight:600">${escapeHtml(cat)}</span></div><div style="font-weight:700;color:var(--success)">+${formatMoney(mnt)}</div></div>`).join('')}</div>
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px; margin-bottom:20px;">
+                                <div class="chart-card"><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                                    <div style="background:var(--bg);border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text-muted)">Taux d'épargne</div><div style="font-size:20px;font-weight:800;color:var(--info)">${tauxEpargne}%</div></div>
+                                    <div style="background:var(--bg);border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text-muted)">Taux de dépenses</div><div style="font-size:20px;font-weight:800;color:var(--warning)">${revenus>0?((depenses/revenus)*100).toFixed(1):0}%</div></div>
+                                    <div style="background:var(--bg);border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text-muted)">Balance moyenne</div><div style="font-size:18px;font-weight:800;color:${soldeMoyen>=0?'var(--success)':'var(--danger)'}">${formatMoney(soldeMoyen)}</div></div>
+                                    <div style="background:var(--bg);border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text-muted)">Meilleur/Pire mois</div><div style="font-size:13px;font-weight:700"><span style="color:var(--success)">${months[bestIdx]||'-'}</span> / <span style="color:var(--danger)">${months[worstIdx]||'-'}</span></div></div>
+                                </div></div>
+                            </div>
+                            <div class="table-card"><div class="table-header"><div class="table-title">Bilan mensuel</div></div><table class="data-table"><thead><tr><th>Mois</th><th>Revenus</th><th>Dépenses</th><th>Balance</th></tr></thead><tbody>${months.map((m,i) => `<tr><td><strong>${m}</strong></td><td style="color:var(--success)">+${formatMoney(revByMonth[i])}</td><td style="color:var(--danger)">-${formatMoney(depByMonth[i])}</td><td style="color:${balByMonth[i]>=0?'var(--success)':'var(--danger)'}">${balByMonth[i]>=0?'+':''}${formatMoney(balByMonth[i])}</td></tr>`).join('')}</tbody></table></div>
+                        `;
         }
 
         // =============================================================
@@ -3487,10 +3488,10 @@
             const ratioDep = revenus > 0 ? (depenses / revenus * 100).toFixed(1) : 0;
 
             document.getElementById('advancedKPIs').innerHTML = `
-                        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-percentage"></i></div><div class="kpi-label">Taux d'épargne</div><div class="kpi-value">${tauxEpargne}%</div><div class="kpi-sub">Objectif : >20%</div></div>
-                        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-balance-scale"></i></div><div class="kpi-label">Ratio Dépenses/Revenus</div><div class="kpi-value">${ratioDep}%</div><div class="kpi-sub">Idéal : <50%</div></div>
-                        <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-line"></i></div><div class="kpi-label">Prévision annuelle</div><div class="kpi-value">${formatMoney((revenus-depenses)*12)}</div><div class="kpi-sub">Épargne projetée</div></div>
-                    `;
+                            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-percentage"></i></div><div class="kpi-label">Taux d'épargne</div><div class="kpi-value">${tauxEpargne}%</div><div class="kpi-sub">Objectif : >20%</div></div>
+                            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-balance-scale"></i></div><div class="kpi-label">Ratio Dépenses/Revenus</div><div class="kpi-value">${ratioDep}%</div><div class="kpi-sub">Idéal : <50%</div></div>
+                            <div class="kpi-card"><div class="kpi-icon"><i class="fas fa-chart-line"></i></div><div class="kpi-label">Prévision annuelle</div><div class="kpi-value">${formatMoney((revenus-depenses)*12)}</div><div class="kpi-sub">Épargne projetée</div></div>
+                        `;
 
             const depParCat = {};
             filtered.filter(t => t.type === 'Depense').forEach(t => depParCat[t.categorie] = (depParCat[t.categorie] ||
@@ -3504,22 +3505,22 @@
                 t.type === 'Depense').length : 0;
 
             document.getElementById('analyseResume').innerHTML = `
-                        <div style="padding:15px;">
-                            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Revenus totaux</span><span style="font-size:13px;font-weight:600;color:var(--success)">${formatMoney(revenus)}</span></div>
-                            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Dépenses totales</span><span style="font-size:13px;font-weight:600;color:var(--danger)">${formatMoney(depenses)}</span></div>
-                            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Épargne</span><span style="font-size:13px;font-weight:600;color:var(--info)">${formatMoney(epargne)}</span></div>
-                            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Balance nette</span><span style="font-size:13px;font-weight:600;color:${revenus-depenses-epargne>=0?'var(--success)':'var(--danger)'}">${formatMoney(revenus-depenses-epargne)}</span></div>
-                            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Nombre de transactions</span><span style="font-size:13px;font-weight:600">${filtered.length}</span></div>
-                            <div style="display:flex;justify-content:space-between;padding:10px 0;"><span style="font-size:13px;color:var(--text-muted)">Dépense moyenne</span><span style="font-size:13px;font-weight:600">${formatMoney(moyenneDepense)}</span></div>
-                        </div>`;
+                            <div style="padding:15px;">
+                                <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Revenus totaux</span><span style="font-size:13px;font-weight:600;color:var(--success)">${formatMoney(revenus)}</span></div>
+                                <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Dépenses totales</span><span style="font-size:13px;font-weight:600;color:var(--danger)">${formatMoney(depenses)}</span></div>
+                                <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Épargne</span><span style="font-size:13px;font-weight:600;color:var(--info)">${formatMoney(epargne)}</span></div>
+                                <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Balance nette</span><span style="font-size:13px;font-weight:600;color:${revenus-depenses-epargne>=0?'var(--success)':'var(--danger)'}">${formatMoney(revenus-depenses-epargne)}</span></div>
+                                <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Nombre de transactions</span><span style="font-size:13px;font-weight:600">${filtered.length}</span></div>
+                                <div style="display:flex;justify-content:space-between;padding:10px 0;"><span style="font-size:13px;color:var(--text-muted)">Dépense moyenne</span><span style="font-size:13px;font-weight:600">${formatMoney(moyenneDepense)}</span></div>
+                            </div>`;
 
             document.getElementById('analyseTop').innerHTML = `
-                        <div style="padding:15px;">
-                            ${topRevenu?`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Plus grand revenu</span><span style="font-size:13px;font-weight:600;color:var(--success)">${escapeHtml(topRevenu[0])} (${formatMoney(topRevenu[1])})</span></div>`:''}
-                            ${topDepense?`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Plus grande dépense</span><span style="font-size:13px;font-weight:600;color:var(--danger)">${escapeHtml(topDepense[0])} (${formatMoney(topDepense[1])})</span></div>`:''}
-                            <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Taux d'épargne</span><span style="font-size:13px;font-weight:600;color:${parseFloat(tauxEpargne)>=20?'var(--success)':'var(--warning)'}">${tauxEpargne}%</span></div>
-                            <div style="display:flex;justify-content:space-between;padding:10px 0;"><span style="font-size:13px;color:var(--text-muted)">Recommandation</span><span style="font-size:13px;font-weight:600;color:var(--text)">${parseFloat(tauxEpargne)>=20?'Excellent !':parseFloat(tauxEpargne)>=10?'Bien':'À améliorer'}</span></div>
-                        </div>`;
+                            <div style="padding:15px;">
+                                ${topRevenu?`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Plus grand revenu</span><span style="font-size:13px;font-weight:600;color:var(--success)">${escapeHtml(topRevenu[0])} (${formatMoney(topRevenu[1])})</span></div>`:''}
+                                ${topDepense?`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Plus grande dépense</span><span style="font-size:13px;font-weight:600;color:var(--danger)">${escapeHtml(topDepense[0])} (${formatMoney(topDepense[1])})</span></div>`:''}
+                                <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span style="font-size:13px;color:var(--text-muted)">Taux d'épargne</span><span style="font-size:13px;font-weight:600;color:${parseFloat(tauxEpargne)>=20?'var(--success)':'var(--warning)'}">${tauxEpargne}%</span></div>
+                                <div style="display:flex;justify-content:space-between;padding:10px 0;"><span style="font-size:13px;color:var(--text-muted)">Recommandation</span><span style="font-size:13px;font-weight:600;color:var(--text)">${parseFloat(tauxEpargne)>=20?'Excellent !':parseFloat(tauxEpargne)>=10?'Bien':'À améliorer'}</span></div>
+                            </div>`;
         }
 
         // =============================================================
@@ -3534,16 +3535,16 @@
                 return;
             }
             tbody.innerHTML = recurrentes.map(r => `
-                        <tr>
-                            <td><strong>${escapeHtml(r.description)}</strong></td>
-                            <td><span class="badge badge-${r.type==='Revenu'?'rev':r.type==='Depense'?'dep':'ep'}">${r.type}</span></td>
-                            <td>${escapeHtml(r.categorie)}</td>
-                            <td style="color:${r.type==='Revenu'?'var(--success)':r.type==='Depense'?'var(--danger)':'var(--info)'}">${r.type==='Depense'?'-':'+'}${formatMoney(r.montant)}</td>
-                            <td>Jour ${r.jour}</td>
-                            <td><span class="badge ${r.actif?'badge-rev':'badge-dep'}" style="cursor:pointer;" onclick="toggleRecurrente(${r.id})">${r.actif?'Actif':'Inactif'}</span></td>
-                            <td><button class="btn btn-secondary btn-sm" onclick="editRecurrente(${r.id})"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-sm" onclick="deleteRecurrente(${r.id})"><i class="fas fa-trash"></i></button></td>
-                        </tr>
-                    `).join('');
+                            <tr>
+                                <td><strong>${escapeHtml(r.description)}</strong></td>
+                                <td><span class="badge badge-${r.type==='Revenu'?'rev':r.type==='Depense'?'dep':'ep'}">${r.type}</span></td>
+                                <td>${escapeHtml(r.categorie)}</td>
+                                <td style="color:${r.type==='Revenu'?'var(--success)':r.type==='Depense'?'var(--danger)':'var(--info)'}">${r.type==='Depense'?'-':'+'}${formatMoney(r.montant)}</td>
+                                <td>Jour ${r.jour}</td>
+                                <td><span class="badge ${r.actif?'badge-rev':'badge-dep'}" style="cursor:pointer;" onclick="toggleRecurrente(${r.id})">${r.actif?'Actif':'Inactif'}</span></td>
+                                <td><button class="btn btn-secondary btn-sm" onclick="editRecurrente(${r.id})"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-sm" onclick="deleteRecurrente(${r.id})"><i class="fas fa-trash"></i></button></td>
+                            </tr>
+                        `).join('');
         }
 
         function sauvegarderParametres() {
@@ -3681,7 +3682,7 @@
         }
 
         // =============================================================
-        // 6.21 ADMIN
+        // 6.21 ADMIN (AMÉLIORÉ)
         // =============================================================
         function formatFirestoreDate(value) {
             if (!value) return '-';
@@ -3689,7 +3690,117 @@
             return isNaN(d) ? '-' : d.toLocaleDateString('fr-FR');
         }
 
+        // Envoyer un email d'activation via EmailJS
+        function sendActivationEmail(email, name) {
+            if (!email || !name) return;
+            const templateParams = {
+                to_email: email,
+                to_name: name,
+                subject: 'Votre compte Money Control Pro est activé !',
+                message: `Bonjour ${name},\n\nFélicitations ! Votre compte Money Control Pro a été activé avec succès. Vous pouvez désormais accéder à toutes les fonctionnalités de l'application.\n\nCordialement,\nL'équipe Money Control Pro`
+            };
+            emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, templateParams)
+                .then(() => { console.log('Email d\'activation envoyé à', email); })
+                .catch(err => { console.error('Erreur envoi email:', err); });
+        }
+
+        // Activer un utilisateur (fonction partagée)
+        async function activateUser(userId, requestId) {
+            if (!isAdmin()) { showNotification('Action non autorisée', 'danger'); return false; }
+            try {
+                // Récupérer les données utilisateur
+                const userDoc = await db.collection('users').doc(userId).get();
+                if (!userDoc.exists) { showNotification('Utilisateur introuvable', 'danger'); return false; }
+                const userData = userDoc.data();
+                const email = userData.email;
+                const name = userData.fullName || email;
+
+                // Activer
+                await db.collection('users').doc(userId).set({
+                    isActivated: true,
+                    activationDate: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+
+                // Mettre à jour la demande
+                if (requestId) {
+                    await db.collection('activation_requests').doc(requestId).update({ status: 'approved' });
+                }
+
+                // Envoyer email
+                sendActivationEmail(email, name);
+
+                showNotification(`Utilisateur ${name} activé avec succès`, 'success');
+                return true;
+            } catch (error) {
+                console.error('Erreur activation:', error);
+                showNotification("Erreur lors de l'activation : " + (error.message || 'inconnue'), 'danger');
+                return false;
+            }
+        }
+
+        async function activateRequest(requestId, userId) {
+            if (!userId) { showNotification('Utilisateur introuvable pour cette demande', 'danger'); return; }
+            const success = await activateUser(userId, requestId);
+            if (success) {
+                renderAdmin();
+                // Mettre à jour le badge
+                const pendingSnap = await db.collection('activation_requests').where('status', '==', 'pending').get();
+                document.getElementById('pendingCount').textContent = pendingSnap.size;
+            }
+        }
+
+        async function rejectRequest(requestId) {
+            if (!isAdmin()) { showNotification('Action non autorisée', 'danger'); return; }
+            try {
+                await db.collection('activation_requests').doc(requestId).update({ status: 'rejected' });
+                showNotification('Demande rejetée', 'warning');
+                renderAdmin();
+            } catch (error) { console.error(error);
+                showNotification('Erreur lors du rejet', 'danger'); }
+        }
+
+        async function deactivateUser(userId) {
+            if (!isAdmin()) { showNotification('Action non autorisée', 'danger'); return; }
+            try {
+                await db.collection('users').doc(userId).set({ isActivated: false }, { merge: true });
+                showNotification('Utilisateur désactivé', 'warning');
+                renderAdmin();
+            } catch (error) { console.error(error);
+                showNotification('Erreur lors de la désactivation', 'danger'); }
+        }
+
+        async function manualActivateUser() {
+            if (!isAdmin()) { showNotification('Action non autorisée', 'danger'); return; }
+            const email = document.getElementById('adminUserEmail').value.trim();
+            if (!email) { showNotification('Adresse e-mail requise', 'danger'); return; }
+            try {
+                const snap = await db.collection('users').where('email', '==', email).limit(1).get();
+                if (snap.empty) { showNotification('Aucun utilisateur trouvé avec cette adresse e-mail', 'danger'); return; }
+                const userDoc = snap.docs[0];
+                const userId = userDoc.id;
+                // Chercher une demande en attente pour cet utilisateur
+                const pendingSnap = await db.collection('activation_requests').where('userId', '==', userId).where(
+                    'status', '==', 'pending').get();
+                let requestId = null;
+                if (!pendingSnap.empty) {
+                    requestId = pendingSnap.docs[0].id;
+                }
+                const success = await activateUser(userId, requestId);
+                if (success) {
+                    document.getElementById('adminUserEmail').value = '';
+                    renderAdmin();
+                }
+            } catch (error) { console.error(error);
+                showNotification("Erreur lors de l'activation manuelle", 'danger'); }
+        }
+
         async function renderAdmin() {
+            if (!isAdmin()) {
+                document.getElementById('pendingRequestsList').innerHTML =
+                    '<p style="text-align:center;color:var(--text-muted);padding:30px;">Accès non autorisé.</p>';
+                document.getElementById('activatedUsersList').innerHTML = '';
+                return;
+            }
             const listEl = document.getElementById('pendingRequestsList');
             const actEl = document.getElementById('activatedUsersList');
             const loadingHtml =
@@ -3722,6 +3833,7 @@
                     '<p style="text-align:center;color:var(--text-muted);padding:30px;">Aucun utilisateur activé</p>' :
                     `<table class="data-table"><thead><tr><th>Nom</th><th>Email</th><th>Date</th><th>Actions</th></tr></thead><tbody>${activatedUsers.map(u => `<tr><td><strong>${escapeHtml(u.fullName)}</strong></td><td>${escapeHtml(u.email)}</td><td>${formatFirestoreDate(u.activationDate)}</td><td><button class="btn btn-danger btn-sm" onclick="deactivateUser('${escapeJsAttr(u.id)}')"><i class="fas fa-ban"></i> Désactiver</button></td></tr>`).join('')}</tbody></table>`;
 
+                // Mettre à jour le badge
                 document.getElementById('pendingCount').textContent = pendingUsers.length;
             } catch (error) {
                 console.error('Erreur chargement admin:', error);
@@ -3733,55 +3845,6 @@
 
         function refreshActivationRequests() { renderAdmin();
             showNotification('Listes rafraîchies', 'success'); }
-
-        async function activateRequest(requestId, userId) {
-            if (!userId) { showNotification('Utilisateur introuvable pour cette demande', 'danger'); return; }
-            try {
-                await db.collection('users').doc(userId).set({ isActivated: true,
-                        activationDate: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
-                await db.collection('activation_requests').doc(requestId).update({ status: 'approved' });
-                showNotification('Utilisateur activé', 'success');
-                renderAdmin();
-            } catch (error) { console.error(error);
-                showNotification("Erreur lors de l'activation", 'danger'); }
-        }
-
-        async function rejectRequest(requestId) {
-            try {
-                await db.collection('activation_requests').doc(requestId).update({ status: 'rejected' });
-                showNotification('Demande rejetée', 'warning');
-                renderAdmin();
-            } catch (error) { console.error(error);
-                showNotification('Erreur lors du rejet', 'danger'); }
-        }
-
-        async function deactivateUser(userId) {
-            try {
-                await db.collection('users').doc(userId).set({ isActivated: false }, { merge: true });
-                showNotification('Utilisateur désactivé', 'warning');
-                renderAdmin();
-            } catch (error) { console.error(error);
-                showNotification('Erreur lors de la désactivation', 'danger'); }
-        }
-
-        async function manualActivateUser() {
-            const email = document.getElementById('adminUserEmail').value.trim();
-            if (!email) { showNotification('Adresse e-mail requise', 'danger'); return; }
-            try {
-                const snap = await db.collection('users').where('email', '==', email).limit(1).get();
-                if (snap.empty) { showNotification('Aucun utilisateur trouvé avec cette adresse e-mail', 'danger'); return; }
-                const userDoc = snap.docs[0];
-                await userDoc.ref.set({ isActivated: true, activationDate: firebase.firestore.FieldValue
-                        .serverTimestamp() }, { merge: true });
-                const pendingSnap = await db.collection('activation_requests').where('userId', '==', userDoc.id).where(
-                    'status', '==', 'pending').get();
-                await Promise.all(pendingSnap.docs.map(doc => doc.ref.update({ status: 'approved' })));
-                showNotification(`${escapeHtml(email)} activé !`, 'success');
-                document.getElementById('adminUserEmail').value = '';
-                renderAdmin();
-            } catch (error) { console.error(error);
-                showNotification("Erreur lors de l'activation", 'danger'); }
-        }
 
         // =============================================================
         // 6.22 EXPORTS
@@ -3876,14 +3939,17 @@
         async function addActivationButtonIfNeeded() {
             if (!auth.currentUser) return;
             const isActivated = await isAccountActivated();
-            const isAdmin = ADMIN_EMAILS.includes(auth.currentUser.email.toLowerCase());
-            isUserActivated = isActivated || isAdmin;
+            const admin = isAdmin();
+            isUserActivated = isActivated || admin;
             if (!isActivated) {
                 const container = document.getElementById('activationBtnContainer');
                 if (container && !document.getElementById('activationRequestBtn')) {
                     container.innerHTML =
                         `<button id="activationRequestBtn" class="btn btn-warning" onclick="openWelcomeGuide()" style="background: var(--warning); color: white; border: none;"><i class="fas fa-key"></i> Demander l'activation</button>`;
                 }
+            } else {
+                const container = document.getElementById('activationBtnContainer');
+                if (container) container.innerHTML = '';
             }
         }
 
@@ -3906,7 +3972,6 @@
                     'Enter') { e.preventDefault();
                     loginWithEmail(e); } });
 
-            // AUTH STATE
             auth.onAuthStateChanged(async (user) => {
                 if (user) {
                     document.getElementById('loginContainer').style.display = 'none';
@@ -3923,6 +3988,8 @@
                     renderObjectifs();
                     renderCalendar();
                     renderParametres();
+                    // Si admin, charger aussi l'admin
+                    if (isAdmin()) renderAdmin();
                 } else {
                     document.getElementById('loginContainer').style.display = 'flex';
                     document.getElementById('appContainer').style.display = 'none';
