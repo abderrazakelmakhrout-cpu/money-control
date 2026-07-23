@@ -2825,33 +2825,43 @@ service cloud.firestore {
             }
         }
 
-        function showCelebrationModal(firstName, lastName, email) {
-            const modal = document.getElementById('celebrateModal');
-            const nameEl = document.getElementById('celebrateName');
-            const emailEl = document.getElementById('celebrateEmail');
-            const fullNameEl = document.getElementById('celebrateFullName');
-            const dateEl = document.getElementById('celebrateDate');
+      function showCelebrationModal(firstName, lastName, email) {
+    const modal = document.getElementById('celebrateModal');
+    if (!modal) {
+        console.error('Modale de célébration non trouvée');
+        // Fallback : rediriger directement
+        setTimeout(() => location.reload(), 2000);
+        return;
+    }
 
-            const fullName = `${firstName} ${lastName}`;
-            nameEl.textContent = `👋 ${fullName}`;
-            emailEl.textContent = email;
-            fullNameEl.textContent = fullName;
-            dateEl.textContent = new Date().toLocaleDateString('fr-FR', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+    const nameEl = document.getElementById('celebrateName');
+    const emailEl = document.getElementById('celebrateEmail');
+    const fullNameEl = document.getElementById('celebrateFullName');
+    const dateEl = document.getElementById('celebrateDate');
 
-            generateConfetti();
-            modal.classList.add('active');
+    const fullName = `${firstName} ${lastName}`;
+    
+    if (nameEl) nameEl.textContent = `👋 ${fullName}`;
+    if (emailEl) emailEl.textContent = email;
+    if (fullNameEl) fullNameEl.textContent = fullName;
+    if (dateEl) {
+        dateEl.textContent = new Date().toLocaleDateString('fr-FR', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
 
-            if (celebrateTimer) clearTimeout(celebrateTimer);
-            celebrateTimer = setTimeout(() => {
-                closeCelebrateAndGo();
-            }, 6000);
-        }
+    generateConfetti();
+    modal.classList.add('active');
+
+    if (celebrateTimer) clearTimeout(celebrateTimer);
+    celebrateTimer = setTimeout(() => {
+        closeCelebrateAndGo();
+    }, 6000);
+}
 
         function generateConfetti() {
             const container = document.getElementById('celebrateCard');
