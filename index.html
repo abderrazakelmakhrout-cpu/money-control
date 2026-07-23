@@ -1139,7 +1139,178 @@
         }
 
         /* ========================================================= */
-        /* 4.17 RESPONSIVE MOBILE                                    */
+        /* 4.17 FÉLICITATIONS MODAL                                  */
+        /* ========================================================= */
+        .celebrate-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 99999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .celebrate-overlay.active {
+            display: flex;
+        }
+
+        .celebrate-card {
+            background: var(--bg-card);
+            border-radius: 32px;
+            max-width: 520px;
+            width: 100%;
+            padding: 40px 32px 32px;
+            text-align: center;
+            border: 2px solid var(--primary);
+            box-shadow: 0 30px 80px rgba(99, 102, 241, 0.3);
+            animation: celebratePop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes celebratePop {
+            0% {
+                opacity: 0;
+                transform: scale(0.7) rotate(-5deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        .celebrate-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, var(--primary), var(--secondary), var(--warning), var(--primary));
+            opacity: 0.05;
+            animation: spin 8s linear infinite;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .celebrate-icon {
+            font-size: 72px;
+            margin-bottom: 12px;
+            display: block;
+            animation: bounce 1s ease infinite;
+        }
+
+        @keyframes bounce {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-12px);
+            }
+        }
+
+        .celebrate-title {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 8px 0 12px;
+        }
+
+        .celebrate-sub {
+            font-size: 16px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            line-height: 1.6;
+        }
+
+        .celebrate-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+            display: block;
+            margin: 6px 0;
+        }
+
+        .celebrate-details {
+            background: var(--bg);
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin: 20px 0 24px;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        .celebrate-details .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 14px;
+        }
+
+        .celebrate-details .row .label {
+            color: var(--text-muted);
+        }
+        .celebrate-details .row .value {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .celebrate-confetti {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+            animation: confettiFall linear forwards;
+            pointer-events: none;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                opacity: 1;
+                transform: translateY(0) rotate(0deg) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(400px) rotate(720deg) scale(0.3);
+            }
+        }
+
+        .btn-celebrate {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 14px 40px;
+            border-radius: 16px;
+            border: none;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-celebrate:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(99, 102, 241, 0.5);
+        }
+
+        /* ========================================================= */
+        /* 4.18 RESPONSIVE MOBILE                                    */
         /* ========================================================= */
         @media (max-width: 1024px) {
             .sidebar {
@@ -1394,6 +1565,10 @@
                 font-size: 14px !important;
             }
 
+            .celebrate-overlay {
+                padding: 12px !important;
+            }
+
             #pendingRequestsList>div,
             #activatedUsersList>div {
                 padding: 14px !important;
@@ -1587,6 +1762,10 @@
                 font-size: 13px !important;
             }
 
+            .celebrate-overlay {
+                padding: 8px !important;
+            }
+
             .main-content {
                 padding: 12px !important;
                 padding-top: 60px !important;
@@ -1639,12 +1818,18 @@
                 padding-top: env(safe-area-inset-top);
                 padding-bottom: env(safe-area-inset-bottom);
             }
+
+            .celebrate-card {
+                padding-left: max(32px, env(safe-area-inset-left));
+                padding-right: max(32px, env(safe-area-inset-right));
+            }
         }
 
         /* Amélioration du défilement */
         .main-content,
         .sidebar,
-        .modal {
+        .modal,
+        .celebrate-card {
             -webkit-overflow-scrolling: touch;
             scroll-behavior: smooth;
         }
@@ -1691,7 +1876,6 @@
     <div id="loginContainer" style="display: flex; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px;">
         <div style="margin: auto; width: 100%; max-width: 420px; padding: 8px;">
             <div style="background: var(--bg-card); border-radius: 28px; padding: 32px 24px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
-                <!-- Logo -->
                 <div style="text-align: center; margin-bottom: 28px;">
                     <div style="width: 70px; height: 70px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
                         <i class="fas fa-chart-line" style="font-size: 32px; color: white;"></i>
@@ -1700,7 +1884,6 @@
                     <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Gestion financière professionnelle</p>
                 </div>
 
-                <!-- Formulaire de connexion -->
                 <div id="loginForm">
                     <div class="form-group" style="margin-bottom: 16px;">
                         <label class="form-label">ADRESSE E-MAIL</label>
@@ -1723,7 +1906,6 @@
                     </div>
                 </div>
 
-                <!-- Formulaire d'inscription -->
                 <div id="registerForm" style="display: none;">
                     <div class="form-group" style="margin-bottom: 14px;">
                         <label class="form-label">PRÉNOM</label>
@@ -1756,7 +1938,6 @@
                     </div>
                 </div>
 
-                <!-- Formulaire de réinitialisation -->
                 <div id="resetForm" style="display: none;">
                     <div class="form-group" style="margin-bottom: 16px;">
                         <label class="form-label">ADRESSE E-MAIL</label>
@@ -1779,18 +1960,13 @@
     <div id="appContainer" style="display: none;">
         <div class="app-container">
 
-            <!-- Boutons flottants -->
             <button class="menu-toggle no-print" onclick="toggleSidebar()" aria-label="Menu"><i class="fas fa-bars"></i></button>
             <button class="theme-toggle no-print" onclick="toggleTheme()" aria-label="Changer le thème"><i class="fas fa-moon"></i></button>
             <button class="theme-toggle no-print" style="right: 80px;" onclick="openWelcomeGuide()" aria-label="Aide"><i class="fas fa-question"></i></button>
             <button class="logout-btn btn btn-secondary btn-sm no-print" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
 
-            <!-- Panneau de notifications -->
             <div class="notif-panel no-print" id="notifPanel"></div>
 
-            <!-- ============================================================ -->
-            <!-- 5.3 SIDEBAR / MENU DE NAVIGATION                              -->
-            <!-- ============================================================ -->
             <aside class="sidebar no-print" id="sidebar">
                 <div class="sidebar-header">
                     <div class="logo">
@@ -1816,12 +1992,8 @@
                 </nav>
             </aside>
 
-            <!-- ============================================================ -->
-            <!-- 5.4 CONTENU PRINCIPAL                                         -->
-            <!-- ============================================================ -->
             <main class="main-content">
 
-                <!-- Message de bienvenue -->
                 <div id="welcomeMessage" class="no-print" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 16px; padding: 16px 20px; margin-bottom: 20px; color: white;">
                     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
                         <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;"><i class="fas fa-user-circle"></i></div>
@@ -1833,7 +2005,6 @@
                     </div>
                 </div>
 
-                <!-- Filtres globaux -->
                 <div class="filters-bar no-print">
                     <div class="filter-group">
                         <select id="globalYear" class="filter-select" onchange="applyGlobalFilters()"></select>
@@ -1849,9 +2020,7 @@
                     <input type="text" id="globalSearch" class="search-box" placeholder="Rechercher une transaction..." oninput="applyGlobalFilters()" />
                 </div>
 
-                <!-- ============================================================ -->
-                <!-- SECTION 1: DASHBOARD                                        -->
-                <!-- ============================================================ -->
+                <!-- SECTION 1: DASHBOARD -->
                 <section id="dashboard" class="section active">
                     <div class="page-header">
                         <div class="page-title">
@@ -1887,9 +2056,7 @@
                     </div>
                 </section>
 
-                <!-- ============================================================ -->
-                <!-- SECTION 2: TRANSACTIONS                                     -->
-                <!-- ============================================================ -->
+                <!-- SECTION 2: TRANSACTIONS -->
                 <section id="transactions" class="section">
                     <div class="page-header">
                         <div class="page-title"><h2>Transactions</h2><p>Gérez vos revenus, dépenses et épargne</p></div>
@@ -1915,9 +2082,7 @@
                     </div>
                 </section>
 
-                <!-- ============================================================ -->
-                <!-- SECTION 3: BUDGETS                                          -->
-                <!-- ============================================================ -->
+                <!-- SECTION 3: BUDGETS -->
                 <section id="budgets" class="section">
                     <div class="page-header">
                         <div class="page-title"><h2>Budgets Mensuels</h2><p>Contrôlez vos dépenses par catégorie</p></div>
@@ -1936,9 +2101,7 @@
                     </div>
                 </section>
 
-                <!-- ============================================================ -->
-                <!-- SECTION 4: OBJECTIFS                                        -->
-                <!-- ============================================================ -->
+                <!-- SECTION 4: OBJECTIFS -->
                 <section id="objectifs" class="section">
                     <div class="page-header">
                         <div class="page-title"><h2>Objectifs d'Épargne</h2><p>Suivez la progression de vos projets</p></div>
@@ -1950,9 +2113,7 @@
                     <div class="objectifs-grid" id="objectifsGrid"></div>
                 </section>
 
-                <!-- ============================================================ -->
-                <!-- SECTION 5: CALENDRIER                                       -->
-                <!-- ============================================================ -->
+                <!-- SECTION 5: CALENDRIER -->
                 <section id="calendrier" class="section">
                     <div class="page-header">
                         <div class="page-title"><h2>Calendrier Financier</h2><p>Visualisation des transactions</p></div>
@@ -1960,9 +2121,7 @@
                     <div class="chart-card" id="calendarView"></div>
                 </section>
 
-                <!-- ============================================================ -->
-                <!-- SECTION 6: RAPPORTS                                         -->
-                <!-- ============================================================ -->
+                <!-- SECTION 6: RAPPORTS -->
                 <section id="rapports" class="section">
                     <div class="page-header">
                         <div class="page-title"><h2>Rapports Financiers</h2><p>Analyses détaillées</p></div>
@@ -1971,9 +2130,7 @@
                     <div id="reportContent"></div>
                 </section>
 
-                <!-- ============================================================ -->
-                <!-- SECTION 7: ANALYSE                                          -->
-                <!-- ============================================================ -->
+                <!-- SECTION 7: ANALYSE -->
                 <section id="analyse" class="section">
                     <div class="page-header">
                         <div class="page-title"><h2>Analyse Financière</h2><p>Indicateurs avancés</p></div>
@@ -1991,14 +2148,11 @@
                     </div>
                 </section>
 
-                <!-- ============================================================ -->
-                <!-- SECTION 8: PARAMETRES                                       -->
-                <!-- ============================================================ -->
+                <!-- SECTION 8: PARAMETRES -->
                 <section id="parametres" class="section">
                     <div class="page-header">
                         <div class="page-title"><h2>Paramètres</h2><p>Personnalisation et transactions récurrentes</p></div>
                     </div>
-                    <!-- Configuration generale -->
                     <div class="table-card">
                         <div class="table-header"><div class="table-title">Configuration</div></div>
                         <div class="form-grid">
@@ -2021,7 +2175,6 @@
                         </div>
                     </div>
 
-                    <!-- Réinitialiser les exemples -->
                     <div class="table-card">
                         <div class="table-header">
                             <div class="table-title">📚 Réinitialiser les exemples</div>
@@ -2034,7 +2187,6 @@
                         </button>
                     </div>
 
-                    <!-- Transactions recurrentes -->
                     <div class="table-card">
                         <div class="table-header">
                             <div class="table-title">Transactions récurrentes mensuelles</div>
@@ -2055,14 +2207,11 @@
                     </div>
                 </section>
 
-                <!-- ============================================================ -->
-                <!-- SECTION 9: ADMIN                                            -->
-                <!-- ============================================================ -->
+                <!-- SECTION 9: ADMIN -->
                 <section id="admin" class="section">
                     <div class="page-header">
                         <div class="page-title"><h2><i class="fas fa-shield-alt"></i> Administration</h2><p>Gestion des utilisateurs et activations</p></div>
                     </div>
-
                     <div class="table-card">
                         <div class="table-header">
                             <div class="table-title">Demandes d'activation en attente</div>
@@ -2070,12 +2219,10 @@
                         </div>
                         <div id="pendingRequestsList" style="padding: 6px 0;"></div>
                     </div>
-
                     <div class="table-card">
                         <div class="table-header"><div class="table-title">Utilisateurs activés</div></div>
                         <div id="activatedUsersList" style="padding: 6px 0;"></div>
                     </div>
-
                     <div class="table-card">
                         <div class="table-header"><div class="table-title">Activation manuelle</div></div>
                         <div class="form-group" style="margin-bottom: 12px;">
@@ -2087,8 +2234,6 @@
                             <div id="manualActivationFeedback" style="font-size: 12px; margin-top: 6px;"></div>
                         </div>
                     </div>
-
-                    <!-- Aide permissions -->
                     <div class="table-card" style="background: rgba(245, 158, 11, 0.08); border: 1px solid var(--warning);">
                         <div style="display: flex; align-items: flex-start; gap: 12px; flex-direction: column;">
                             <div style="display: flex; align-items: center; gap: 10px;">
@@ -2126,7 +2271,7 @@ service cloud.firestore {
         </div>
 
         <!-- ============================================================ -->
-        <!-- 5.5 MODALS (FENETRES POPUP)                                   -->
+        <!-- 5.5 MODALS                                                   -->
         <!-- ============================================================ -->
 
         <!-- Modal Transaction -->
@@ -2343,7 +2488,7 @@ service cloud.firestore {
         </div>
 
         <!-- ============================================================ -->
-        <!-- 5.6 FÉLICITATIONS MODAL                                      -->
+        <!-- 5.6 FÉLICITATIONS MODAL (CORRIGÉE)                           -->
         <!-- ============================================================ -->
         <div class="celebrate-overlay" id="celebrateModal">
             <div class="celebrate-card" id="celebrateCard">
@@ -2381,7 +2526,7 @@ service cloud.firestore {
     </div>
 
     <!-- ============================================================ -->
-    <!-- 6. JAVASCRIPT COMPLET                                        -->
+    <!-- 6. JAVASCRIPT COMPLET (CORRIGÉ)                              -->
     <!-- ============================================================ -->
     <script>
         // =============================================================
@@ -2415,7 +2560,7 @@ service cloud.firestore {
         const RIB = "230 810 27083002111006100 90";
 
         // =============================================================
-        // 6.4 DONNEES PAR DEFAUT (EXEMPLES)
+        // 6.4 DONNEES PAR DEFAUT
         // =============================================================
         const DEFAULT_TRANSACTIONS = [
             { id: 1, date: "2026-05-01", mois: "mai-2026", annee: 2026, type: "Revenu", description: "Salaire mai",
@@ -2624,7 +2769,6 @@ service cloud.firestore {
                 categories = doc.data().categories || { ...DEFAULT_CATEGORIES };
                 recurrentes = doc.data().recurrentes || [];
             } else {
-                // Nouvel utilisateur : données par défaut avec exemples
                 transactions = [...DEFAULT_TRANSACTIONS];
                 objectifs = [...DEFAULT_OBJECTIFS];
                 budgets = [...DEFAULT_BUDGETS];
@@ -2767,6 +2911,9 @@ service cloud.firestore {
             confirmError.classList.toggle('show', mismatch);
         }
 
+        // =============================================================
+        // 6.12 INSCRIPTION AVEC FÉLICITATIONS (CORRIGÉE)
+        // =============================================================
         async function registerWithEmail(event) {
             const firstName = document.getElementById('registerFirstName').value.trim();
             const lastName = document.getElementById('registerLastName').value.trim();
@@ -2811,6 +2958,7 @@ service cloud.firestore {
                     requestDate: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
+                // Afficher la modale de félicitations
                 showCelebrationModal(firstName, lastName, email);
 
             } catch (error) {
@@ -2825,46 +2973,55 @@ service cloud.firestore {
             }
         }
 
-      function showCelebrationModal(firstName, lastName, email) {
-    const modal = document.getElementById('celebrateModal');
-    if (!modal) {
-        console.error('Modale de célébration non trouvée');
-        // Fallback : rediriger directement
-        setTimeout(() => location.reload(), 2000);
-        return;
-    }
+        // =============================================================
+        // 6.13 MODALE DE FÉLICITATIONS (CORRIGÉE)
+        // =============================================================
+        function showCelebrationModal(firstName, lastName, email) {
+            const modal = document.getElementById('celebrateModal');
+            if (!modal) {
+                console.error('Modale de célébration non trouvée');
+                // Fallback : rediriger après 2 secondes
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+                return;
+            }
 
-    const nameEl = document.getElementById('celebrateName');
-    const emailEl = document.getElementById('celebrateEmail');
-    const fullNameEl = document.getElementById('celebrateFullName');
-    const dateEl = document.getElementById('celebrateDate');
+            const nameEl = document.getElementById('celebrateName');
+            const emailEl = document.getElementById('celebrateEmail');
+            const fullNameEl = document.getElementById('celebrateFullName');
+            const dateEl = document.getElementById('celebrateDate');
 
-    const fullName = `${firstName} ${lastName}`;
-    
-    if (nameEl) nameEl.textContent = `👋 ${fullName}`;
-    if (emailEl) emailEl.textContent = email;
-    if (fullNameEl) fullNameEl.textContent = fullName;
-    if (dateEl) {
-        dateEl.textContent = new Date().toLocaleDateString('fr-FR', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    }
+            const fullName = `${firstName} ${lastName}`;
 
-    generateConfetti();
-    modal.classList.add('active');
+            if (nameEl) nameEl.textContent = `👋 ${fullName}`;
+            if (emailEl) emailEl.textContent = email;
+            if (fullNameEl) fullNameEl.textContent = fullName;
+            if (dateEl) {
+                dateEl.textContent = new Date().toLocaleDateString('fr-FR', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
 
-    if (celebrateTimer) clearTimeout(celebrateTimer);
-    celebrateTimer = setTimeout(() => {
-        closeCelebrateAndGo();
-    }, 6000);
-}
+            // Générer des confettis
+            generateConfetti();
+
+            modal.classList.add('active');
+
+            // Auto-redirection après 6 secondes
+            if (celebrateTimer) clearTimeout(celebrateTimer);
+            celebrateTimer = setTimeout(() => {
+                closeCelebrateAndGo();
+            }, 6000);
+        }
 
         function generateConfetti() {
             const container = document.getElementById('celebrateCard');
+            if (!container) return;
             container.querySelectorAll('.celebrate-confetti').forEach(el => el.remove());
 
             const colors = ['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#ef4444', '#8b5cf6', '#f472b6'];
@@ -2898,10 +3055,14 @@ service cloud.firestore {
         function closeCelebrateAndGo() {
             if (celebrateTimer) { clearTimeout(celebrateTimer);
                 celebrateTimer = null; }
-            document.getElementById('celebrateModal').classList.remove('active');
+            const modal = document.getElementById('celebrateModal');
+            if (modal) modal.classList.remove('active');
             location.reload();
         }
 
+        // =============================================================
+        // 6.14 RÉINITIALISATION MOT DE PASSE
+        // =============================================================
         async function resetPassword(event) {
             const email = document.getElementById('resetEmail').value.trim();
             const errorDiv = document.getElementById('loginErrorMessage');
@@ -2979,7 +3140,7 @@ service cloud.firestore {
         }
 
         // =============================================================
-        // 6.12 FILTRES
+        // 6.15 FILTRES
         // =============================================================
         function getFilteredTransactions() {
             let filtered = [...transactions];
@@ -3059,7 +3220,7 @@ service cloud.firestore {
         }
 
         // =============================================================
-        // 6.13 NAVIGATION UI
+        // 6.16 NAVIGATION UI
         // =============================================================
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
 
@@ -3088,7 +3249,7 @@ service cloud.firestore {
         }
 
         // =============================================================
-        // 6.14 DASHBOARD
+        // 6.17 DASHBOARD
         // =============================================================
         function renderDashboard() {
             const filtered = getFilteredTransactions();
@@ -3166,7 +3327,7 @@ service cloud.firestore {
         }
 
         // =============================================================
-        // 6.15 TRANSACTIONS
+        // 6.18 TRANSACTIONS
         // =============================================================
         function renderTransactions() {
             const filtered = getFilteredTransactions();
@@ -3275,7 +3436,7 @@ service cloud.firestore {
         }
 
         // =============================================================
-        // 6.16 BUDGETS
+        // 6.19 BUDGETS
         // =============================================================
         function renderBudgets() {
             const filtered = getFilteredTransactions().filter(t => t.type === 'Depense');
@@ -3366,7 +3527,7 @@ service cloud.firestore {
         }
 
         // =============================================================
-        // 6.17 OBJECTIFS
+        // 6.20 OBJECTIFS
         // =============================================================
         function renderObjectifs() {
             const epargneTxs = transactions.filter(t => t.type === 'Epargne');
@@ -3508,7 +3669,7 @@ service cloud.firestore {
         }
 
         // =============================================================
-        // 6.18 CALENDRIER
+        // 6.21 CALENDRIER
         // =============================================================
         function renderCalendar() {
             const filtered = getFilteredTransactions();
@@ -3548,7 +3709,7 @@ service cloud.firestore {
         }
 
         // =============================================================
-        // 6.19 RAPPORTS
+        // 6.22 RAPPORTS
         // =============================================================
         function renderReports() {
             const filtered = getFilteredTransactions();
@@ -3604,7 +3765,7 @@ service cloud.firestore {
         }
 
         // =============================================================
-        // 6.20 ANALYSE AVANCEE
+        // 6.23 ANALYSE AVANCEE
         // =============================================================
         function renderAdvancedAnalysis() {
             const filtered = getFilteredTransactions();
@@ -3651,7 +3812,7 @@ service cloud.firestore {
         }
 
         // =============================================================
-        // 6.21 PARAMETRES
+        // 6.24 PARAMETRES
         // =============================================================
         function renderParametres() {
             const tbody = document.getElementById('recurrentesTable');
@@ -3679,7 +3840,7 @@ service cloud.firestore {
         }
 
         // =============================================================
-        // 6.22 TRANSACTIONS RECURRENTES
+        // 6.25 TRANSACTIONS RECURRENTES
         // =============================================================
         function openRecurrenteModal() {
             document.getElementById('recurrenteModal').classList.add('active');
@@ -3809,7 +3970,7 @@ service cloud.firestore {
         }
 
         // =============================================================
-        // 6.23 ADMIN
+        // 6.26 ADMIN
         // =============================================================
         function formatFirestoreDate(value) {
             if (!value) return '-';
@@ -4025,7 +4186,7 @@ service cloud.firestore {
             showNotification('Listes rafraîchies', 'success'); }
 
         // =============================================================
-        // 6.24 EXPORTS
+        // 6.27 EXPORTS
         // =============================================================
         function csvField(value) {
             let str = String(value ?? '');
@@ -4075,7 +4236,7 @@ service cloud.firestore {
         }
 
         // =============================================================
-        // 6.25 GUIDE & UTILITAIRES
+        // 6.28 GUIDE & UTILITAIRES
         // =============================================================
         function openWelcomeGuide() { document.getElementById('welcomeGuideModal').classList.add('active'); }
 
@@ -4106,7 +4267,7 @@ service cloud.firestore {
         }
 
         // =============================================================
-        // 6.26 ACTIVATION COMPTE
+        // 6.29 ACTIVATION COMPTE
         // =============================================================
         async function isAccountActivated() {
             if (!auth.currentUser) return false;
@@ -4139,7 +4300,7 @@ service cloud.firestore {
         }
 
         // =============================================================
-        // 6.27 INITIALISATION
+        // 6.30 INITIALISATION
         // =============================================================
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('loginEmail')?.addEventListener('keydown', function(e) { if (e.key ===
