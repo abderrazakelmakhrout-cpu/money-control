@@ -2008,7 +2008,7 @@
                 </section>
 
                 <!-- ============================================================ -->
-                <!-- SECTION 9: ADMIN (AMÉLIORÉ)                                  -->
+                <!-- SECTION 9: ADMIN (CORRIGÉ)                                   -->
                 <!-- ============================================================ -->
                 <section id="admin" class="section">
                     <div class="page-header">
@@ -2040,6 +2040,39 @@
                                 <button class="btn btn-primary" onclick="manualActivateUser()"><i class="fas fa-check-circle"></i> Activer</button>
                             </div>
                             <div id="manualActivationFeedback" style="font-size: 12px; margin-top: 6px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Aide pour les permissions -->
+                    <div class="table-card" style="background: rgba(245, 158, 11, 0.08); border: 1px solid var(--warning);">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <i class="fas fa-info-circle" style="color: var(--warning); font-size: 20px;"></i>
+                            <div>
+                                <strong style="color: var(--warning);">Problème de permissions ?</strong>
+                                <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
+                                    Si vous voyez l'erreur <strong>"Missing or insufficient permissions"</strong>, cela signifie que les règles de sécurité Firebase sont trop restrictives.
+                                    <br />Pour activer des comptes, l'administrateur doit avoir accès en écriture à la collection <code>users</code> et <code>activation_requests</code>.
+                                    <br />Configurez vos règles dans la console Firebase comme suit :
+                                </p>
+                                <pre style="background: var(--bg); padding: 12px; border-radius: 8px; font-size: 12px; overflow-x: auto; margin-top: 8px; border: 1px solid var(--border);">
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Permissions pour les administrateurs (à adapter)
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId || request.auth.token.email in ['abderrazak.elmakhrout@gmail.com'];
+    }
+    match /activation_requests/{docId} {
+      allow read, write: if request.auth != null && request.auth.token.email in ['abderrazak.elmakhrout@gmail.com'];
+    }
+    // Autres règles...
+  }
+}
+</pre>
+                                <button class="btn btn-primary btn-sm" onclick="window.open('https://firebase.google.com/docs/firestore/security/get-started', '_blank')" style="margin-top: 8px;">
+                                    <i class="fas fa-external-link-alt"></i> Voir la documentation
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -2303,7 +2336,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- 6. JAVASCRIPT COMPLET (AVEC ADMIN AMÉLIORÉ)                  -->
+    <!-- 6. JAVASCRIPT COMPLET (AVEC CORRECTIONS ADMIN)               -->
     <!-- ============================================================ -->
     <script>
         // =============================================================
@@ -3679,7 +3712,7 @@
         }
 
         // =============================================================
-        // 6.21 ADMIN (AMÉLIORÉ)
+        // 6.21 ADMIN (CORRIGÉ AVEC GESTION D'ERREURS)
         // =============================================================
         function formatFirestoreDate(value) {
             if (!value) return '-';
@@ -3729,7 +3762,13 @@
                 return true;
             } catch (error) {
                 console.error('Erreur activation:', error);
-                showNotification("Erreur lors de l'activation : " + (error.message || 'inconnue'), 'danger');
+                let msg = "Erreur lors de l'activation : ";
+                if (error.code === 'permission-denied' || error.message.includes('permission')) {
+                    msg += "Permissions insuffisantes. Vérifiez les règles de sécurité Firebase.";
+                } else {
+                    msg += error.message || 'inconnue';
+                }
+                showNotification(msg, 'danger');
                 return false;
             }
         }
@@ -3786,7 +3825,6 @@
                     return;
                 }
 
-                // Chercher une demande en attente
                 const pendingSnap = await db.collection('activation_requests').where('userId', '==', userId).where(
                     'status', '==', 'pending').get();
                 let requestId = null;
@@ -3800,11 +3838,15 @@
                     feedback.innerHTML = `<span style="color:var(--success);">✅ Utilisateur "${escapeHtml(email)}" activé avec succès.</span>`;
                     renderAdmin();
                 } else {
-                    feedback.innerHTML = `<span style="color:var(--danger);">❌ Échec de l'activation. Vérifiez les logs.</span>`;
+                    feedback.innerHTML = `<span style="color:var(--danger);">❌ Échec de l'activation. Vérifiez les permissions.</span>`;
                 }
             } catch (error) {
                 console.error(error);
-                feedback.innerHTML = `<span style="color:var(--danger);">Erreur : ${escapeHtml(error.message || 'inconnue')}</span>`;
+                let msg = error.message || 'inconnue';
+                if (error.code === 'permission-denied') {
+                    msg = 'Permissions insuffisantes. Vérifiez les règles de sécurité Firebase.';
+                }
+                feedback.innerHTML = `<span style="color:var(--danger);">Erreur : ${escapeHtml(msg)}</span>`;
             }
         }
 
@@ -3871,8 +3913,12 @@
                 document.getElementById('pendingCount').textContent = pendingUsers.length;
             } catch (error) {
                 console.error('Erreur chargement admin:', error);
+                let msg = error.message || 'inconnue';
+                if (error.code === 'permission-denied') {
+                    msg = 'Permissions insuffisantes. Vérifiez les règles de sécurité Firebase.';
+                }
                 listEl.innerHTML =
-                    `<p style="text-align:center;color:var(--danger);padding:30px;">Erreur de chargement des données : ${escapeHtml(error.message || 'inconnue')}</p>`;
+                    `<p style="text-align:center;color:var(--danger);padding:30px;">Erreur de chargement : ${escapeHtml(msg)}</p>`;
                 actEl.innerHTML = '';
             }
         }
